@@ -1,35 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.BalanceResiduals;
+﻿using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.StatusType;
 using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
+using System.Linq;
 
 namespace VRdkHRMsysBLL.Services
 {
     public class VacationRequestService : IVacationRequestService
     {
+        private const string emptyValue = "None";
         private readonly IVacationRequestRepository _vacationRepository;
-        private readonly IVacationTypeRepository _vacationTypeRepository;
-        private readonly IRequestStatusRepository _requestStatusRepository;
         private readonly IMapHelper _mapHelper;
 
         public VacationRequestService(IVacationRequestRepository vacationRepository,
-                                      IVacationTypeRepository vacationTypes,
-                                      IRequestStatusRepository requestStatusRepository,
                                       IMapHelper mapHelper)
         {
             _vacationRepository = vacationRepository;
-            _vacationTypeRepository = vacationTypes;
-            _requestStatusRepository = requestStatusRepository;
             _mapHelper = mapHelper;
         }
       
@@ -45,34 +35,53 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<VacationRequest, VacationRequestDTO>(request);
         }
 
-        public async Task<VacationRequestDTO[]> GetProccessingVacationRequestsAsync(string organisationId, string teamId)
+        public async Task<VacationRequestViewDTO[]> GetProccessingVacationRequestsAsync(string organisationId, string teamId)
         {
-            var reqs =  await _vacationRepository.GetAsync(req
-                                                         => (req.Employee.TeamId == teamId
-                                                          || req.RequestStatus.Name.Equals(RequestStatusEnum.Proccessing.ToString()))
-                                                          && req.Employee.Organisation.Equals(organisationId));
-            return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(reqs);
+            var reqs = await _vacationRepository.GetWithEmployeeAsync(req
+                                                        => (req.Employee.TeamId == teamId
+                                                         || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                                                         && req.Employee.OrganisationId.Equals(organisationId));
+            var requests = reqs != null ? reqs.Select(r=> new VacationRequestViewDTO()
+            {
+                EmployeeId = r.EmployeeId,
+                VacationId =r.VacationId,
+                EmployeeFullName = $"{r.Employee.FirstName} {r.Employee.LastName}",
+                BeginDate = r.BeginDate,
+                EndDate = r.EndDate,
+                Duration = r.Duration,
+                RequestStatus = r.RequestStatus,
+                TeamName = r.Employee.Team != null ? r.Employee.Team.Name : emptyValue,
+                VacationType = r.VacationType.Replace('_', ' ')
+            }
+            ).ToArray() : new VacationRequestViewDTO[] { };
+
+            return requests;
         }
 
-        public async Task<VacationTypeDTO[]> GetVacationTypesAsync()
+        public async Task<VacationRequestViewDTO[]> GetPendingVacationRequestsAsync(string organisationId, string teamId)
         {
-            var types = await _vacationTypeRepository.GetAsync();
-            return _mapHelper.MapCollection<VacationType, VacationTypeDTO>(types);
+            var reqs = await _vacationRepository.GetWithEmployeeAsync(req
+                                                         => req.Employee.TeamId == teamId
+                                                         && !req.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString())
+                                                         && req.Employee.OrganisationId.Equals(organisationId));
+            var requests = reqs != null ? reqs.Select(r => new VacationRequestViewDTO()
+            {
+                EmployeeId = r.EmployeeId,
+                VacationId = r.VacationId,
+                EmployeeFullName = $"{r.Employee.FirstName} {r.Employee.LastName}",
+                BeginDate = r.BeginDate,
+                EndDate = r.EndDate,
+                Duration = r.Duration,
+                RequestStatus = r.RequestStatus,
+                TeamName = r.Employee.Team != null ? r.Employee.Team.Name : emptyValue,
+                VacationType = r.VacationType.Replace('_', ' ')
+            }
+            ).ToArray() : new VacationRequestViewDTO[] { };
+
+            return requests;
         }
 
-        public async Task<RequestStatusDTO[]> GetRequestStatusesAsync()
-        {
-            var statuses = await _requestStatusRepository.GetAsync();
-            return _mapHelper.MapCollection<RequestStatus, RequestStatusDTO>(statuses);
-        }
-
-        public async Task<RequestStatusDTO> GetRequestStatusByNameAsync(string name)
-        {
-            var status = await _requestStatusRepository.GetByNameAsync(name);
-            return _mapHelper.Map<RequestStatus, RequestStatusDTO>(status);
-        }
-
-        public async Task CreateVacationRequestAsync(VacationRequestDTO request)
+        public async Task CreateAsync(VacationRequestDTO request)
         {
             var vacationRequest = _mapHelper.Map<VacationRequestDTO, VacationRequest>(request);
             await _vacationRepository.CreateAsync(vacationRequest);
@@ -85,6 +94,30 @@ namespace VRdkHRMsysBLL.Services
             {
                 _mapHelper.MapChanges(newRequest, currentRequest);
                 await _vacationRepository.UpdateAsync();
+            }
+        }
+
+        private int SortByProccesingStatus(string status)
+        {
+            if (status.Equals(RequestStatusEnum.Proccessing))
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+        private int SortByPendingStatus(string status)
+        {
+            if (status.Equals(RequestStatusEnum.Pending))
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using VRdkHRMsysDAL.Entities;
 
 namespace VRdkHRMsysDAL.Interfaces
@@ -6,5 +8,6 @@ namespace VRdkHRMsysDAL.Interfaces
     public interface IVacationRequestRepository : IRepository<VacationRequest>
     {
         Task<VacationRequest> GetByIdWithEmployeeWithTeamAsync(string id);
+        Task<VacationRequest[]> GetWithEmployeeAsync(Expression<Func<VacationRequest, bool>> condition = null);
     }
 }

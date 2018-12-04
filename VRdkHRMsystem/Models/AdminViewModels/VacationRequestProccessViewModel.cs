@@ -11,7 +11,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels
         public string EmployeeFullName { get; set; }
         public string TeamleadFullName { get; set; }
         public string TeamName { get; set; }
-        public string VacationTypeId { get; set; }
         public string VacationType { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }

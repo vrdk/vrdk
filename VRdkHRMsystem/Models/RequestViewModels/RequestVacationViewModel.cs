@@ -11,7 +11,7 @@ namespace VRdkHRMsystem.Models.RequestViewModels
     {        
         public string EmployeeId { get; set; }
         [Required]
-        public string VacationTypeId { get; set; }
+        public string VacationType { get; set; }
         public IEnumerable<SelectListItem> VacationTypes { get; set; }
         [Required]
         [DataType(DataType.Date)]

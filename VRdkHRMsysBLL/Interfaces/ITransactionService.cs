@@ -6,6 +6,5 @@ namespace VRdkHRMsysBLL.Interfaces
     public interface ITransactionService
     {
         Task CreateAsync(TransactionDTO transaction);
-        Task<TransactionTypeDTO[]> GetTransactionTypesAsync();
     }
 }

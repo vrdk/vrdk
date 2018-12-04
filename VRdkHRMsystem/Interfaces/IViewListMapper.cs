@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using VRdkHRMsysBLL.DTOs.Post;
-using VRdkHRMsysBLL.DTOs.Role;
-using VRdkHRMsysBLL.DTOs.Vacation;
 
 namespace VRdkHRMsystem.Interfaces
 {
     public interface IViewListMapper
     {
-        SelectListItem[] CreateVacationTypesList(VacationTypeDTO[] types);
+        SelectListItem[] CreateVacationTypesList();
         SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts);
-        SelectListItem[] CreateRolesList(RoleDTO[] roles);
+        SelectListItem[] CreateRolesList();
     }
 }

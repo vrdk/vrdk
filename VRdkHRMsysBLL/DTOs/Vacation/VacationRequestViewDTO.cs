@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace VRdkHRMsysBLL.DTOs.Vacation
 {
@@ -14,6 +12,6 @@ namespace VRdkHRMsysBLL.DTOs.Vacation
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
-        public string VacationState { get; set; }
+        public string RequestStatus { get; set; }
     }
 }

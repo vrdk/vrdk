@@ -16,13 +16,10 @@ namespace VRdkHRMsysDAL.Contexts
         public virtual DbSet<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
         public virtual DbSet<Organisation> Organisation { get; set; }
         public virtual DbSet<Post> Post { get; set; }
-        public virtual DbSet<RequestStatus> RequestStatus { get; set; }
         public virtual DbSet<SickLeaveRequest> SickLeaveRequest { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
-        public virtual DbSet<TransactionType> TransactionType { get; set; }
         public virtual DbSet<VacationRequest> VacationRequest { get; set; }
-        public virtual DbSet<VacationType> VacationType { get; set; }
         public virtual DbSet<WorkDay> WorkDay { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -335,21 +332,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__post__organisati__398D8EEE");
             });
-
-            modelBuilder.Entity<RequestStatus>(entity =>
-            {
-                entity.ToTable("request_status");
-
-                entity.Property(e => e.RequestStatusId)
-                    .HasColumnName("request_status_id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(512);
-            });
-
             modelBuilder.Entity<SickLeaveRequest>(entity =>
             {
                 entity.HasKey(e => e.SickLeaveId);
@@ -389,22 +371,16 @@ namespace VRdkHRMsysDAL.Contexts
 
                 entity.Property(e => e.ProccessedbyId).HasColumnName("processedby_id").HasMaxLength(450); ;
 
-                entity.Property(e => e.RequestStatusId)
+                entity.Property(e => e.RequestStatus)
                     .IsRequired()
-                    .HasColumnName("request_status_id")
-                    .HasMaxLength(450);
+                    .HasColumnName("request_status")
+                    .HasMaxLength(512);
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.SickLeaveRequest)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__sick_leav__emplo__52593CB8");
-
-                entity.HasOne(d => d.RequestStatus)
-                    .WithMany(p => p.SickLeaveRequest)
-                    .HasForeignKey(d => d.RequestStatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__sick_leav__reque__534D60F1");
             });
 
             modelBuilder.Entity<Team>(entity =>
@@ -461,34 +437,15 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("transaction_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.TransactionTypeId)
-                    .HasColumnName("transaction_type_id")
-                    .HasMaxLength(450);
+                entity.Property(e => e.TransactionType)
+                    .HasColumnName("transaction_type")
+                    .HasMaxLength(512);
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Transaction)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__transacti__emplo__47DBAE45");
-
-                entity.HasOne(d => d.TransactionType)
-                    .WithMany(p => p.Transaction)
-                    .HasForeignKey(d => d.TransactionTypeId)
-                    .HasConstraintName("FK__transacti__trans__48CFD27E");
-            });
-
-            modelBuilder.Entity<TransactionType>(entity =>
-            {
-                entity.ToTable("transaction_type");
-
-                entity.Property(e => e.TransactionTypeId)
-                    .HasColumnName("transaction_type_id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(512);
+                    .HasConstraintName("FK__transacti__emplo__47DBAE45");       
             });
 
             modelBuilder.Entity<VacationRequest>(entity =>
@@ -535,45 +492,20 @@ namespace VRdkHRMsysDAL.Contexts
 
                 entity.Property(e => e.ProccessedbyId).HasColumnName("proccessedby_id").HasMaxLength(450);
 
-                entity.Property(e => e.RequestStatusId)
+                entity.Property(e => e.RequestStatus)
                     .IsRequired()
-                    .HasColumnName("request_status_id")
-                    .HasMaxLength(450);
+                    .HasColumnName("request_status")
+                    .HasMaxLength(512);
 
-                entity.Property(e => e.VacationTypeId)
-                    .HasColumnName("vacation_type_id")
-                    .HasMaxLength(450);
+                entity.Property(e => e.VacationType)
+                    .HasColumnName("vacation_type")
+                    .HasMaxLength(512);
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.VacationRequest)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__vacation___emplo__4D94879B");
-
-                entity.HasOne(d => d.RequestStatus)
-                    .WithMany(p => p.VacationRequest)
-                    .HasForeignKey(d => d.RequestStatusId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__vacation___reque__4E88ABD4");
-
-                entity.HasOne(d => d.VacationType)
-                    .WithMany(p => p.VacationRequest)
-                    .HasForeignKey(d => d.VacationTypeId)
-                    .HasConstraintName("FK__vacation___vacat__4F7CD00D");
-            });
-
-            modelBuilder.Entity<VacationType>(entity =>
-            {
-                entity.ToTable("vacation_type");
-
-                entity.Property(e => e.VacationTypeId)
-                    .HasColumnName("vacation_type_id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(512);
             });
 
             modelBuilder.Entity<WorkDay>(entity =>

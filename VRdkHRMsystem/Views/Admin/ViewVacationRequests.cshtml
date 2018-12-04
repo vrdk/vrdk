@@ -11,33 +11,27 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
+        <tr>              
                 <th>
-                    @Html.DisplayNameFor(model => model.EmployeeId)
+                    Name
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.VacationId)
+                    Team
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.EmployeeFullName)
+                    Vacation type
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TeamName)
+                    Begin Date
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.VacationType)
+                    End Date
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.BeginDate)
+                    Duration
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.EndDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Duration)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.VacationState)
+                    Request Status
                 </th>
             <th></th>
         </tr>
@@ -45,12 +39,6 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmployeeId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VacationId)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.EmployeeFullName)
             </td>
@@ -70,7 +58,7 @@
                 @Html.DisplayFor(modelItem => item.Duration)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.VacationState)
+                @Html.DisplayFor(modelItem => item.RequestStatus)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |

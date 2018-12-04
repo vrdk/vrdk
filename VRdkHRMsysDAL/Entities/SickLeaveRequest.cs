@@ -8,7 +8,7 @@ namespace VRdkHRMsysDAL.Entities
         public string SickLeaveId { get; set; }
         public string EmployeeId { get; set; }
         public string TransactionId { get; set; }
-        public string RequestStatusId { get; set; }
+        public string RequestStatus { get; set; }
         public DateTime BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
         public string Comment { get; set; }
@@ -18,6 +18,5 @@ namespace VRdkHRMsysDAL.Entities
         public DateTime CloseDate { get; set; }
 
         public Employee Employee { get; set; }
-        public RequestStatus RequestStatus { get; set; }
     }   
 }

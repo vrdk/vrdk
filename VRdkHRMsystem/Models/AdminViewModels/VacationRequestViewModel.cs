@@ -15,6 +15,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
-        public string VacationState { get; set; }
+        public string RequestStatus { get; set; }
     }
 }

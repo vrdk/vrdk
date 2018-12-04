@@ -4,6 +4,7 @@ using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
@@ -67,14 +68,14 @@ namespace VRdkHRMsysBLL.Services
                 {
                     ResidualId = Guid.NewGuid().ToString(),
                     EmployeeId = employee.EmployeeId,
-                    Name = "UnpaidVacation",
+                    Name = ResidualTypeEnum.Unpaid_vacation.ToString(),
                     ResidualBalance = 28
                 },
                  new BalanceResidualsDTO
                 {
                     ResidualId = Guid.NewGuid().ToString(),
                     EmployeeId = employee.EmployeeId,
-                    Name = "PaidVacation",
+                    Name = ResidualTypeEnum.Paid_vacation.ToString(),
                     ResidualBalance = 28
                 }
             };

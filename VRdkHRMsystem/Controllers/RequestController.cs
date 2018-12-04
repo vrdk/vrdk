@@ -47,8 +47,7 @@ namespace VRdkHRMsystem.Controllers
                 model.EmployeeId = employee.EmployeeId;
             }
 
-            var types = await _vacationRequestService.GetVacationTypesAsync();
-            model.VacationTypes = _listMapper.CreateVacationTypesList(types);
+            model.VacationTypes = _listMapper.CreateVacationTypesList();
 
             return View(model);
         }
@@ -59,21 +58,18 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
             if (employee != null)
             {
-                var statuses = await _vacationRequestService.GetRequestStatusesAsync();
-                var vacationTypes = await _vacationRequestService.GetVacationTypesAsync();
-
                 var vacationRequest = _mapHelper.Map<RequestVacationViewModel, VacationRequestDTO>(model);
                 if (employee.TeamId != null)
                 {
-                    vacationRequest.RequestStatusId = statuses.FirstOrDefault(status => status.Name.Equals(RequestStatusEnum.Pending.ToString())).RequestStatusId;
+                    vacationRequest.RequestStatus = RequestStatusEnum.Pending.ToString();
                 }
                 else
                 {
-                    vacationRequest.RequestStatusId = statuses.FirstOrDefault(status => status.Name.Equals(RequestStatusEnum.Proccessing.ToString())).RequestStatusId;
+                    vacationRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
                 }
                 vacationRequest.VacationId = Guid.NewGuid().ToString();
                 vacationRequest.CreateDate = DateTime.UtcNow.Date;
-                await _vacationRequestService.CreateVacationRequestAsync(vacationRequest);
+                await _vacationRequestService.CreateAsync(vacationRequest);
             }
 
             return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });

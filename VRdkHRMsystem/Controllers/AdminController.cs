@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Role;
 using VRdkHRMsysBLL.DTOs.Transaction;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
@@ -99,24 +97,11 @@ namespace VRdkHRMsystem.Controllers
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
             var posts = await _postService.GetPostsByOrganisationIdAsync(user.OrganisationId);
-            var roles = new RoleDTO[] {
-                new RoleDTO
-                {
-                    Name=RoleEnum.Administrator.ToString()
-                },
-                new RoleDTO
-                {
-                    Name=RoleEnum.Teamlead.ToString()
-                },
-                new RoleDTO
-                {
-                    Name=RoleEnum.Employee.ToString()
-                }
-            };
+           
             var model = new AddEmployeeViewModel()
             {
                 Posts = _listMapper.CreateOrganisationPostsList(posts),
-                Roles = _listMapper.CreateRolesList(roles)
+                Roles = _listMapper.CreateRolesList()
             };
 
             return View(model);
@@ -155,7 +140,8 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> ViewVacationRequests()
         {
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            var model = await _vacationRequestService.GetProccessingVacationRequestsAsync(employee.OrganisationId, employee.TeamId);
+            var requests = await _vacationRequestService.GetProccessingVacationRequestsAsync(employee.OrganisationId, employee.TeamId);
+            var model = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(requests);
             return View(model);
         }
 
@@ -163,23 +149,27 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> ProccessVacationRequest(string id)
         {
             var request = await _vacationRequestService.GetByIdWithEmployeeWithTeamAsync(id);
-            var vacationTypes = await _vacationRequestService.GetVacationTypesAsync();
-            var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(request);
-            model.EmployeeFullName = $"{request.Employee.FirstName} {request.Employee.LastName}";
-            model.VacationType = vacationTypes.FirstOrDefault(type=>type.VacationTypeId.Equals(request.VacationTypeId)).Name;
-            if(request.Employee.Team != null)
+            if(request != null && request.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
             {
-                var teamlead = await _employeeService.GetByIdAsync(request.Employee.Team.TeamleadId);
-                model.TeamName = request.Employee.Team.Name;
-                model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-            }
-            else
-            {
-                model.TeamName = emptyValue;
-                model.TeamleadFullName = emptyValue;
-            }
+                var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(request);
+                model.EmployeeFullName = $"{request.Employee.FirstName} {request.Employee.LastName}";
+                model.VacationType = request.VacationType;
+                if (request.Employee.Team != null)
+                {
+                    var teamlead = await _employeeService.GetByIdAsync(request.Employee.Team.TeamleadId);
+                    model.TeamName = request.Employee.Team.Name;
+                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                }
+                else
+                {
+                    model.TeamName = emptyValue;
+                    model.TeamleadFullName = emptyValue;
+                }
 
-            return View(model);
+                return View(model);
+            }         
+
+            return View();
         }
 
         [HttpPost]
@@ -187,12 +177,8 @@ namespace VRdkHRMsystem.Controllers
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
             var request = await _vacationRequestService.GetByIdAsync(model.VacationId);
-            var status = await _vacationRequestService.GetRequestStatusByNameAsync(RequestStatusEnum.Proccessing.ToString());
-            if(request != null && request.RequestStatusId.Equals(status.RequestStatusId))
-            {
-                var residual = await _residualsService.GetByEmployeeIdAsync(request.EmployeeId, model.VacationType);
-                var transactionTypes = await _transactionService.GetTransactionTypesAsync();
-                var requestStatuses = await _vacationRequestService.GetRequestStatusesAsync();
+            if(request != null && request.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
+            {             
                 var transaction = new TransactionDTO()
                 {
                     TransactionId = Guid.NewGuid().ToString(),
@@ -200,23 +186,23 @@ namespace VRdkHRMsystem.Controllers
                     Change = model.Duration,
                     Description = model.ProccessComment ?? model.VacationType,
                     TransactionDate = DateTime.UtcNow,
-                    TransactionTypeId = transactionTypes.FirstOrDefault(type => type.Name.Equals(model.VacationType)).TransactionTypeId
+                    TransactionType = model.VacationType
                 };
+                await _transactionService.CreateAsync(transaction);
                 request.TransactionId = transaction.TransactionId;
-                request.ProcessDate = DateTime.UtcNow;
-                request.ProcessedbyId = user.Id;
+                request.ProccessDate = DateTime.UtcNow;
+                request.ProccessedbyId = user.Id;
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                 {
-                    request.RequestStatusId = requestStatuses.FirstOrDefault(st => st.Name.Equals(RequestStatusEnum.Approved.ToString())).RequestStatusId;
+                    var residual = await _residualsService.GetByEmployeeIdAsync(request.EmployeeId, model.VacationType);
+                    request.RequestStatus = RequestStatusEnum.Approved.ToString();
                     residual.ResidualBalance -= request.Duration;
+                    await _residualsService.UpdateAsync(residual);
                 }
                 else
                 {
-                    request.RequestStatusId = requestStatuses.FirstOrDefault(st => st.Name.Equals(RequestStatusEnum.Denied.ToString())).RequestStatusId;
-                }
-
-                await _transactionService.CreateAsync(transaction);
-                await _residualsService.UpdateAsync(residual);
+                    request.RequestStatus = RequestStatusEnum.Denied.ToString();
+                }                     
                 await _vacationRequestService.UpdateAsync(request);
             }
            

@@ -9,22 +9,13 @@ namespace VRdkHRMsysBLL.Services
     public class TransactionService : ITransactionService
     {
         private readonly ITransactionRepository _transactionRepository;
-        private readonly ITransactionTypeRepository _transactionTypeRepository;
         private readonly IMapHelper _mapHelper;
 
         public TransactionService(ITransactionRepository transactionRepository,
-                                  ITransactionTypeRepository transactionTypeRepository,
                                   IMapHelper mapHelper)
         {
             _transactionRepository = transactionRepository;
-            _transactionTypeRepository = transactionTypeRepository;
             _mapHelper = mapHelper;
-        }
-        
-        public async Task<TransactionTypeDTO[]> GetTransactionTypesAsync()
-        {
-            var types = await _transactionTypeRepository.GetAsync();
-            return _mapHelper.MapCollection<TransactionType, TransactionTypeDTO>(types);
         }
 
         public async Task CreateAsync(TransactionDTO transaction)

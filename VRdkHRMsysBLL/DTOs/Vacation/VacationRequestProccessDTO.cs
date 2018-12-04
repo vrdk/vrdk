@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace VRdkHRMsysBLL.DTOs.Vacation
 {
@@ -17,6 +15,5 @@ namespace VRdkHRMsysBLL.DTOs.Vacation
         public string Comment { get; set; }
         public bool IsApproved { get; set; }
         public bool IsDenied { get; set; }
-        public string VacationState { get; set; }
     }
 }

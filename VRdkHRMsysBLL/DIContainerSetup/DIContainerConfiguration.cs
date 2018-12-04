@@ -19,11 +19,8 @@ namespace VRdkHRMsysBLL.DIContainerSetup
             container.Register<HRMSystemDbContext, HRMSystemDbContext>(Lifestyle.Scoped);
             container.Register<IEmployeeRepository, EmployeeRepository>();
             container.Register<IPostRepository, PostRepository>();
-            container.Register<IVacationTypeRepository, VacationTypeRepository>();
             container.Register<IVacationRequestRepository, VacationRequestRepository>();
             container.Register<ITransactionRepository, TransactionRepository>();
-            container.Register<ITransactionTypeRepository, TransactionTypeRepository>();
-            container.Register<IRequestStatusRepository, RequestStatusRepository>();
             container.Register<IEmployeeBalanceResidualsRepository, EmployeeBalanceResidualsRepository>();
 
             container.Register<IEmailSender, EmailSender>();
