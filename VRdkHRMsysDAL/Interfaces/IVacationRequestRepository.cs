@@ -8,6 +8,6 @@ namespace VRdkHRMsysDAL.Interfaces
     public interface IVacationRequestRepository : IRepository<VacationRequest>
     {
         Task<VacationRequest> GetByIdWithEmployeeWithTeamAsync(string id);
-        Task<VacationRequest[]> GetWithEmployeeAsync(Expression<Func<VacationRequest, bool>> condition = null);
+        Task<VacationRequest[]> GetWithEmployeeWithTeamAsync(Expression<Func<VacationRequest, bool>> condition = null);
     }
 }

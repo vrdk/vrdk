@@ -23,11 +23,11 @@ namespace VRdkHRMsysDAL.Repositories
             return condition != null ? await _context.VacationRequest.Where(condition).ToArrayAsync() : await _context.VacationRequest.ToArrayAsync();          
         }
 
-        public async Task<VacationRequest[]> GetWithEmployeeAsync(Expression<Func<VacationRequest, bool>> condition = null)
+        public async Task<VacationRequest[]> GetWithEmployeeWithTeamAsync(Expression<Func<VacationRequest, bool>> condition = null)
         {
             return condition != null ? 
-                await _context.VacationRequest.Include(r=>r.Employee).Where(condition).OrderByDescending(req=>req.RequestStatus).ThenByDescending(req=>req.CreateDate).ToArrayAsync() 
-              : await _context.VacationRequest.Include(r => r.Employee).OrderByDescending(req => req.RequestStatus).ThenByDescending(req => req.CreateDate).ToArrayAsync();
+                await _context.VacationRequest.Include(r=>r.Employee).ThenInclude(emp=>emp.Team).Where(condition).OrderByDescending(req=>req.RequestStatus).ThenByDescending(req=>req.CreateDate).ToArrayAsync() 
+              : await _context.VacationRequest.Include(r => r.Employee).ThenInclude(emp => emp.Team).OrderByDescending(req => req.RequestStatus).ThenByDescending(req => req.CreateDate).ToArrayAsync();
         }
 
         public async Task<VacationRequest> GetByIdAsync(string id)

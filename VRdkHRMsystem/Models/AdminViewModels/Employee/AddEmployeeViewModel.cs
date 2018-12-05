@@ -1,23 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace VRdkHRMsystem.Models.AdminViewModels
+namespace VRdkHRMsystem.Models.Employee.AdminViewModels
 {
-    public class EditEmployeeViewModel
-    {
-        [HiddenInput]
-        public string EmployeeId { get; set; }
-        [HiddenInput]
+    public class AddEmployeeViewModel
+    {    
         public string OrganisationId { get; set; }
+        [Required]
         public string FirstName { get; set; }
         [Required]
         public string LastName { get; set; }
         [Required]
         public string PostId { get; set; }
+        public IEnumerable<SelectListItem> Posts { get; set; }
         [Required]
         public bool State { get; set; }
         [Required]
@@ -40,5 +37,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels
         public string WorkEmail { get; set; }
         [Required]
         public string Role { get; set; }
+        public IEnumerable<SelectListItem> Roles { get; set; }
     }
 }

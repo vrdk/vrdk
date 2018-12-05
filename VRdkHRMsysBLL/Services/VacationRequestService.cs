@@ -10,13 +10,13 @@ using System.Linq;
 
 namespace VRdkHRMsysBLL.Services
 {
-    public class VacationRequestService : IVacationRequestService
+    public class VacationService : IVacationService
     {
         private const string emptyValue = "None";
         private readonly IVacationRequestRepository _vacationRepository;
         private readonly IMapHelper _mapHelper;
 
-        public VacationRequestService(IVacationRequestRepository vacationRepository,
+        public VacationService(IVacationRequestRepository vacationRepository,
                                       IMapHelper mapHelper)
         {
             _vacationRepository = vacationRepository;
@@ -37,7 +37,7 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task<VacationRequestViewDTO[]> GetProccessingVacationRequestsAsync(string organisationId, string teamId)
         {
-            var reqs = await _vacationRepository.GetWithEmployeeAsync(req
+            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(req
                                                         => (req.Employee.TeamId == teamId
                                                          || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
                                                          && req.Employee.OrganisationId.Equals(organisationId));
@@ -60,7 +60,7 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task<VacationRequestViewDTO[]> GetPendingVacationRequestsAsync(string organisationId, string teamId)
         {
-            var reqs = await _vacationRepository.GetWithEmployeeAsync(req
+            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(req
                                                          => req.Employee.TeamId == teamId
                                                          && !req.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString())
                                                          && req.Employee.OrganisationId.Equals(organisationId));

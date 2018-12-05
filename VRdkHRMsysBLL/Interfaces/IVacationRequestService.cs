@@ -3,7 +3,7 @@ using VRdkHRMsysBLL.DTOs.Vacation;
 
 namespace VRdkHRMsysBLL.Interfaces
 {
-    public interface IVacationRequestService
+    public interface IVacationService
     {
         Task<VacationRequestDTO> GetByIdAsync(string id);      
         Task<VacationRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id);

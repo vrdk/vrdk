@@ -2,13 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using VRdkHRMsysBLL.DTOs.SickLeave;
 using VRdkHRMsysBLL.DTOs.Transaction;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.RequestViewModels;
+using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -16,19 +19,24 @@ namespace VRdkHRMsystem.Controllers
     public class RequestController : Controller
     {
         private readonly IEmployeeService _employeeService;
-        private readonly IVacationRequestService _vacationRequestService;
-     
+        private readonly IVacationService _vacationService;
+        private readonly ISickLeaveService _sickLeaveService;
+        private readonly IFileManagmentService _fileManagmentService;
+
         private readonly IMapHelper _mapHelper;
         private readonly IViewListMapper _listMapper;
 
         public RequestController(IEmployeeService employeeService,
-                                 IVacationRequestService vacationRequestService,
+                                 IVacationService vacationRequestService,
+                                 ISickLeaveService sickLeaveService,
+                                 IFileManagmentService fileManagmentService,
                                  IMapHelper mapHelper,
                                  IViewListMapper listMapper)
         {
             _employeeService = employeeService;
-            _vacationRequestService = vacationRequestService;
-           
+            _vacationService = vacationRequestService;
+            _sickLeaveService = sickLeaveService;
+            _fileManagmentService = fileManagmentService;
             _mapHelper = mapHelper;
             _listMapper = listMapper;
         }
@@ -69,7 +77,41 @@ namespace VRdkHRMsystem.Controllers
                 }
                 vacationRequest.VacationId = Guid.NewGuid().ToString();
                 vacationRequest.CreateDate = DateTime.UtcNow.Date;
-                await _vacationRequestService.CreateAsync(vacationRequest);
+                await _vacationService.CreateAsync(vacationRequest);
+            }
+
+            return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RequestSickLeave(string id = null)
+        {
+            RequestSickLeaveViewModel model = new RequestSickLeaveViewModel();
+            if (id != null)
+            {
+                model.EmployeeId = id;
+            }
+            else
+            {
+                var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+                model.EmployeeId = employee.EmployeeId;
+            }   
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestSickLeave(RequestSickLeaveViewModel model)
+        {
+            var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
+            if (employee != null && model.Files.Count() <= 3)
+            {
+                var sickLeaveRequest = _mapHelper.Map<RequestSickLeaveViewModel, SickLeaveDTO>(model);
+                sickLeaveRequest.RequestStatus = RequestStatusEnum.Pending.ToString();
+                sickLeaveRequest.SickLeaveId = Guid.NewGuid().ToString();
+                sickLeaveRequest.CreateDate = DateTime.UtcNow.Date;
+                await _sickLeaveService.CreateAsync(sickLeaveRequest);
+                await _fileManagmentService.UploadSickLeaveFiles(model.Files, model.EmployeeId, model.EmployeeId);
             }
 
             return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });

@@ -342,10 +342,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("sick_leave_id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.BeginDate)
-                    .HasColumnName("begin_date")
-                    .HasColumnType("date");
-
                 entity.Property(e => e.CloseDate)
                     .HasColumnName("close_date")
                     .HasColumnType("date");
@@ -365,11 +361,11 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
 
-                entity.Property(e => e.EndDate)
-                    .HasColumnName("end_date")
-                    .HasColumnType("date");
+                entity.Property(e => e.TransactionId)
+                 .HasColumnName("transaction_id")
+                 .HasMaxLength(450);
 
-                entity.Property(e => e.ProccessedbyId).HasColumnName("processedby_id").HasMaxLength(450); ;
+                entity.Property(e => e.ProccessedbyId).HasColumnName("proccessedby_id").HasMaxLength(450); ;
 
                 entity.Property(e => e.RequestStatus)
                     .IsRequired()
@@ -478,7 +474,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.Property(e => e.TransactionId)
-                   .IsRequired()
                    .HasColumnName("transaction_id")
                    .HasMaxLength(450);
 

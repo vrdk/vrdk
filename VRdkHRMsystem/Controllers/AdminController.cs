@@ -11,7 +11,8 @@ using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
-using VRdkHRMsystem.Models.AdminViewModels;
+using VRdkHRMsystem.Models.Employee.AdminViewModels;
+using VRdkHRMsystem.Models.Vacation.AdminViewModels;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -24,7 +25,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly IEmployeeService _employeeService;
-        private readonly IVacationRequestService _vacationRequestService;
+        private readonly IVacationService _vacationRequestService;
         private readonly IResidualsService _residualsService;
         private readonly ITransactionService _transactionService;
         private readonly IPostService _postService;
@@ -36,7 +37,7 @@ namespace VRdkHRMsystem.Controllers
             SignInManager<ApplicationUser> signInManager,
             IPostService postService,
             IEmployeeService employeeService,
-            IVacationRequestService vacationRequestService,
+            IVacationService vacationRequestService,
             IResidualsService residualsService,
             ITransactionService transactionService,
             IEmailSender emailSender,
