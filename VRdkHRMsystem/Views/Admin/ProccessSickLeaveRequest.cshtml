@@ -1,0 +1,86 @@
+﻿@model VRdkHRMsystem.Models.AdminViewModels.SickLeave.SickLeaveRequestProccessViewModel
+
+@{
+    ViewData["Title"] = "ProccessSickLeaveRequest";
+}
+
+<h2>ProccessSickLeaveRequest</h2>
+
+<h4>SickLeaveRequestProccessViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ProccessSickLeaveRequest">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" hidden>
+                <label asp-for="SickLeaveId" class="control-label"></label>
+                <input asp-for="SickLeaveId" class="form-control" />
+                <span asp-validation-for="SickLeaveId" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="EmployeeId" class="control-label"></label>
+                <input asp-for="EmployeeId" class="form-control" />
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="OrganisationId" class="control-label"></label>
+                <input asp-for="OrganisationId" class="form-control" />
+                <span asp-validation-for="OrganisationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeFullName" class="control-label"></label>
+                <input asp-for="EmployeeFullName" class="form-control" />
+                <span asp-validation-for="EmployeeFullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TeamleadFullName" class="control-label"></label>
+                <input asp-for="TeamleadFullName" class="form-control" />
+                <span asp-validation-for="TeamleadFullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TeamName" class="control-label"></label>
+                <input asp-for="TeamName" class="form-control" />
+                <span asp-validation-for="TeamName" class="text-danger"></span>
+            </div>
+            @foreach (var file in Model.Files)
+            {
+                <a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId" asp-route-code="@Model.OrganisationId"> ProductName</a>
+            }
+            <div class="radio">
+                <div class="form-group">
+                    <label>
+                        Approved
+                        <input type="radio" name="Result" value="Approved" checked />
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Denied
+                        <input type="radio" name="Result" value="Denied" />
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comment" class="control-label"></label>
+                <input asp-for="Comment" class="form-control" />
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreateDate" class="control-label"></label>
+                <input asp-for="CreateDate" class="form-control" />
+                <span asp-validation-for="CreateDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

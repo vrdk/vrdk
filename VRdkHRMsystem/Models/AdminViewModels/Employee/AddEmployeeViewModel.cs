@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.Employee.AdminViewModels
+namespace VRdkHRMsystem.Models.AdminViewModels.Employee
 {
     public class AddEmployeeViewModel
     {    
@@ -38,5 +38,21 @@ namespace VRdkHRMsystem.Models.Employee.AdminViewModels
         [Required]
         public string Role { get; set; }
         public IEnumerable<SelectListItem> Roles { get; set; }
+        [Required]
+        [Display(Name = "Paid vacation balance")]
+        [Range(1, 100)]
+        public int PaidVacationBalance { get; set; }
+        [Required]
+        [Display(Name = "Paid vacation balance")]
+        [Range(1, 100)]
+        public int UnpaidVacationBalance { get; set; }
+        [Required]
+        [Display(Name = "Paid vacation balance")]
+        [Range(1, 100)]
+        public int SickLeaveBalance { get; set; }
+        [Required]
+        [Display(Name = "Paid vacation balance")]
+        [Range(1,100)]
+        public int AbsenceBalance { get; set; }
     }
 }

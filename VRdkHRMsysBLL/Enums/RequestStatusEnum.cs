@@ -5,6 +5,7 @@
         Pending,
         Proccessing,
         Approved,
-        Denied
+        Denied,
+        Closed
     }
 }

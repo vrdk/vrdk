@@ -96,29 +96,5 @@ namespace VRdkHRMsysBLL.Services
                 await _vacationRepository.UpdateAsync();
             }
         }
-
-        private int SortByProccesingStatus(string status)
-        {
-            if (status.Equals(RequestStatusEnum.Proccessing))
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-
-        private int SortByPendingStatus(string status)
-        {
-            if (status.Equals(RequestStatusEnum.Pending))
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-        }
     }
 }

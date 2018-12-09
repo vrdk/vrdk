@@ -62,23 +62,6 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task CreateAsync(EmployeeDTO employee)
         {
-            employee.EmployeeBalanceResiduals = new BalanceResidualsDTO[]
-            {
-                new BalanceResidualsDTO
-                {
-                    ResidualId = Guid.NewGuid().ToString(),
-                    EmployeeId = employee.EmployeeId,
-                    Name = ResidualTypeEnum.Unpaid_vacation.ToString(),
-                    ResidualBalance = 28
-                },
-                 new BalanceResidualsDTO
-                {
-                    ResidualId = Guid.NewGuid().ToString(),
-                    EmployeeId = employee.EmployeeId,
-                    Name = ResidualTypeEnum.Paid_vacation.ToString(),
-                    ResidualBalance = 28
-                }
-            };
             var employeeToAdd = _mapHelper.NestedMap<EmployeeDTO, Employee, BalanceResidualsDTO, EmployeeBalanceResiduals>(employee);
             await _employeeRepository.CreateAsync(employeeToAdd);
         }

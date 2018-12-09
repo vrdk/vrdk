@@ -20,12 +20,31 @@ namespace VRdkHRMsysBLL.Services
             _configuration = configuration;
         }
 
-        public async Task UploadSickLeaveFiles(IFormFile[] files,string id, string containerName)
+        public async Task UploadSickLeaveFilesAsync(IFormFile[] files, string id, string containerName)
         {
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 await UploadFile(file, id, containerName);
             }
+        }
+
+        public async Task<string[]> GetSickLeaveFilesAsync(string id)
+        {
+            CloudBlobContainer cloudBlobContainer = await GetContainerReference(id);
+            var files = await cloudBlobContainer.ListBlobsSegmentedAsync(null);
+            var result = new List<string>();
+            foreach (var file in files.Results)
+            {
+                result.Add(((CloudBlockBlob)file).Name);
+            }
+
+            return result.ToArray();
+        }
+
+        public async Task<byte[]> DownloadFileAsync(string fileName, string containerName)
+        {
+            var file = await DownloadFileInBlocks(fileName, containerName);
+            return file;
         }
 
         private byte[] ConvertToByteArray(IFormFile fileToConvert)
@@ -53,7 +72,7 @@ namespace VRdkHRMsysBLL.Services
             CloudBlockBlob blob = cloudBlobContainer.GetBlockBlobReference(Path.GetFileName(fileName));
             SharedAccessBlobPolicy a = new SharedAccessBlobPolicy
             {
-                Permissions = SharedAccessBlobPermissions.Read 
+                Permissions = SharedAccessBlobPermissions.Read
             };
 
             int blockSize = 1024 * 1024;

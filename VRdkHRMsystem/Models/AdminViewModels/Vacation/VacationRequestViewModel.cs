@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.Vacation.AdminViewModels
+namespace VRdkHRMsystem.Models.AdminViewModels.Vacation
 {
     public class VacationRequestViewModel
     {

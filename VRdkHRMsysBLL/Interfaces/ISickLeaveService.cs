@@ -5,6 +5,9 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface ISickLeaveService
     {
-        Task CreateAsync(SickLeaveDTO SickLeave);
+        Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id);
+        Task<SickLeaveRequestDTO> GetByIdAsync(string id);
+        Task CreateAsync(SickLeaveRequestDTO SickLeave);
+        Task UpdateAsync(SickLeaveRequestDTO newRequest);
     }
 }

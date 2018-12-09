@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.Employee.AdminViewModels
+namespace VRdkHRMsystem.Models.AdminViewModels.Employee
 {
     public class EditEmployeeViewModel
     {

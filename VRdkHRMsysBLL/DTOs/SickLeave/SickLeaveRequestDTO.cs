@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using VRdkHRMsysBLL.DTOs.Employee;
 
 namespace VRdkHRMsysBLL.DTOs.SickLeave
 {
-    public class SickLeaveDTO
+    public class SickLeaveRequestDTO
     {
         public string SickLeaveId { get; set; }
         public string EmployeeId { get; set; }
@@ -15,5 +14,7 @@ namespace VRdkHRMsysBLL.DTOs.SickLeave
         public int? Duration { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? CloseDate { get; set; }
+
+        public EmployeeDTO Employee { get; set; }
     }
 }

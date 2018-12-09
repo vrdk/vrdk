@@ -2,16 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Transaction;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
-using VRdkHRMsystem.Models.RequestViewModels;
 using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
+using VRdkHRMsystem.Models.RequestViewModels.Vacation;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -106,12 +104,12 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
             if (employee != null && model.Files.Count() <= 3)
             {
-                var sickLeaveRequest = _mapHelper.Map<RequestSickLeaveViewModel, SickLeaveDTO>(model);
+                var sickLeaveRequest = _mapHelper.Map<RequestSickLeaveViewModel, SickLeaveRequestDTO>(model);
                 sickLeaveRequest.RequestStatus = RequestStatusEnum.Pending.ToString();
                 sickLeaveRequest.SickLeaveId = Guid.NewGuid().ToString();
                 sickLeaveRequest.CreateDate = DateTime.UtcNow.Date;
                 await _sickLeaveService.CreateAsync(sickLeaveRequest);
-                await _fileManagmentService.UploadSickLeaveFiles(model.Files, model.EmployeeId, model.EmployeeId);
+                await _fileManagmentService.UploadSickLeaveFilesAsync(model.Files, model.EmployeeId, sickLeaveRequest.SickLeaveId);
             }
 
             return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });
