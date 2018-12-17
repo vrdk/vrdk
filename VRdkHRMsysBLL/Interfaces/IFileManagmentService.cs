@@ -6,7 +6,7 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface IFileManagmentService
     {
-        Task UploadSickLeaveFilesAsync(IFormFile[] files, string id, string containerName);
+        Task UploadSickLeaveFilesAsync(IFormFile[] files, string containerName);
         Task<string[]> GetSickLeaveFilesAsync(string id);
         Task<byte[]> DownloadFileAsync(string fileName, string containerName);
     }

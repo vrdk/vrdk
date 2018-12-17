@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VRdkHRMsysBLL.DTOs.Team
+﻿namespace VRdkHRMsysBLL.DTOs.Team
 {
     public class TeamDTO
     {

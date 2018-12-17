@@ -9,6 +9,7 @@ namespace VRdkHRMsysDAL.Entities
         {
             Employee = new HashSet<Employee>();
             Post = new HashSet<Post>();
+            Notification = new HashSet<Notification>();
             Team = new HashSet<Team>();
         }
 
@@ -17,6 +18,7 @@ namespace VRdkHRMsysDAL.Entities
         public DateTime RegistrationDate { get; set; }
 
         public ICollection<Employee> Employee { get; set; }
+        public ICollection<Notification> Notification { get; set; }
         public ICollection<Post> Post { get; set; }
         public ICollection<Team> Team { get; set; }
     }

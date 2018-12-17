@@ -1,21 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
 using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.SickLeave;
+using VRdkHRMsysBLL.DTOs.Notification;
+using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.DTOs.Transaction;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
+using VRdkHRMsystem.Models.AdminViewModels.Assignment;
 using VRdkHRMsystem.Models.AdminViewModels.Employee;
-using VRdkHRMsystem.Models.AdminViewModels.SickLeave;
-using VRdkHRMsystem.Models.AdminViewModels.Vacation;
+using VRdkHRMsystem.Models.AdminViewModels.Team;
+using VRdkHRMsystem.Models.SharedViewModels.Employee;
+using VRdkHRMsystem.Models.SharedViewModels.Vacation;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -33,7 +39,10 @@ namespace VRdkHRMsystem.Controllers
         private readonly ITransactionService _transactionService;
         private readonly IPostService _postService;
         private readonly ISickLeaveService _sickLeaveRequestService;
+        private readonly ITeamService _teamService;
+        private readonly IAssignmentService _assignmentService;
         private readonly IViewListMapper _listMapper;
+        private readonly INotificationService _notificationService;
         private readonly IMapHelper _mapHelper;
         private readonly IFileManagmentService _fileManagmentService;
 
@@ -47,6 +56,9 @@ namespace VRdkHRMsystem.Controllers
             ISickLeaveService sickLeaveService,
             ITransactionService transactionService,
             IFileManagmentService fileManagmentService,
+            INotificationService notificationService,
+            ITeamService teamService,
+            IAssignmentService assignmentService,
             IEmailSender emailSender,
             ILogger<AccountController> logger,
             IViewListMapper listMapper,
@@ -59,7 +71,10 @@ namespace VRdkHRMsystem.Controllers
             _vacationRequestService = vacationRequestService;
             _transactionService = transactionService;
             _fileManagmentService = fileManagmentService;
+            _notificationService = notificationService;
             _postService = postService;
+            _teamService = teamService;
+            _assignmentService = assignmentService;
             _sickLeaveRequestService = sickLeaveService;
             _emailSender = emailSender;
             _logger = logger;
@@ -187,9 +202,9 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProccessVacationRequest(string id)
+        public async Task<IActionResult> ProccessVacationRequest(string codeV)
         {
-            var vacationRequest = await _vacationRequestService.GetByIdWithEmployeeWithTeamAsync(id);
+            var vacationRequest = await _vacationRequestService.GetByIdWithEmployeeWithTeamAsync(codeV);
             if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
             {
                 var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
@@ -220,17 +235,6 @@ namespace VRdkHRMsystem.Controllers
             var vacationRequest = await _vacationRequestService.GetByIdAsync(model.VacationId);
             if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
             {
-                var transaction = new TransactionDTO()
-                {
-                    TransactionId = Guid.NewGuid().ToString(),
-                    EmployeeId = vacationRequest.EmployeeId,
-                    Change = model.Duration,
-                    Description = model.ProccessComment ?? model.VacationType,
-                    TransactionDate = DateTime.UtcNow,
-                    TransactionType = model.VacationType
-                };
-                await _transactionService.CreateAsync(transaction);
-                vacationRequest.TransactionId = transaction.TransactionId;
                 vacationRequest.ProccessDate = DateTime.UtcNow;
                 vacationRequest.ProccessedbyId = user.Id;
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
@@ -239,67 +243,163 @@ namespace VRdkHRMsystem.Controllers
                     vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
                     residual.ResidualBalance -= vacationRequest.Duration;
                     await _residualsService.UpdateAsync(residual);
+                    var transaction = new TransactionDTO()
+                    {
+                        TransactionId = Guid.NewGuid().ToString(),
+                        EmployeeId = vacationRequest.EmployeeId,
+                        Change = model.Duration,
+                        Description = model.ProccessComment ?? model.VacationType,
+                        TransactionDate = DateTime.UtcNow,
+                        TransactionType = model.VacationType
+                    };
+                    await _transactionService.CreateAsync(transaction);
+                    vacationRequest.TransactionId = transaction.TransactionId;                   
                 }
                 else
                 {
                     vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
                 }
                 await _vacationRequestService.UpdateAsync(vacationRequest);
+                var notification = new NotificationDTO
+                {
+                    NotificationId = Guid.NewGuid().ToString(),
+                    EmployeeId = vacationRequest.EmployeeId,
+                    OrganisationId = user.OrganisationId,
+                    NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                    NotificationDate = DateTime.UtcNow,
+                    Description = $"Your vacation request was proccessed",
+                    IsChecked = false
+                };
+                await _notificationService.CreateAsync(notification);
             }
 
-            return View(model);
+            return RedirectToAction("Profile", "Profile");
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProccessSickLeaveRequest(string id)
+        public async Task<IActionResult> AddTeam(string codeE = null)
         {
-            var sickLeaveRequest = await _sickLeaveRequestService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+            EmployeeDTO creator;
+            if (codeE == null)
             {
-                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveRequestProccessViewModel>(sickLeaveRequest);
-                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(model.SickLeaveId);
-                model.EmployeeFullName = $"{sickLeaveRequest.Employee.FirstName} {sickLeaveRequest.Employee.LastName}";
-                model.OrganisationId = sickLeaveRequest.Employee.OrganisationId;
-                if (sickLeaveRequest.Employee.Team != null)
-                {
-                    var teamlead = await _employeeService.GetByIdAsync(sickLeaveRequest.Employee.Team.TeamleadId);
-                    model.TeamName = sickLeaveRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                }
-                else
-                {
-                    model.TeamName = emptyValue;
-                    model.TeamleadFullName = emptyValue;
-                }
-
-                return View(model);
+                creator = await _employeeService.GetByEmailWithTeamAsync(User.Identity.Name);
+            }
+            else
+            {
+                creator = await _employeeService.GetByIdWithTeamAsync(codeE);
             }
 
-            return View();
-           
+            var employees = await _employeeService.Get(emp => emp.OrganisationId.Equals(creator.OrganisationId));
+
+            var model = new AddTeamViewModel
+            {
+                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees.Where(emp=>emp.TeamId == null).ToArray()),
+                Teamleads = _listMapper.CreateEmployeesList(employees),
+                OrganisationId = creator.OrganisationId
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveRequestProccessViewModel model)
+        public async Task<IActionResult> AddTeam(AddTeamViewModel model)
         {
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            var sickLeaveRequest = await _sickLeaveRequestService.GetByIdAsync(model.SickLeaveId);
-            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+            var employees = await _employeeService.Get(emp => model.TeamMembers.Contains(emp.EmployeeId));
+            var team = new TeamDTO
             {
-                sickLeaveRequest.ProccessedbyId = user.Id;
-                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
-                {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();                 
-                }
-                else
-                {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                }
-
-                await _sickLeaveRequestService.UpdateAsync(sickLeaveRequest);
+                TeamId = Guid.NewGuid().ToString(),
+                OrganisationId = model.OrganisationId,
+                TeamleadId = model.TeamleadId,
+                Name = model.Name
+            };
+            await _teamService.CreateAsync(team);
+            foreach(var employee in employees)
+            {
+                employee.TeamId = team.TeamId;
             }
 
+            await _employeeService.UpdateRange(employees);
+
+            var user = await _userManager.FindByIdAsync(model.TeamleadId);
+            await _userManager.AddToRoleAsync(user, RoleEnum.Teamlead.ToString());
+            return RedirectToAction("Profile", "Profile");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddAssignment(string codeE = null)
+        {
+            EmployeeDTO creator;
+            if (codeE == null)
+            {
+                creator = await _employeeService.GetByEmailWithTeamAsync(User.Identity.Name);
+            }
+            else
+            {
+                creator = await _employeeService.GetByIdWithTeamAsync(codeE);
+            }
+
+            var employees = await _employeeService.Get(emp => emp.OrganisationId.Equals(creator.OrganisationId));
+
+            var model = new AddAssignmentViewModel
+            {
+                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees).ToArray(),
+                OrganisationId = creator.OrganisationId
+            };
+
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAssignment(AddAssignmentViewModel model)
+        {
+            var assignment = new AssignmentDTO
+            {
+                AssignmentId = Guid.NewGuid().ToString(),
+                BeginDate = model.BeginDate,
+                EndDate = model.EndDate,
+                Duration = model.EndDate.DayOfYear - model.EndDate.DayOfYear,
+                Name = model.Name,
+                OrganisationId = model.OrganisationId          
+            };
+            assignment.Employees = model.AssignmentMembers.Select(code => new AssignmentEmployeeDTO
+            {
+                AssignmentId = assignment.AssignmentId,
+                EmployeeId =  code,
+                RowId = Guid.NewGuid().ToString()
+            }).ToArray();
+            await _assignmentService.CreateAsync(assignment);
+            var employees = await _employeeService.GetWithTeam(emp => model.AssignmentMembers.Any(m => m == emp.EmployeeId));
+            List<NotificationDTO> notificationList = new List<NotificationDTO>();
+            foreach(var employee in employees)
+            {
+                notificationList.Add(new NotificationDTO
+                {
+                    NotificationId = Guid.NewGuid().ToString(),
+                    EmployeeId = employee.EmployeeId,
+                    OrganisationId = employee.OrganisationId,
+                    NotificationType = NotificationTypeEnum.Assignment.ToString(),
+                    NotificationDate = DateTime.UtcNow,
+                    Description = "You have been added to assignment",
+                    IsChecked = false                   
+                });
+                if(employee.TeamId != null)
+                {
+                    notificationList.Add(new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = employee.Team.TeamleadId,
+                        OrganisationId = employee.OrganisationId,
+                        NotificationType = NotificationTypeEnum.Assignment.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = "Your employee have been added to assignment",
+                        IsChecked = false
+                    });
+                }
+            }
+
+            await _notificationService.CreateRangeAsync(notificationList.ToArray());
+
+            return RedirectToAction("Profile", "Profile");
         }
     }
 }

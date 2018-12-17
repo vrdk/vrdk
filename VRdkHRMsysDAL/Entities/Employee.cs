@@ -8,11 +8,12 @@ namespace VRdkHRMsysDAL.Entities
         public Employee()
         {
             Absence = new HashSet<Absence>();
-            AssignmentEmployee = new HashSet<AssignmentEmployee>();
+            Assignments = new HashSet<AssignmentEmployee>();
             DayOff = new HashSet<DayOff>();
             EmployeeBalanceResiduals = new HashSet<EmployeeBalanceResiduals>();
             SickLeaveRequest = new HashSet<SickLeaveRequest>();
             Transaction = new HashSet<Transaction>();
+            Notification = new HashSet<Notification>();
             VacationRequest = new HashSet<VacationRequest>();
             WorkDay = new HashSet<WorkDay>();
         }
@@ -35,8 +36,9 @@ namespace VRdkHRMsysDAL.Entities
         public Post Post { get; set; }
         public Team Team { get; set; }
         public ICollection<Absence> Absence { get; set; }
-        public ICollection<AssignmentEmployee> AssignmentEmployee { get; set; }
+        public ICollection<AssignmentEmployee> Assignments { get; set; }
         public ICollection<DayOff> DayOff { get; set; }
+        public ICollection<Notification> Notification { get; set; }
         public ICollection<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
         public ICollection<SickLeaveRequest> SickLeaveRequest { get; set; }
         public ICollection<Transaction> Transaction { get; set; }

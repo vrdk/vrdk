@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using VRdkHRMsysDAL.Entities;
 
 namespace VRdkHRMsysDAL.Interfaces
@@ -9,5 +11,6 @@ namespace VRdkHRMsysDAL.Interfaces
         Task<Employee> GetByIdWithTeamAsync(string id);
         Task<Employee> GetByEmailWithTeamAsync(string email);
         Task<Employee> GetByIdWithResidualsAsync(string id);
+        Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null);
     }
 }

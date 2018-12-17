@@ -2,6 +2,7 @@
 {
     public interface IMapHelper
     {
+        void MapRangeChanges<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom[] source, TypeToMapTo[] destination);
         TypeToMapTo Map<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom model);
         TypeToMapTo[] MapCollection<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom[] model);
         OuterTypeToMapTo NestedMap<OuterTypeToMapFrom, OuterTypeToMapTo, InnerTypeToMapFrom, InnerTypeToMapTo>(OuterTypeToMapFrom source);
@@ -12,5 +13,8 @@
         void MapNestedChanges<OuterTypeToMapFrom, OuterTypeToMapTo,
                                           FirstInnerTypeToMapFrom, FirstInnerTypeToMapTo,
                                           SecondInnerTypeToMapFrom, SecondInnerTypeToMapTo>(OuterTypeToMapFrom source, OuterTypeToMapTo destination);
+        OuterTypeToMapTo[] NestedMapCollection<OuterTypeToMapFrom, OuterTypeToMapTo,
+                                         FirstInnerTypeToMapFrom, FirstInnerTypeToMapTo,
+                                         SecondInnerTypeToMapFrom, SecondInnerTypeToMapTo>(OuterTypeToMapFrom[] source);
     }
 }

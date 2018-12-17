@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysDAL.Entities
+namespace VRdkHRMsysBLL.DTOs.Assignment
 {
-    public partial class Assignment
+    public class AssignmentDTO
     {
-        public Assignment()
-        {
-            Employees = new HashSet<AssignmentEmployee>();
-        }
-
         public string AssignmentId { get; set; }
         public string OrganisationId { get; set; }
         public string Name { get; set; }
@@ -17,6 +14,6 @@ namespace VRdkHRMsysDAL.Entities
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
 
-        public ICollection<AssignmentEmployee> Employees { get; set; }
+        public AssignmentEmployeeDTO[] Employees { get; set; }
     }
 }

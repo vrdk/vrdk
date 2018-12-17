@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Team;
-using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
@@ -24,6 +24,18 @@ namespace VRdkHRMsysBLL.Services
             _employeeRepository = employeeRepository;
             _postsRepository = postRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task<EmployeeDTO[]> Get(Expression<Func<Employee, bool>> condition = null)
+        {
+            var employees = await _employeeRepository.GetAsync(condition);
+            return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
+        }
+
+        public async Task<EmployeeDTO[]> GetWithTeam(Expression<Func<Employee, bool>> condition = null)
+        {
+            var employees = await _employeeRepository.GetWithTeamAsync(condition);
+            return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
 
         public async Task<EmployeeDTO> GetByEmailAsync(string email)
@@ -49,7 +61,18 @@ namespace VRdkHRMsysBLL.Services
             var employee = await _employeeRepository.GetByIdWithTeamAsync(id);
             return _mapHelper.NestedMap<Employee, EmployeeDTO, Team, TeamDTO>(employee);
         }
-
+        public async Task UpdateRange(EmployeeDTO[] newEmployees)
+        {
+            var currentEmployees = await _employeeRepository.GetAsync(emp => newEmployees.Any(e=>emp.EmployeeId==e.EmployeeId));
+            if (currentEmployees != null)
+            {
+                for(int i = 0; i < currentEmployees.Length; i++)
+                {
+                    _mapHelper.MapChanges(newEmployees[i],currentEmployees[i]);
+                }
+                await _employeeRepository.UpdateAsync();
+            }
+        }
         public async Task UpdateAsync(EmployeeDTO newEmployee)
         {
             var currentEmployee = await _employeeRepository.GetByIdAsync(newEmployee.EmployeeId);

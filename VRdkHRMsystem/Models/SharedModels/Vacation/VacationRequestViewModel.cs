@@ -1,13 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.AdminViewModels.Vacation
+namespace VRdkHRMsystem.Models.SharedViewModels.Vacation
 {
-    public class VacationRequestProccessViewModel
+    public class VacationRequestViewModel
     {
+        public string EmployeeId { get; set; }
         public string VacationId { get; set; }
         public string EmployeeFullName { get; set; }
-        public string TeamleadFullName { get; set; }
         public string TeamName { get; set; }
         public string VacationType { get; set; }
         [DataType(DataType.Date)]
@@ -15,8 +15,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Vacation
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
-        public string Comment { get; set; }
-        public string Result { get; set; }
-        public string ProccessComment { get; set; }
+        public string RequestStatus { get; set; }
     }
 }

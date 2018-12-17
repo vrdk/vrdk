@@ -16,6 +16,7 @@ namespace VRdkHRMsysDAL.Contexts
         public virtual DbSet<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
         public virtual DbSet<Organisation> Organisation { get; set; }
         public virtual DbSet<Post> Post { get; set; }
+        public virtual DbSet<Notification> Notification { get; set; }
         public virtual DbSet<SickLeaveRequest> SickLeaveRequest { get; set; }
         public virtual DbSet<Team> Team { get; set; }
         public virtual DbSet<Transaction> Transaction { get; set; }
@@ -62,6 +63,11 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("assignment_id")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.OrganisationId)
+                    .IsRequired()
+                    .HasColumnName("organisation_id")
+                    .HasMaxLength(450);
+
                 entity.Property(e => e.BeginDate)
                     .HasColumnName("begin_date")
                     .HasColumnType("date");
@@ -97,12 +103,12 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.HasOne(d => d.Assignment)
-                    .WithMany(p => p.AssignmentEmployee)
+                    .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.AssignmentId)
                     .HasConstraintName("FK__assignmen__assig__5BE2A6F2");
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.AssignmentEmployee)
+                    .WithMany(p => p.Assignments)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__assignmen__emplo__5AEE82B9");
             });
@@ -288,6 +294,51 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.EmployeeBalanceResiduals)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__employee___emplo__60A75C0F");
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.ToTable("notification");
+
+                entity.Property(e => e.NotificationId)
+                    .HasColumnName("notification_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasColumnName("description")
+                    .HasMaxLength(512);
+
+                entity.Property(e => e.EmployeeId)
+                    .HasColumnName("employee_id")
+                    .HasMaxLength(450);
+
+                entity.Property(e => e.IsChecked).HasColumnName("isChecked");
+
+                entity.Property(e => e.NotificationDate)
+                    .HasColumnName("notification_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.NotificationType)
+                    .IsRequired()
+                    .HasColumnName("notification_type")
+                    .HasMaxLength(512);
+
+                entity.Property(e => e.OrganisationId)
+                    .IsRequired()
+                    .HasColumnName("organisation_id")
+                    .HasMaxLength(450);
+
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.Notification)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .HasConstraintName("FK__notificat__emplo__681373AD");
+
+                entity.HasOne(d => d.Organisation)
+                    .WithMany(p => p.Notification)
+                    .HasForeignKey(d => d.OrganisationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__notificat__organ__690797E6");
             });
 
             modelBuilder.Entity<Organisation>(entity =>

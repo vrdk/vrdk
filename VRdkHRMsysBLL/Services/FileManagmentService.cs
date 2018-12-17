@@ -20,11 +20,11 @@ namespace VRdkHRMsysBLL.Services
             _configuration = configuration;
         }
 
-        public async Task UploadSickLeaveFilesAsync(IFormFile[] files, string id, string containerName)
+        public async Task UploadSickLeaveFilesAsync(IFormFile[] files, string containerName)
         {
             foreach (var file in files)
             {
-                await UploadFile(file, id, containerName);
+                await UploadFile(file, containerName);
             }
         }
 
@@ -59,11 +59,10 @@ namespace VRdkHRMsysBLL.Services
             return content;
         }
 
-        private async Task UploadFile(IFormFile file, string id, string containerName)
+        private async Task UploadFile(IFormFile file, string containerName)
         {
             var byteFile = ConvertToByteArray(file);
-            var fileName = $"{file.FileName}{id}.jpg";
-            await UploadFileInBlocks(byteFile, fileName, containerName);
+            await UploadFileInBlocks(byteFile, file.FileName, containerName);
         }
 
         private async Task<byte[]> DownloadFileInBlocks(string fileName, string containerName)

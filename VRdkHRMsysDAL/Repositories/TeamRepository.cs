@@ -18,6 +18,21 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
+        public async Task<Team[]> GetAsync(Expression<Func<Team, bool>> condition = null)
+        {
+            return condition != null ? await _context.Team.Where(condition).ToArrayAsync() : await _context.Team.ToArrayAsync();
+        }
+
+        public async Task<Team> GetByIdAsync(string id)
+        {
+            return await _context.Team.FirstOrDefaultAsync(team => team.TeamId.Equals(id));
+        }
+
+        public async Task UpdateAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
         public async Task CreateAsync(Team entity)
         {
             _context.Team.Add(entity);
@@ -27,21 +42,6 @@ namespace VRdkHRMsysDAL.Repositories
         public async Task DeleteAsync(Team entity)
         {
             _context.Team.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<Team[]> GetAsync(Expression<Func<Team, bool>> condition = null)
-        {
-            return condition != null ? await _context.Team.Where(condition).ToArrayAsync() : await _context.Team.ToArrayAsync();
-        }
-
-        public async Task<Team> GetByIdAsync(string id)
-        {
-            return await _context.Team.FirstOrDefaultAsync(ab => ab.TeamId.Equals(id));
-        }
-
-        public async Task UpdateAsync()
-        {
             await _context.SaveChangesAsync();
         }
     }

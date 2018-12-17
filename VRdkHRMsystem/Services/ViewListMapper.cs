@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
+using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Post;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsystem.Interfaces;
@@ -48,6 +49,16 @@ namespace VRdkHRMsystem.Services
                 }
             };
             return roles.Select(role => new SelectListItem() { Text = role.Name, Value = role.Name }).ToArray();
+        }
+
+        public SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees)
+        {
+            return employees.Select(emp => new SelectListItem() { Text = $"{emp.FirstName} {emp.LastName}", Value = emp.EmployeeId }).ToArray();
+        }
+
+        public MultiSelectList CreateMultiEmployeesList(EmployeeDTO[] employees)
+        {
+            return new MultiSelectList(employees, "EmployeeId", "FirstName");
         }
     }
 }

@@ -23,6 +23,9 @@ namespace VRdkHRMsysBLL.DIContainerSetup
             container.Register<ISickLeaveRequestRepository, SickLeaveRequestRepository>();
             container.Register<ITransactionRepository, TransactionRepository>();
             container.Register<IEmployeeBalanceResidualsRepository, EmployeeBalanceResidualsRepository>();
+            container.Register<ITeamRepository, TeamRepository>();
+            container.Register<IAssignmentRepository, AssignmentRepository>();
+            container.Register<INotificationRepository, NotificationRepository>();
 
             container.Register<IEmailSender, EmailSender>();
             container.Register<IMapHelper, MapHelper>();
@@ -33,6 +36,9 @@ namespace VRdkHRMsysBLL.DIContainerSetup
             container.Register<IFileManagmentService,FileManagmentService>();
             container.Register<ITransactionService, TransactionService>();
             container.Register<IResidualsService, ResidualsService>();
+            container.Register<ITeamService, TeamService>();
+            container.Register<IAssignmentService, AssignmentService>();
+            container.Register<INotificationService, NotificationService>();
             return container;
         }
     }

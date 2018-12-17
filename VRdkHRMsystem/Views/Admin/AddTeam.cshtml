@@ -1,0 +1,49 @@
+﻿@model VRdkHRMsystem.Models.AdminViewModels.Team.AddTeamViewModel
+
+@{
+    ViewData["Title"] = "AddTeam";
+}
+
+<h2>AddTeam</h2>
+
+<h4>AddTeamViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AddTeam">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" hidden>
+                <label asp-for="OrganisationId" class="control-label"></label>
+                <input asp-for="OrganisationId" class="form-control" />
+                <span asp-validation-for="OrganisationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <select name="TeamMembers" id="TeamMembers"  multiple>
+                @foreach (var employee in Model.Employees)
+                {
+                    <option id="@employee.EmployeeId" value="@employee.EmployeeId">@employee.FirstName @employee.LastName</option>
+                }
+            </select>
+            <div class="form-group">
+                <select asp-for="TeamleadId" asp-items="Model.Teamleads">
+                    <option>Please select one</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

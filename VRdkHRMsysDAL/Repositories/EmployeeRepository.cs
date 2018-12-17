@@ -23,6 +23,11 @@ namespace VRdkHRMsysDAL.Repositories
             return condition != null ? await _context.Employee.Where(condition).ToArrayAsync() : await _context.Employee.ToArrayAsync();
         }
 
+        public async Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null)
+        {
+            return condition != null ? await _context.Employee.Where(condition).Include(emp=>emp.Team).ToArrayAsync() : await _context.Employee.Include(emp => emp.Team).ToArrayAsync();
+        }
+
         public async Task<Employee> GetByIdAsync(string id)
         {
             return await _context.Employee.FirstOrDefaultAsync(em => em.EmployeeId.Equals(id));

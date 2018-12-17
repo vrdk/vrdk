@@ -21,16 +21,10 @@ namespace VRdkHRMsystem.Controllers
             _employeeService = employeeService;
         }
 
-        public async Task<FileResult> DownloadFile(string fileName,string containerName,string code)
+        public async Task<FileResult> DownloadFile(string fileName,string containerName)
         {
-            var caller = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if(caller != null && caller.OrganisationId.Equals(code))
-            {
                 byte[] file = await _fileManagmentService.DownloadFileAsync(fileName, containerName);
                 return File(file, "application/x-msdownload", fileName);
-            }
-
-            return File(new byte[] { }, "", fileName);
         }
     }
 }

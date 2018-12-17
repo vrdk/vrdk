@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,16 @@ namespace VRdkHRMsystem.Controllers
         private const string emptyValue = "None";
         private readonly IEmployeeService _employeeService;
         private readonly IPostService _postService;
+        private readonly ISickLeaveService _sickLeaveService;
         private readonly IMapHelper _mapHelper;
 
         public ProfileController(IEmployeeService employeeService,
                                  IPostService postService,
-                                 IMapHelper mapHelper)
+                                 ISickLeaveService sickLeaveService,
+        IMapHelper mapHelper)
         {
             _employeeService = employeeService;
+            _sickLeaveService = sickLeaveService;
             _postService = postService;
             _mapHelper = mapHelper;
         }
@@ -55,5 +59,7 @@ namespace VRdkHRMsystem.Controllers
             
             return View(model);
         }
+
+       
     }
 }

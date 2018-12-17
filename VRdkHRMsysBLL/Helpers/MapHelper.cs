@@ -7,7 +7,7 @@ namespace VRdkHRMsysBLL.Helpers
     {
         public  TypeToMapTo Map<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom model)
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<TypeToMapFrom, TypeToMapTo>()).CreateMapper();
+            var mapper = new MapperConfiguration(cfg => { cfg.CreateMap<TypeToMapFrom, TypeToMapTo>(); cfg.ValidateInlineMaps = false;}).CreateMapper();
 
             return mapper.Map<TypeToMapFrom, TypeToMapTo>(model);
         }
@@ -20,6 +20,13 @@ namespace VRdkHRMsysBLL.Helpers
         }
 
         public void MapChanges<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom source, TypeToMapTo destination)
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<TypeToMapFrom, TypeToMapTo>()).CreateMapper();
+
+            mapper.Map(source, destination);
+        }
+
+        public void MapRangeChanges<TypeToMapFrom, TypeToMapTo>(TypeToMapFrom[] source, TypeToMapTo[] destination)
         {
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<TypeToMapFrom, TypeToMapTo>()).CreateMapper();
 
@@ -66,6 +73,21 @@ namespace VRdkHRMsysBLL.Helpers
             ).CreateMapper();
 
             return mapper.Map<OuterTypeToMapFrom, OuterTypeToMapTo>(source);
+        }
+
+        public OuterTypeToMapTo[] NestedMapCollection<OuterTypeToMapFrom, OuterTypeToMapTo,
+                                         FirstInnerTypeToMapFrom, FirstInnerTypeToMapTo,
+                                         SecondInnerTypeToMapFrom, SecondInnerTypeToMapTo>(OuterTypeToMapFrom[] source)
+        {
+            var mapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<OuterTypeToMapFrom, OuterTypeToMapTo>();
+                cfg.CreateMap<FirstInnerTypeToMapFrom, FirstInnerTypeToMapTo>();
+                cfg.CreateMap<SecondInnerTypeToMapFrom, SecondInnerTypeToMapTo>();
+            }
+            ).CreateMapper();
+
+            return mapper.Map<OuterTypeToMapFrom[], OuterTypeToMapTo[]>(source);
         }
     }
 }
