@@ -31,9 +31,7 @@
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PostId" class="control-label"></label>
-                <input asp-for="PostId" class="form-control" />
-                <span asp-validation-for="PostId" class="text-danger"></span>
+                <select asp-for="PostId" asp-items="Model.Posts"></select>
             </div>
             <div class="form-group">
                 <div class="checkbox">
@@ -73,9 +71,32 @@
                 <span asp-validation-for="WorkEmail" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Role" class="control-label"></label>
-                <input asp-for="Role" class="form-control" />
-                <span asp-validation-for="Role" class="text-danger"></span>
+                <select asp-for="Role" asp-items="Model.Roles"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SickLeaveBalance" class="control-label"></label>
+                <input asp-for="SickLeaveBalance" class="form-control" />
+                <span asp-validation-for="SickLeaveBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaidVacationBalance" class="control-label"></label>
+                <input asp-for="PaidVacationBalance" class="form-control" />
+                <span asp-validation-for="PaidVacationBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UnpaidVacationBalance" class="control-label"></label>
+                <input asp-for="UnpaidVacationBalance" class="form-control" />
+                <span asp-validation-for="UnpaidVacationBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AbsenceBalance" class="control-label"></label>
+                <input asp-for="AbsenceBalance" class="form-control" />
+                <span asp-validation-for="AbsenceBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AssignmentBalance" class="control-label"></label>
+                <input asp-for="AssignmentBalance" class="form-control" />
+                <span asp-validation-for="AssignmentBalance" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />

@@ -10,8 +10,6 @@ namespace VRdkHRMsysDAL.Contexts
         public virtual DbSet<Assignment> Assignment { get; set; }
         public virtual DbSet<AssignmentEmployee> AssignmentEmployee { get; set; }
         public virtual DbSet<DayOff> DayOff { get; set; }
-        public virtual DbSet<DayOffImportanceState> DayOffImportanceState { get; set; }
-        public virtual DbSet<DayOffState> DayOffState { get; set; }
         public virtual DbSet<Employee> Employee { get; set; }
         public virtual DbSet<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
         public virtual DbSet<Organisation> Organisation { get; set; }
@@ -125,13 +123,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("day_off_date")
                     .HasColumnType("date");
 
-                entity.Property(e => e.DayOffImportanceStateId)
-                    .HasColumnName("day_off_importance_state_id")
-                    .HasMaxLength(450);
+                entity.Property(e => e.DayOffImportance)
+                    .HasColumnName("day_off_importance")
+                    .HasMaxLength(512);
 
-                entity.Property(e => e.DayOffStateId)
-                    .HasColumnName("day_off_state_id")
-                    .HasMaxLength(450);
+                entity.Property(e => e.DayOffState)
+                    .HasColumnName("day_off_state")
+                    .HasMaxLength(512);
 
                 entity.Property(e => e.EmployeeId)
                     .HasColumnName("employee_id")
@@ -141,48 +139,10 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("process_date")
                     .HasColumnType("datetime");
 
-                entity.HasOne(d => d.DayOffImportanceState)
-                    .WithMany(p => p.DayOff)
-                    .HasForeignKey(d => d.DayOffImportanceStateId)
-                    .HasConstraintName("FK__day_off__day_off__6A30C649");
-
-                entity.HasOne(d => d.DayOffState)
-                    .WithMany(p => p.DayOff)
-                    .HasForeignKey(d => d.DayOffStateId)
-                    .HasConstraintName("FK__day_off__day_off__693CA210");
-
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.DayOff)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__day_off__employe__68487DD7");
-            });
-
-            modelBuilder.Entity<DayOffImportanceState>(entity =>
-            {
-                entity.ToTable("day_off_importance_state");
-
-                entity.Property(e => e.DayOffImportanceStateId)
-                    .HasColumnName("day_off_importance_state_id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(512);
-            });
-
-            modelBuilder.Entity<DayOffState>(entity =>
-            {
-                entity.ToTable("day_off_state");
-
-                entity.Property(e => e.DayOffStateId)
-                    .HasColumnName("day_off_state_id")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(512);
             });
 
             modelBuilder.Entity<Employee>(entity =>

@@ -32,9 +32,8 @@ namespace VRdkHRMsystem.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
-        private readonly ILogger _logger;
         private readonly IEmployeeService _employeeService;
-        private readonly IVacationService _vacationRequestService;
+        private readonly IVacationService _vacationService;
         private readonly IResidualsService _residualsService;
         private readonly ITransactionService _transactionService;
         private readonly IPostService _postService;
@@ -51,7 +50,7 @@ namespace VRdkHRMsystem.Controllers
             SignInManager<ApplicationUser> signInManager,
             IPostService postService,
             IEmployeeService employeeService,
-            IVacationService vacationRequestService,
+            IVacationService vacationService,
             IResidualsService residualsService,
             ISickLeaveService sickLeaveService,
             ITransactionService transactionService,
@@ -60,7 +59,6 @@ namespace VRdkHRMsystem.Controllers
             ITeamService teamService,
             IAssignmentService assignmentService,
             IEmailSender emailSender,
-            ILogger<AccountController> logger,
             IViewListMapper listMapper,
             IMapHelper mapHelper)
         {
@@ -68,7 +66,7 @@ namespace VRdkHRMsystem.Controllers
             _signInManager = signInManager;
             _employeeService = employeeService;
             _residualsService = residualsService;
-            _vacationRequestService = vacationRequestService;
+            _vacationService = vacationService;
             _transactionService = transactionService;
             _fileManagmentService = fileManagmentService;
             _notificationService = notificationService;
@@ -77,7 +75,6 @@ namespace VRdkHRMsystem.Controllers
             _assignmentService = assignmentService;
             _sickLeaveRequestService = sickLeaveService;
             _emailSender = emailSender;
-            _logger = logger;
             _listMapper = listMapper;
             _mapHelper = mapHelper;
         }
@@ -85,10 +82,20 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<IActionResult> EditEmployee(string id)
         {
-            var employee = await _employeeService.GetByIdAsync(id);
+            var employee = await _employeeService.GetByIdWithResidualsAsync(id);
             if (employee != null)
             {
+                var user = await _userManager.FindByIdAsync(employee.EmployeeId);
+                var role = await _userManager.GetRolesAsync(user);
+                var posts = await _postService.GetPostsByOrganisationIdAsync(employee.OrganisationId);
                 var model = _mapHelper.Map<EmployeeDTO, EditEmployeeViewModel>(employee);
+                model.AbsenceBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance;
+                model.AssignmentBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance;
+                model.PaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance;
+                model.UnpaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance;
+                model.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
+                model.Posts = _listMapper.CreateOrganisationPostsList(posts, employee.PostId);
+                model.Roles = _listMapper.CreateRolesList(role[0]);
                 return View(model);
             }
 
@@ -98,7 +105,7 @@ namespace VRdkHRMsystem.Controllers
         [HttpPost]
         public async Task<IActionResult> EditEmployee(EditEmployeeViewModel model)
         {
-            var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
+            var employee = await _employeeService.GetByIdWithResidualsAsync(model.EmployeeId);
             if (employee != null)
             {
                 var user = await _userManager.FindByIdAsync(model.EmployeeId);
@@ -109,12 +116,37 @@ namespace VRdkHRMsystem.Controllers
                 {
                     await _signInManager.RefreshSignInAsync(user);
                 }
-                await _userManager.UpdateAsync(user);
+
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains(model.Role))
+                {
+                   if ((!roles.Contains(RoleEnum.Administrator.ToString())
+                   && model.Role == RoleEnum.Administrator.ToString())
+                   || (!roles.Contains(RoleEnum.Administrator.ToString())
+                   && !roles.Contains(RoleEnum.Teamlead.ToString())
+                   && model.Role == RoleEnum.Teamlead.ToString())
+                   )
+                   {
+                        await _userManager.AddToRoleAsync(user, model.Role.ToString());
+                   }
+                   else
+                   {
+                        await _userManager.RemoveFromRolesAsync(user, roles);
+                        await _userManager.AddToRoleAsync(user, model.Role);
+                   }
+                }                          
+                await _userManager.UpdateAsync(user);                
+                employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance = model.AbsenceBalance;
+                employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance = model.AssignmentBalance;
+                employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance = model.PaidVacationBalance;
+                employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance = model.UnpaidVacationBalance;
+                employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance = model.SickLeaveBalance;
                 var newEmployee = _mapHelper.Map<EditEmployeeViewModel, EmployeeDTO>(model);
                 await _employeeService.UpdateAsync(newEmployee);
+                await _residualsService.UpdateRangeAsync(employee.EmployeeBalanceResiduals);
             }
 
-            return View(model);
+            return RedirectToAction("Profile","Profile");
         }
 
         [HttpGet]
@@ -142,11 +174,11 @@ namespace VRdkHRMsystem.Controllers
                 var result = await _userManager.CreateAsync(user, "123asdQ!");
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, model.Role);
-                    var employee = _mapHelper.Map<AddEmployeeViewModel, EmployeeDTO>(model);
-                    employee.EmployeeId = user.Id;
-                    employee.OrganisationId = organisationId;
-                    employee.EmployeeBalanceResiduals = new BalanceResidualsDTO[]
+                   await _userManager.AddToRoleAsync(user, model.Role);
+                   var employee = _mapHelper.Map<AddEmployeeViewModel, EmployeeDTO>(model);
+                   employee.EmployeeId = user.Id;
+                   employee.OrganisationId = organisationId;
+                   var residuals = new BalanceResidualsDTO[]
                     {
                       new BalanceResidualsDTO
                       {
@@ -175,10 +207,17 @@ namespace VRdkHRMsystem.Controllers
                       EmployeeId = employee.EmployeeId,
                       Name = ResidualTypeEnum.Absence.ToString(),
                       ResidualBalance = model.AbsenceBalance
+                      },
+                      new BalanceResidualsDTO
+                      {
+                      ResidualId = Guid.NewGuid().ToString(),
+                      EmployeeId = employee.EmployeeId,
+                      Name = ResidualTypeEnum.Assignment.ToString(),
+                      ResidualBalance = model.AssignmentBalance
                       }
                     };
                     await _employeeService.CreateAsync(employee);
-
+                    await _residualsService.CreateRangeAsync(residuals);
                     var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
                     var emailConfirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string callbackUrl = Url.Action("SetPasswordAndConfrimEmail", "Account", new { id = user.Id, resetCode = passwordResetCode, confirmCode = emailConfirmationCode }, Request.Scheme);
@@ -196,7 +235,10 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> ViewVacationRequests()
         {
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            var requests = await _vacationRequestService.GetProccessingVacationRequestsAsync(employee.OrganisationId, employee.TeamId);
+            var requests = await _vacationService.GetForProccessAsync(req
+                                                        => (req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                        || req.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
+                                                        && req.Employee.OrganisationId == employee.OrganisationId);
             var model = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(requests);
             return View(model);
         }
@@ -204,8 +246,8 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<IActionResult> ProccessVacationRequest(string codeV)
         {
-            var vacationRequest = await _vacationRequestService.GetByIdWithEmployeeWithTeamAsync(codeV);
-            if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
+            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(codeV);
+            if (vacationRequest != null)
             {
                 var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
                 model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
@@ -232,8 +274,8 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> ProccessVacationRequest(VacationRequestProccessViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            var vacationRequest = await _vacationRequestService.GetByIdAsync(model.VacationId);
-            if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString()))
+            var vacationRequest = await _vacationService.GetByIdAsync(model.VacationId);
+            if (vacationRequest != null)
             {
                 vacationRequest.ProccessDate = DateTime.UtcNow;
                 vacationRequest.ProccessedbyId = user.Id;
@@ -253,13 +295,13 @@ namespace VRdkHRMsystem.Controllers
                         TransactionType = model.VacationType
                     };
                     await _transactionService.CreateAsync(transaction);
-                    vacationRequest.TransactionId = transaction.TransactionId;                   
+                    vacationRequest.TransactionId = transaction.TransactionId;
                 }
                 else
                 {
                     vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
                 }
-                await _vacationRequestService.UpdateAsync(vacationRequest);
+                await _vacationService.UpdateAsync(vacationRequest);
                 var notification = new NotificationDTO
                 {
                     NotificationId = Guid.NewGuid().ToString(),
@@ -289,11 +331,11 @@ namespace VRdkHRMsystem.Controllers
                 creator = await _employeeService.GetByIdWithTeamAsync(codeE);
             }
 
-            var employees = await _employeeService.Get(emp => emp.OrganisationId.Equals(creator.OrganisationId));
+            var employees = await _employeeService.GetAsync(emp => emp.OrganisationId.Equals(creator.OrganisationId));
 
             var model = new AddTeamViewModel
             {
-                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees.Where(emp=>emp.TeamId == null).ToArray()),
+                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees.Where(emp => emp.TeamId == null).ToArray()),
                 Teamleads = _listMapper.CreateEmployeesList(employees),
                 OrganisationId = creator.OrganisationId
             };
@@ -304,7 +346,7 @@ namespace VRdkHRMsystem.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTeam(AddTeamViewModel model)
         {
-            var employees = await _employeeService.Get(emp => model.TeamMembers.Contains(emp.EmployeeId));
+            var employees = await _employeeService.GetAsync(emp => model.TeamMembers.Contains(emp.EmployeeId));
             var team = new TeamDTO
             {
                 TeamId = Guid.NewGuid().ToString(),
@@ -313,12 +355,12 @@ namespace VRdkHRMsystem.Controllers
                 Name = model.Name
             };
             await _teamService.CreateAsync(team);
-            foreach(var employee in employees)
+            foreach (var employee in employees)
             {
                 employee.TeamId = team.TeamId;
             }
 
-            await _employeeService.UpdateRange(employees);
+            await _employeeService.UpdateRangeAsync(employees);
 
             var user = await _userManager.FindByIdAsync(model.TeamleadId);
             await _userManager.AddToRoleAsync(user, RoleEnum.Teamlead.ToString());
@@ -338,7 +380,7 @@ namespace VRdkHRMsystem.Controllers
                 creator = await _employeeService.GetByIdWithTeamAsync(codeE);
             }
 
-            var employees = await _employeeService.Get(emp => emp.OrganisationId.Equals(creator.OrganisationId));
+            var employees = await _employeeService.GetAsync(emp => emp.OrganisationId.Equals(creator.OrganisationId));
 
             var model = new AddAssignmentViewModel
             {
@@ -357,20 +399,28 @@ namespace VRdkHRMsystem.Controllers
                 AssignmentId = Guid.NewGuid().ToString(),
                 BeginDate = model.BeginDate,
                 EndDate = model.EndDate,
-                Duration = model.EndDate.DayOfYear - model.EndDate.DayOfYear,
+                Duration = model.EndDate.DayOfYear - model.BeginDate.DayOfYear,
                 Name = model.Name,
-                OrganisationId = model.OrganisationId          
+                OrganisationId = model.OrganisationId
             };
             assignment.Employees = model.AssignmentMembers.Select(code => new AssignmentEmployeeDTO
             {
                 AssignmentId = assignment.AssignmentId,
-                EmployeeId =  code,
+                EmployeeId = code,
                 RowId = Guid.NewGuid().ToString()
             }).ToArray();
+
             await _assignmentService.CreateAsync(assignment);
             var employees = await _employeeService.GetWithTeam(emp => model.AssignmentMembers.Any(m => m == emp.EmployeeId));
+            var residuals = await _residualsService.GetAsync(res => model.AssignmentMembers.Any(m => m == res.EmployeeId) && res.Name == ResidualTypeEnum.Assignment.ToString());
+            foreach (var res in residuals)
+            {
+                res.ResidualBalance += assignment.Duration;
+            }
+
+            await _residualsService.UpdateRangeAsync(residuals);
             List<NotificationDTO> notificationList = new List<NotificationDTO>();
-            foreach(var employee in employees)
+            foreach (var employee in employees)
             {
                 notificationList.Add(new NotificationDTO
                 {
@@ -380,9 +430,9 @@ namespace VRdkHRMsystem.Controllers
                     NotificationType = NotificationTypeEnum.Assignment.ToString(),
                     NotificationDate = DateTime.UtcNow,
                     Description = "You have been added to assignment",
-                    IsChecked = false                   
+                    IsChecked = false
                 });
-                if(employee.TeamId != null)
+                if (employee.TeamId != null)
                 {
                     notificationList.Add(new NotificationDTO
                     {

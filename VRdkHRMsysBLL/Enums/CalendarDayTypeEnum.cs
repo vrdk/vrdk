@@ -4,12 +4,8 @@ using System.Text;
 
 namespace VRdkHRMsysBLL.Enums
 {
-    public enum NotificationTypeEnum
+    public enum CalendarDayTypeEnum
     {
-        Assignment,
-        Absence,
-        Vacation,
-        SickLeave,
         DayOff,
         WorkDay
     }

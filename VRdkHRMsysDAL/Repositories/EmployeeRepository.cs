@@ -38,9 +38,9 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.Employee.FirstOrDefaultAsync(em => em.WorkEmail.Equals(email));
         }
 
-        public async Task<Employee> GetByIdWithResidualsAsync(string email)
+        public async Task<Employee> GetByIdWithResidualsAsync(string id)
         {
-            return await _context.Employee.Include(x => x.EmployeeBalanceResiduals).FirstOrDefaultAsync(em => em.WorkEmail.Equals(email));
+            return await _context.Employee.Include(x => x.EmployeeBalanceResiduals).FirstOrDefaultAsync(em => em.EmployeeId == id);
         }
 
         public async Task<Employee> GetByEmailWithTeamAsync(string email)

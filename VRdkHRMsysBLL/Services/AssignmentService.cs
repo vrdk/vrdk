@@ -34,5 +34,11 @@ namespace VRdkHRMsysBLL.Services
             var assignments = await _assignmentRepository.GetWithEmployeeAsync(condition);
             return _mapHelper.NestedMapCollection<Assignment, AssignmentDTO, AssignmentEmployee, AssignmentEmployeeDTO, Employee, EmployeeDTO>(assignments);
         }
+
+        public async Task<AssignmentEmployeeDTO[]> GetByEmployeeIdAsync(string id)
+        {
+            var assignments = await _assignmentRepository.GetByEmployeeIdAsync(id);
+            return _mapHelper.MapCollection<AssignmentEmployee, AssignmentEmployeeDTO>(assignments);
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace VRdkHRMsysBLL.Interfaces
     {
         Task CreateAsync(AssignmentDTO assignment);
         Task<AssignmentDTO[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
+        Task<AssignmentEmployeeDTO[]> GetByEmployeeIdAsync(string id);
     }
 }

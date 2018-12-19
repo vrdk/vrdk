@@ -5,6 +5,7 @@
         Paid_vacation,
         Unpaid_vacation,
         Absence,    
-        Sick_leave
+        Sick_leave,
+        Assignment
     }
 }

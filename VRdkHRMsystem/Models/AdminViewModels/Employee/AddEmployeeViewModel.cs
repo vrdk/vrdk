@@ -43,16 +43,19 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         [Range(1, 100)]
         public int PaidVacationBalance { get; set; }
         [Required]
-        [Display(Name = "Paid vacation balance")]
+        [Display(Name = "Unpaid vacation balance")]
         [Range(1, 100)]
         public int UnpaidVacationBalance { get; set; }
         [Required]
-        [Display(Name = "Paid vacation balance")]
+        [Display(Name = "Sick leave balance")]
         [Range(1, 100)]
         public int SickLeaveBalance { get; set; }
         [Required]
-        [Display(Name = "Paid vacation balance")]
+        [Display(Name = "Absence balance")]
         [Range(1,100)]
         public int AbsenceBalance { get; set; }
+        [Display(Name = "Assignment balance")]
+        [Range(1, 100)]
+        public int AssignmentBalance { get; set; }
     }
 }

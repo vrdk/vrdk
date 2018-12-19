@@ -182,7 +182,7 @@ namespace VRdkHRMsystem.Controllers
         {
             var request = await _sickLeaveService.GetByIdAsync(codeS);
             request.CloseDate = DateTime.UtcNow.Date;
-            request.Duration = request.CloseDate?.DayOfYear - request.CreateDate.DayOfYear;
+            request.Duration = request.CloseDate?.DayOfYear != request.CreateDate.DayOfYear ? request.CloseDate?.DayOfYear - request.CreateDate.DayOfYear : 1;
             request.RequestStatus = RequestStatusEnum.Closed.ToString();
             await _sickLeaveService.UpdateAsync(request);
             return Ok();

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.SickLeave;
 using VRdkHRMsysBLL.DTOs.Team;
@@ -18,6 +20,12 @@ namespace VRdkHRMsysBLL.Services
         {
             _sickLeaveRepository = sickLeaveRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task<SickLeaveRequestDTO[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null)
+        {
+            var requests = await _sickLeaveRepository.GetAsync(condition);
+            return _mapHelper.MapCollection<SickLeaveRequest, SickLeaveRequestDTO>(requests);
         }
 
         public async Task<SickLeaveRequestDTO> GetByIdAsync(string id)

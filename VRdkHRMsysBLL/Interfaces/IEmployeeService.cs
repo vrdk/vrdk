@@ -12,10 +12,11 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<EmployeeDTO> GetByEmailAsync(string email);
         Task<EmployeeDTO> GetByIdWithTeamAsync(string id);
         Task<EmployeeDTO> GetByEmailWithTeamAsync(string email);
-        Task<EmployeeDTO[]> Get(Expression<Func<Employee, bool>> condition = null);
+        Task<EmployeeDTO> GetByIdWithResidualsAsync(string id);
+        Task<EmployeeDTO[]> GetAsync(Expression<Func<Employee, bool>> condition = null);
         Task<EmployeeDTO[]> GetWithTeam(Expression<Func<Employee, bool>> condition = null);
         Task CreateAsync(EmployeeDTO employee);
         Task UpdateAsync(EmployeeDTO employee);
-        Task UpdateRange(EmployeeDTO[] newEmployees);
+        Task UpdateRangeAsync(EmployeeDTO[] newEmployees);
     }
 }

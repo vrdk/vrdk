@@ -1,57 +1,38 @@
-﻿@model IEnumerable<VRdkHRMsystem.Models.SharedViewModels.Vacation.VacationRequestViewModel>
+﻿@model IEnumerable<VRdkHRMsystem.Models.Profile.Vacation.ProfileVacationsViewModel>
 
 @{
-    ViewData["Title"] = "ViewVacationRequests";
+    ViewData["Title"] = "Vacations";
 }
 
-<h2>ViewVacationRequests</h2>
+<h2>Vacations</h2>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
-        <tr>              
+        <tr>
                 <th>
-                    Name
+                    @Html.DisplayNameFor(model => model.BeginDate)
                 </th>
                 <th>
-                    Team
+                    @Html.DisplayNameFor(model => model.EndDate)
                 </th>
                 <th>
-                    Vacation type
+                    @Html.DisplayNameFor(model => model.Duration)
                 </th>
                 <th>
-                    Begin Date
+                    @Html.DisplayNameFor(model => model.VacationType)
                 </th>
                 <th>
-                    End Date
-                </th>
-                <th>
-                    Duration
-                </th>
-                <th>
-                    Request Status
+                    @Html.DisplayNameFor(model => model.RequestStatus)
                 </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-            @foreach (var item in Model)
-            {
+@foreach (var item in Model) {
         <tr>
-            <td hidden>
-                @item.VacationId
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EmployeeFullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TeamName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VacationType)
-            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.BeginDate)
             </td>
@@ -62,6 +43,9 @@
                 @Html.DisplayFor(modelItem => item.Duration)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.VacationType)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.RequestStatus)
             </td>
             <td>
@@ -70,6 +54,6 @@
                 @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
             </td>
         </tr>
-            }
+}
     </tbody>
 </table>

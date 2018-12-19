@@ -7,6 +7,8 @@ using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
 using System.Linq;
+using System.Linq.Expressions;
+using System;
 
 namespace VRdkHRMsysBLL.Services
 {
@@ -35,35 +37,15 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<VacationRequest, VacationRequestDTO>(request);
         }
 
-        public async Task<VacationRequestViewDTO[]> GetProccessingVacationRequestsAsync(string organisationId, string teamId)
+        public async Task<VacationRequestDTO[]> GetAsync(Expression<Func<VacationRequest, bool>> condition = null)
         {
-            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(req
-                                                        => (req.Employee.TeamId == teamId
-                                                         || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-                                                         && req.Employee.OrganisationId.Equals(organisationId));
-            var requests = reqs != null ? reqs.Select(r=> new VacationRequestViewDTO()
-            {
-                EmployeeId = r.EmployeeId,
-                VacationId =r.VacationId,
-                EmployeeFullName = $"{r.Employee.FirstName} {r.Employee.LastName}",
-                BeginDate = r.BeginDate,
-                EndDate = r.EndDate,
-                Duration = r.Duration,
-                RequestStatus = r.RequestStatus,
-                TeamName = r.Employee.Team != null ? r.Employee.Team.Name : emptyValue,
-                VacationType = r.VacationType.Replace('_', ' ')
-            }
-            ).ToArray() : new VacationRequestViewDTO[] { };
-
-            return requests;
+            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(condition);
+            return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(reqs);
         }
 
-        public async Task<VacationRequestViewDTO[]> GetPendingVacationRequestsAsync(string organisationId, string teamId)
+        public async Task<VacationRequestViewDTO[]> GetForProccessAsync(Expression<Func<VacationRequest, bool>> condition = null)
         {
-            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(req
-                                                         => req.Employee.TeamId == teamId
-                                                         && !req.RequestStatus.Equals(RequestStatusEnum.Proccessing.ToString())
-                                                         && req.Employee.OrganisationId.Equals(organisationId));
+            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(condition);
             var requests = reqs != null ? reqs.Select(r => new VacationRequestViewDTO()
             {
                 EmployeeId = r.EmployeeId,

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
-namespace VRdkHRMsysDAL.Entities
+namespace VRdkHRMsysBLL.DTOs.DayOff
 {
-    public partial class DayOff
+    public class DayOffDTO
     {
         public string DayOffId { get; set; }
         public string EmployeeId { get; set; }
         public string DayOffState { get; set; }
-        public string DayOffImportance{ get; set; }
+        public string DayOffImportance { get; set; }
         public DateTime DayOffDate { get; set; }
         public DateTime? ProcessDate { get; set; }
-
-        public Employee Employee { get; set; }
     }
 }

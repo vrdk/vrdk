@@ -1,0 +1,62 @@
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarDayViewModel
+
+@{
+    ViewData["Title"] = "ProccessCalendarDay";
+}
+
+<h2>ProccessCalendarDay</h2>
+
+<h4>CalendarDayViewModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ProccessCalendarDay">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group" hidden>
+                <label asp-for="EmployeeId" class="control-label"></label>
+                <input asp-for="EmployeeId" class="form-control" />
+                <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="From" class="control-label"></label>
+                <input asp-for="From" class="form-control" />
+                <span asp-validation-for="From" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeTo" class="control-label"></label>
+                <input asp-for="TimeTo" class="form-control" />
+                <span asp-validation-for="TimeTo" class="text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+            <div class="radio">
+                <div class="form-group">
+                    <label>
+                        Рабочий день
+                        <input type="radio" name="Result" value="WorkDay" checked />
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Выходной
+                        <input type="radio" name="Result" value="DayOff" />
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -12,5 +12,6 @@ namespace VRdkHRMsysBLL.DTOs.Assignment
         public string AssignmentId { get; set; }
 
         public EmployeeDTO Employee { get; set; }
+        public AssignmentDTO Assignment { get; set; }
     }
 }

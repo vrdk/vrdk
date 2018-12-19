@@ -27,12 +27,12 @@ namespace VRdkHRMsystem.Services
             return types.Select(type => new SelectListItem() { Text = type.DisplayName, Value = type.Name }).ToArray();
         }
 
-        public SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts)
+        public SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts, string editUserPost = null)
         {
-            return posts.Select(post => new SelectListItem() { Text = post.Name, Value = post.PostId }).ToArray();
+            return posts.Select(post => new SelectListItem() { Text = post.Name, Value = post.PostId, Selected = post.PostId == editUserPost }).ToArray();
         }
 
-        public SelectListItem[] CreateRolesList()
+        public SelectListItem[] CreateRolesList(string editUserRole = null)
         {
             var roles = new Role[] {
                 new Role
@@ -48,7 +48,7 @@ namespace VRdkHRMsystem.Services
                     Name=RoleEnum.Employee.ToString()
                 }
             };
-            return roles.Select(role => new SelectListItem() { Text = role.Name, Value = role.Name }).ToArray();
+            return roles.Select(role => new SelectListItem() { Text = role.Name, Value = role.Name, Selected = role.Name == editUserRole }).ToArray();
         }
 
         public SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees)

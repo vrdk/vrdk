@@ -8,5 +8,6 @@ namespace VRdkHRMsysDAL.Interfaces
     public interface IAssignmentRepository : IRepository<Assignment>
     {
         Task<Assignment[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
+        Task<AssignmentEmployee[]> GetByEmployeeIdAsync(string id);
     }
 }

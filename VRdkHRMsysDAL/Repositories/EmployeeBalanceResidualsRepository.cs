@@ -45,6 +45,11 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.EmployeeBalanceResiduals.FirstOrDefaultAsync(res=>res.EmployeeId.Equals(id) && res.Name.Equals(type));
         }
 
+        public async Task CreateRangeAsync(EmployeeBalanceResiduals[] entities)
+        {
+            _context.AddRange(entities);
+            await _context.SaveChangesAsync();
+        }
         public async Task UpdateAsync()
         {
             await _context.SaveChangesAsync();

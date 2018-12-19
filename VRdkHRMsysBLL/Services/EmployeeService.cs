@@ -26,7 +26,7 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
-        public async Task<EmployeeDTO[]> Get(Expression<Func<Employee, bool>> condition = null)
+        public async Task<EmployeeDTO[]> GetAsync(Expression<Func<Employee, bool>> condition = null)
         {
             var employees = await _employeeRepository.GetAsync(condition);
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
@@ -56,29 +56,38 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<Employee, EmployeeDTO>(employee);
         }
 
+        public async Task<EmployeeDTO> GetByIdWithResidualsAsync(string id)
+        {
+            var employee = await _employeeRepository.GetByIdWithResidualsAsync(id);
+            return _mapHelper.Map<Employee, EmployeeDTO>(employee);
+        }
+
         public async Task<EmployeeDTO> GetByIdWithTeamAsync(string id)
         {
             var employee = await _employeeRepository.GetByIdWithTeamAsync(id);
             return _mapHelper.NestedMap<Employee, EmployeeDTO, Team, TeamDTO>(employee);
         }
-        public async Task UpdateRange(EmployeeDTO[] newEmployees)
+        public async Task UpdateRangeAsync(EmployeeDTO[] newEmployees)
         {
             var currentEmployees = await _employeeRepository.GetAsync(emp => newEmployees.Any(e=>emp.EmployeeId==e.EmployeeId));
             if (currentEmployees != null)
             {
-                for(int i = 0; i < currentEmployees.Length; i++)
+                newEmployees.OrderBy(emp => emp.EmployeeId);
+                currentEmployees.OrderBy(emp => emp.EmployeeId);
+                for (int i = 0; i < currentEmployees.Length; i++)
                 {
                     _mapHelper.MapChanges(newEmployees[i],currentEmployees[i]);
                 }
+
                 await _employeeRepository.UpdateAsync();
             }
         }
         public async Task UpdateAsync(EmployeeDTO newEmployee)
         {
-            var currentEmployee = await _employeeRepository.GetByIdAsync(newEmployee.EmployeeId);
+            var currentEmployee = await _employeeRepository.GetByIdWithResidualsAsync(newEmployee.EmployeeId);
             if(currentEmployee != null)
             {
-                _mapHelper.MapChanges(newEmployee, currentEmployee);             
+                _mapHelper.MapChanges(newEmployee, currentEmployee);    
                 await _employeeRepository.UpdateAsync();
             }         
         }

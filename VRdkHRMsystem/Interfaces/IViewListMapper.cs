@@ -7,8 +7,8 @@ namespace VRdkHRMsystem.Interfaces
     public interface IViewListMapper
     {
         SelectListItem[] CreateVacationTypesList();
-        SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts);
-        SelectListItem[] CreateRolesList();
+        SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts, string editUserPost = null);
+        SelectListItem[] CreateRolesList(string editUserRole = null);
         SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees);
         MultiSelectList CreateMultiEmployeesList(EmployeeDTO[] employees);
     }
