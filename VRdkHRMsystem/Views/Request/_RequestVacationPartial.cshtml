@@ -1,0 +1,71 @@
+﻿@model VRdkHRMsystem.Models.RequestViewModels.Vacation.RequestVacationViewModel
+
+<form asp-action="RequestVacation" method="post">
+    <div class="profile__right">
+        <div class="profile__days vacrequest__days">
+            <div class="profile__block">
+                <p class="profile__daystitle profile__daystitle_border-none">Отпуск</p>
+                <div class="profile__vacdays_wrapper">
+                    <div>
+                        <p class="profile__vacdays_title">Оплаченный</p>
+                        <div class="profile__daysblock">
+                            <p class="profile__dayscount">@Model.PaidVacationResiduals</p>
+                            <p class="profile__days_word">Дней</p>
+                            <p class="profile__days_leftword">Осталось</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="profile__vacdays_title">Неоплаченный</p>
+                        <div class="profile__daysblock">
+                            <p class="profile__dayscount">@Model.UnpaidVaccationResiduals</p>
+                            <p class="profile__days_word">Дней</p>
+                            <p class="profile__days_leftword">Осталось</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="vacrequest__request">
+            <p>Запрос на отпуск</p>
+            <div class="vacrequest__body">
+                <div class="vacrequest__body_left">
+                    <input asp-for="EmployeeId" hidden />
+                    <div class="vacrequest__block">
+                        <p>@Html.DisplayNameFor(model => model.VacationType)</p>
+                        <div class="select">
+                            <select asp-for="VacationType" asp-items="Model.VacationTypes" class="input vacrequest__select"></select>
+                        </div>
+                    </div>
+                    <div class="vacrequest__block">
+                        <p>Вид</p>
+                        <textarea class="input" type="text"></textarea>
+                    </div>
+                </div>
+                <div class="vacrequest__body_right">
+                    <div class="vacrequest__block">
+                        <p>От</p>
+                        <input class="input" type="text" id="vacrequest__from_datepicker" name="BeginDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" />
+                    </div>
+                    <div class="vacrequest__block">
+                        <p>До</p>
+                        <input class="input" type="text" id="vacrequest__to_datepicker" name="EndDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" />
+                    </div>
+                    <div class="vacrequest__block">
+                        <p>Длительность</p>
+                        <input asp-for="Duration" readonly id="Duration" class="input" />
+                    </div>
+                    <div class="vacrequest__button_wrapper">
+                        <button class="empprofile__button button">
+                            <img src="~/images/cancel.png" alt="cancel" />
+                            <p>Отменить</p>
+                        </button>
+                        <button class="empprofile__button button" type="submit">
+                            <img src="~/images/plus.png" alt="submit" />
+                            <p>Готово</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

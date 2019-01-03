@@ -10,6 +10,6 @@ namespace VRdkHRMsystem.Interfaces
         SelectListItem[] CreateOrganisationPostsList(PostDTO[] posts, string editUserPost = null);
         SelectListItem[] CreateRolesList(string editUserRole = null);
         SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees);
-        MultiSelectList CreateMultiEmployeesList(EmployeeDTO[] employees);
+        SelectListItem[] CreateStateList(bool userState);
     }
 }

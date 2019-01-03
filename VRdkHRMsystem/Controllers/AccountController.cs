@@ -210,13 +210,13 @@ namespace VRdkHRMsystem.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpGet]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction(nameof(AccountController.Login), "Account");
         }
 
         [HttpPost]
@@ -324,7 +324,7 @@ namespace VRdkHRMsystem.Controllers
                 string callbackUrl = Url.Action("ResetPassword", "Account", new { user.Id, code, email = user.Email}, Request.Scheme);
                 await _emailSender.SendPasswordResetLink(model.Email,"", "Reset Password","",
                    $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                return RedirectToAction(nameof(Login));
             }
 
             // If we got this far, something failed, redisplay form
@@ -381,7 +381,7 @@ namespace VRdkHRMsystem.Controllers
             var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
             if (result.Succeeded)
             {
-                return RedirectToAction(nameof(ResetPasswordConfirmation));
+                return RedirectToAction(nameof(Login));
             }
             AddErrors(result);
             return View();
@@ -419,7 +419,7 @@ namespace VRdkHRMsystem.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(AccountController.Login), "Account");
             }
         }
 

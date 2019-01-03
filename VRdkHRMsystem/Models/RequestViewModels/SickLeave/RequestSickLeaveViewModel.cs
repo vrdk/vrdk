@@ -6,6 +6,7 @@ namespace VRdkHRMsystem.Models.RequestViewModels.SickLeave
     {
         public string EmployeeId { get; set; }
         public string Comment { get; set; }
-        public IFormFile[] Files { get; set; }
+        public IFormFile File { get; set; }
+        public int SickLeaveBalance { get; set; }
     }
 }

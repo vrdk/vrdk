@@ -12,6 +12,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Team
         public string TeamleadId { get; set; }
         public IEnumerable<SelectListItem> Teamleads { get; set; }
         public string[] TeamMembers { get; set; }
-        public EmployeeViewModel[] Employees { get; set; }
+        public IEnumerable<SelectListItem> Employees { get; set; }
     }
 }

@@ -96,6 +96,7 @@ namespace VRdkHRMsystem.Controllers
                 model.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
                 model.Posts = _listMapper.CreateOrganisationPostsList(posts, employee.PostId);
                 model.Roles = _listMapper.CreateRolesList(role[0]);
+                model.States = _listMapper.CreateStateList(model.State);
                 return View(model);
             }
 
@@ -158,7 +159,8 @@ namespace VRdkHRMsystem.Controllers
             var model = new AddEmployeeViewModel()
             {
                 Posts = _listMapper.CreateOrganisationPostsList(posts),
-                Roles = _listMapper.CreateRolesList()
+                Roles = _listMapper.CreateRolesList(),
+                States = _listMapper.CreateStateList(true)
             };
 
             return View(model);
@@ -267,7 +269,7 @@ namespace VRdkHRMsystem.Controllers
                 return View(model);
             }
 
-            return View();
+            return View(); 
         }
 
         [HttpPost]
@@ -281,8 +283,9 @@ namespace VRdkHRMsystem.Controllers
                 vacationRequest.ProccessedbyId = user.Id;
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                 {
-                    var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
                     vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                    await _vacationService.UpdateAsync(vacationRequest);
+                    var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);                
                     residual.ResidualBalance -= vacationRequest.Duration;
                     await _residualsService.UpdateAsync(residual);
                     var transaction = new TransactionDTO()
@@ -300,14 +303,14 @@ namespace VRdkHRMsystem.Controllers
                 else
                 {
                     vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                }
-                await _vacationService.UpdateAsync(vacationRequest);
+                    await _vacationService.UpdateAsync(vacationRequest);
+                }               
                 var notification = new NotificationDTO
                 {
                     NotificationId = Guid.NewGuid().ToString(),
                     EmployeeId = vacationRequest.EmployeeId,
                     OrganisationId = user.OrganisationId,
-                    NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                    NotificationType = NotificationTypeEnum.Vacation.ToString(),
                     NotificationDate = DateTime.UtcNow,
                     Description = $"Your vacation request was proccessed",
                     IsChecked = false
@@ -335,7 +338,7 @@ namespace VRdkHRMsystem.Controllers
 
             var model = new AddTeamViewModel
             {
-                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees.Where(emp => emp.TeamId == null).ToArray()),
+                Employees = _listMapper.CreateEmployeesList(employees.Where(emp => emp.TeamId == null).ToArray()),
                 Teamleads = _listMapper.CreateEmployeesList(employees),
                 OrganisationId = creator.OrganisationId
             };

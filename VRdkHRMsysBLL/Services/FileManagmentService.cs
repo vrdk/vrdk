@@ -20,12 +20,9 @@ namespace VRdkHRMsysBLL.Services
             _configuration = configuration;
         }
 
-        public async Task UploadSickLeaveFilesAsync(IFormFile[] files, string containerName)
+        public async Task UploadSickLeaveFileAsync(IFormFile file, string containerName)
         {
-            foreach (var file in files)
-            {
                 await UploadFile(file, containerName);
-            }
         }
 
         public async Task<string[]> GetSickLeaveFilesAsync(string id)

@@ -21,5 +21,7 @@ namespace VRdkHRMsystem.Models.RequestViewModels.Vacation
         public string Comment { get; set; }
         [Required]
         public int Duration { get; set; }
+        public int PaidVacationResiduals { get; set; }
+        public int UnpaidVaccationResiduals { get; set; }
     }
 }

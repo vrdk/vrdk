@@ -25,17 +25,17 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null)
         {
-            return condition != null ? await _context.Employee.Where(condition).Include(emp=>emp.Team).ToArrayAsync() : await _context.Employee.Include(emp => emp.Team).ToArrayAsync();
+            return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).ToArrayAsync() : await _context.Employee.Include(emp => emp.Team).ToArrayAsync();
         }
 
         public async Task<Employee> GetByIdAsync(string id)
         {
-            return await _context.Employee.FirstOrDefaultAsync(em => em.EmployeeId.Equals(id));
+            return await _context.Employee.FirstOrDefaultAsync(em => em.EmployeeId == id);
         }
 
         public async Task<Employee> GetByEmailAsync(string email)
         {
-            return await _context.Employee.FirstOrDefaultAsync(em => em.WorkEmail.Equals(email));
+            return await _context.Employee.FirstOrDefaultAsync(em => em.WorkEmail == email);
         }
 
         public async Task<Employee> GetByIdWithResidualsAsync(string id)
@@ -43,14 +43,24 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.Employee.Include(x => x.EmployeeBalanceResiduals).FirstOrDefaultAsync(em => em.EmployeeId == id);
         }
 
+        public async Task<Employee> GetByIdWithTeamWithResidualsAsync(string id)
+        {
+            return await _context.Employee.Include(x => x.EmployeeBalanceResiduals).Include(x => x.Team).FirstOrDefaultAsync(em => em.EmployeeId == id);
+        }
+
+        public async Task<Employee> GetByEmailWithTeamWithResidualsAsync(string email)
+        {
+            return await _context.Employee.Include(x => x.EmployeeBalanceResiduals).Include(x => x.Team).FirstOrDefaultAsync(em => em.WorkEmail == email);
+        }
+
         public async Task<Employee> GetByEmailWithTeamAsync(string email)
         {
-            return await _context.Employee.Include(x => x.Team).FirstOrDefaultAsync(em => em.WorkEmail.Equals(email));
+            return await _context.Employee.Include(x => x.Team).FirstOrDefaultAsync(em => em.WorkEmail == email);
         }
 
         public async Task<Employee> GetByIdWithTeamAsync(string id)
         {
-            return await _context.Employee.Include(x=>x.Team).FirstOrDefaultAsync(em => em.EmployeeId.Equals(id));
+            return await _context.Employee.Include(x => x.Team).FirstOrDefaultAsync(em => em.EmployeeId == id);
         }
 
         public async Task CreateAsync(Employee entity)
@@ -64,7 +74,7 @@ namespace VRdkHRMsysDAL.Repositories
             _context.Employee.Remove(entity);
             await _context.SaveChangesAsync();
         }
-       
+
         public async Task UpdateAsync()
         {
             await _context.SaveChangesAsync();

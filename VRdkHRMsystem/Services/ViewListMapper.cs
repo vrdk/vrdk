@@ -56,9 +56,23 @@ namespace VRdkHRMsystem.Services
             return employees.Select(emp => new SelectListItem() { Text = $"{emp.FirstName} {emp.LastName}", Value = emp.EmployeeId }).ToArray();
         }
 
-        public MultiSelectList CreateMultiEmployeesList(EmployeeDTO[] employees)
+        public SelectListItem[] CreateStateList(bool userState)
         {
-            return new MultiSelectList(employees, "EmployeeId", "FirstName");
+            return new SelectListItem[]
+            {
+                new SelectListItem
+                {
+                    Text = "Работает",
+                    Value = true.ToString(),
+                    Selected = true.ToString() == userState.ToString()
+                },
+                new SelectListItem
+                {
+                    Text = "Уволен",
+                    Value = false.ToString(),
+                    Selected = false.ToString() == userState.ToString()
+                }
+            };
         }
     }
 }

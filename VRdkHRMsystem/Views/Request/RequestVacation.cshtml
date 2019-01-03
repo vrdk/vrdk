@@ -1,55 +1,15 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.Vacation.RequestVacationViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.Vacation.CompositeRequestVacationViewModel
 
 @{
     ViewData["Title"] = "RequestVacation";
 }
-
-<h2>RequestVacation</h2>
-
-<h4>RequestVacationViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="RequestVacation">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group" hidden>
-                <input asp-for="EmployeeId" class="form-control" />
-            </div>
-            <div class="form-group">
-                <label asp-for="VacationType" class="control-label"></label>
-                <select asp-for="VacationType" asp-items="Model.VacationTypes"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="BeginDate" class="control-label"></label>
-                <input asp-for="BeginDate" class="form-control" />
-                <span asp-validation-for="BeginDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Comment" class="control-label"></label>
-                <input asp-for="Comment" class="form-control" />
-                <span asp-validation-for="Comment" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Duration" class="control-label"></label>
-                <input asp-for="Duration" class="form-control" />
-                <span asp-validation-for="Duration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+<div class="content">
+    <div class="profile__globalwrapper">
+        @await Html.PartialAsync("~/Views/Profile/_UserProfilePartial.cshtml", Model.ProfileModel)
+        @await Html.PartialAsync("_RequestVacationPartial", Model.RequestVacationModel)
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+ @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

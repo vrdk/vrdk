@@ -3,47 +3,47 @@
 @{
     ViewData["Title"] = "AddTeam";
 }
-
-<h2>AddTeam</h2>
-
-<h4>AddTeamViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="AddTeam">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group" hidden>
-                <label asp-for="OrganisationId" class="control-label"></label>
-                <input asp-for="OrganisationId" class="form-control" />
-                <span asp-validation-for="OrganisationId" class="text-danger"></span>
+<div class="content">
+    <form asp-action="AddTeam" method="post">
+        <input asp-for="OrganisationId" hidden />
+        <div class="teamprofile">
+            <div class="teamprofile__leader">
+                <div class="teamprofile__info">
+                    <p>Название команды</p>
+                    <input asp-for="Name" class="input" type="text" />
+                </div>
+                <div class="teamprofile__teamlead" style="padding:20px;">
+                    <p>Team Lead:</p>
+                    <select class="emplits__empselect teamprofile__select" asp-for="TeamleadId" asp-items="Model.Teamleads" style="width:100%;" hidden></select>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="teamprofile__members">
+                <p>Учасники</p>
+                <div class="teamprofile__members_wrapper" style="padding:20px;">
+                    <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
+                </div>
+                <div class="teamprofile__empbuttons">
+                    <button class="empprofile__button button">
+                        <img src="~/images/cancel.png" alt="cancel" />
+                        <p>Отменить</p>
+                    </button>
+                    <button class="empprofile__button button" type="submit">
+                        <img src="~/images/submit.png" alt="submit" />
+                        <p>Создать</p>
+                    </button>
+                </div>
             </div>
-            <select name="TeamMembers" id="TeamMembers"  multiple>
-                @foreach (var employee in Model.Employees)
-                {
-                    <option id="@employee.EmployeeId" value="@employee.EmployeeId">@employee.FirstName @employee.LastName</option>
-                }
-            </select>
-            <div class="form-group">
-                <select asp-for="TeamleadId" asp-items="Model.Teamleads">
-                    <option>Please select one</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#teamMembers').select2({
+                placeholder: "Выберите..."
+            });
+            $('.emplits__empselect').select2();
+        });
+    </script>
 }

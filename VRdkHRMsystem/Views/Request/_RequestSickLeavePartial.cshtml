@@ -1,0 +1,46 @@
+﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.RequestSickLeaveViewModel
+
+<form asp-action="RequestSickLeave" method="post">
+    <div class="profile__right">
+        <div class="profile__days sickmessage__days">
+            <div class="profile__block">
+                <p class="profile__daystitle">Больничные</p>
+                <div class="profile__daysblock">
+                    <p class="profile__dayscount">@Model.SickLeaveBalance</p>
+                    <p class="profile__days_word">Дней</p>
+                </div>
+            </div>
+        </div>
+        <div class="vacrequest__request">
+            <p>Сообщение о болезни</p>
+            <input asp-for="EmployeeId" hidden />
+            <div class="vacrequest__body sickmessage__body">
+                <div class="vacrequest__body_left sickmessage__body_left">
+                    <div class="vacrequest__block">
+                        <p>Коментарий</p>
+                        <textarea class="input" type="text" name="Comment"></textarea>
+                    </div>
+                </div>
+                <div class="sickmessage__upload">
+                    <label class="sickmessage__ulpoad_label" for="File">
+                        <img src="~/images/camera.png" alt="cross" />
+                        <p>Загрузить фото</p>
+                    </label>
+                    <input class="sickmessage__ulpoad_my" type="file" id="File" name="myfile" multiple="multiple" />
+                </div>
+                <div class="vacrequest__body_right sickmessage__body_right">
+                    <div class="vacrequest__button_wrapper sickmessage__button_wrapper">
+                        <button class="empprofile__button button">
+                            <img src="~/images/cancel.png" alt="cancel" />
+                            <p>Отменить</p>
+                        </button>
+                        <button class="empprofile__button button" type="submit">
+                            <img src="~/images/submit.png" alt="submit" />
+                            <p>Отправить</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

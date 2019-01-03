@@ -11,6 +11,8 @@ namespace VRdkHRMsysDAL.Interfaces
         Task<Employee> GetByIdWithTeamAsync(string id);
         Task<Employee> GetByEmailWithTeamAsync(string email);
         Task<Employee> GetByIdWithResidualsAsync(string id);
+        Task<Employee> GetByIdWithTeamWithResidualsAsync(string id);
+        Task<Employee> GetByEmailWithTeamWithResidualsAsync(string email);
         Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null);
     }
 }

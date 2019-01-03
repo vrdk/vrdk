@@ -51,6 +51,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Absence)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__absence__employe__5812160E");
+               
             });
 
             modelBuilder.Entity<Assignment>(entity =>
@@ -512,6 +513,8 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__vacation___emplo__4D94879B");
+
+                entity.Property(req => req.RequestStatus).IsConcurrencyToken();
             });
 
             modelBuilder.Entity<WorkDay>(entity =>

@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.3" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.4" PrivateAssets="All" />
     <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="Select2.js" Version="4.0.5" />
     <PackageReference Include="SimpleInjector.Integration.AspNetCore.Mvc" Version="4.4.1" />
   </ItemGroup>
 
@@ -23,12 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VRdkHRMsysBLL\VRdkHRMsysBLL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Views\Account\Register.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
   </ItemGroup>
 
 </Project>

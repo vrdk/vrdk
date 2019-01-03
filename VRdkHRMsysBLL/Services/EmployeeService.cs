@@ -44,6 +44,18 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<Employee, EmployeeDTO>(employee);
         }
 
+        public async Task<EmployeeDTO> GetByIdWithTeamWithResidualsAsync(string id)
+        {
+            var employee = await _employeeRepository.GetByIdWithTeamWithResidualsAsync(id);
+            return _mapHelper.Map<Employee, EmployeeDTO>(employee);
+        }
+
+        public async Task<EmployeeDTO> GetByEmailWithTeamWithResidualsAsync(string email)
+        {
+            var employee = await _employeeRepository.GetByEmailWithTeamWithResidualsAsync(email);
+            return _mapHelper.Map<Employee, EmployeeDTO>(employee);
+        }
+
         public async Task<EmployeeDTO> GetByEmailWithTeamAsync(string email)
         {
             var employee = await _employeeRepository.GetByEmailWithTeamAsync(email);
@@ -94,7 +106,7 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task CreateAsync(EmployeeDTO employee)
         {
-            var employeeToAdd = _mapHelper.NestedMap<EmployeeDTO, Employee, BalanceResidualsDTO, EmployeeBalanceResiduals>(employee);
+            var employeeToAdd = _mapHelper.Map<EmployeeDTO, Employee>(employee);
             await _employeeRepository.CreateAsync(employeeToAdd);
         }
     }

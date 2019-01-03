@@ -1,106 +1,139 @@
 ﻿@model VRdkHRMsystem.Models.AdminViewModels.Employee.AddEmployeeViewModel
 
-@{
-    ViewData["Title"] = "AddEmployee";
-}
 
-<h2>AddEmployee</h2>
-
-<h4>AddEmployeeViewModel</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="AddEmployee">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <select asp-for="PostId" asp-items="Model.Posts"></select>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="State" /> @Html.DisplayNameFor(model => model.State)
-                    </label>
+    <form asp-action="AddEmployee" method="post" class="content">
+        <div class="profile__globalwrapper">
+            <div class="profile empprofileedit">
+                <div class="empprofile__header empprofileedit__header">
+                    <div class="profile__imgblock"><img src="~/images/profile/profilephoto.png" alt="photo" /></div>
+                    <button class="empprofile__button button empprofileedit__button">
+                        <img src="~/images/plus.png" alt="plus" />
+                        <p>Загрузить фотографию</p>
+                    </button>
+                </div>
+                <div class="profile__data">
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Имя
+                            <span asp-validation-for="FirstName" style="color: #ad545f;"></span>
+                        </label>                       
+                        <input asp-for="FirstName" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label  class="profile__blockname">
+                            Фамилия
+                            <span asp-validation-for="LastName" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="LastName" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Оплачиваемый отпуск
+                            <span asp-validation-for="PaidVacationBalance" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="PaidVacationBalance" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label  class="profile__blockname">
+                            Неоплачиваемый отпуск
+                            <span asp-validation-for="UnpaidVacationBalance" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="UnpaidVacationBalance" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Больгичные
+                            <span asp-validation-for="SickLeaveBalance" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="SickLeaveBalance" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Командировки
+                            <span asp-validation-for="AssignmentBalance" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="AssignmentBalance" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Прогулы
+                            <span asp-validation-for="AbsenceBalance" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="AbsenceBalance" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BirthDate" class="control-label"></label>
-                <input asp-for="BirthDate" class="form-control" />
-                <span asp-validation-for="BirthDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="HireDate" class="control-label"></label>
-                <input asp-for="HireDate" class="form-control" />
-                <span asp-validation-for="HireDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DismissalDate" class="control-label"></label>
-                <input asp-for="DismissalDate" class="form-control" />
-                <span asp-validation-for="DismissalDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PersonalEmail" class="control-label"></label>
-                <input asp-for="PersonalEmail" class="form-control" />
-                <span asp-validation-for="PersonalEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WorkEmail" class="control-label"></label>
-                <input asp-for="WorkEmail" class="form-control" />
-                <span asp-validation-for="WorkEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <select asp-for="Role" asp-items="Model.Roles"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="SickLeaveBalance" class="control-label"></label>
-                <input asp-for="SickLeaveBalance" class="form-control" />
-                <span asp-validation-for="SickLeaveBalance" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PaidVacationBalance" class="control-label"></label>
-                <input asp-for="PaidVacationBalance" class="form-control" />
-                <span asp-validation-for="PaidVacationBalance" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UnpaidVacationBalance" class="control-label"></label>
-                <input asp-for="UnpaidVacationBalance" class="form-control" />
-                <span asp-validation-for="UnpaidVacationBalance" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AbsenceBalance" class="control-label"></label>
-                <input asp-for="AbsenceBalance" class="form-control" />
-                <span asp-validation-for="AbsenceBalance" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AssignmentBalance" class="control-label"></label>
-                <input asp-for="AssignmentBalance" class="form-control" />
-                <span asp-validation-for="AssignmentBalance" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
-</div>
+            <div class="empprofila__data_wrapper empprofileedit__data_wrapper">
+                <div class="profile__data empprofileedit__data">
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+                    <div class="profile__datablock">
+                        <p class="profile__blockname">Роль на сайте</p>
+                        <select asp-for="Role" asp-items="Model.Roles" class="input empprofileedit__input"></select>
+                    </div>
+                    <div class="profile__datablock">
+                        <p class="profile__blockname">Должность:</p>
+                        <select asp-for="PostId" asp-items="Model.Posts" class="input empprofileedit__input"></select>
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Рабочий E-mail
+                            <span asp-validation-for="WorkEmail" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="WorkEmail" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Личный E-mail
+                            <span asp-validation-for="PersonalEmail" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="PersonalEmail" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Номер телефона
+                            <span asp-validation-for="PhoneNumber" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="PhoneNumber" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            День рождения
+                            <span asp-validation-for="BirthDate" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="BirthDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker" value="" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Дата найма
+                            <span asp-validation-for="HireDate" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="HireDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker1" value="" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <label class="profile__blockname">
+                            Дата увольнения
+                            <span asp-validation-for="DismissalDate" style="color: #ad545f;"></span>
+                        </label>
+                        <input asp-for="DismissalDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker2" value="" autocomplete="off" />
+                    </div>
+                    <div class="profile__datablock">
+                        <p class="profile__blockname">Статус</p>
+                        <select asp-for="State" asp-items="Model.States" class="input empprofileedit__input"></select>
+                    </div>
+                </div>
+                <div class="empprofileedit__buttonwrapper">
+                    <button class="empprofile__button button">
+                        <img src="~/images/cancel.png" alt="cancel" />
+                        <p>Отменить</p>
+                    </button>
+                    <button class="empprofile__button button" type="submit">
+                        <img src="~/images/submit.png" alt="submit" />
+                        <p>Готово</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
