@@ -13,5 +13,6 @@ namespace VRdkHRMsysBLL.DTOs.Vacation
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
         public string RequestStatus { get; set; }
+        public int Balance { get; set; }
     }
 }

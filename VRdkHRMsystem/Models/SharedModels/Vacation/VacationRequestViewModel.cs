@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.SharedViewModels.Vacation
+namespace VRdkHRMsystem.Models.SharedModels.Vacation
 {
     public class VacationRequestViewModel
     {
@@ -16,5 +16,6 @@ namespace VRdkHRMsystem.Models.SharedViewModels.Vacation
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
         public string RequestStatus { get; set; }
+        public int Balance { get; set; }
     }
 }

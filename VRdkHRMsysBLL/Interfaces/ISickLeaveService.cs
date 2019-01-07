@@ -8,6 +8,8 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface ISickLeaveService
     {
+        Task<SickLeaveViewDTO[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
+        Task<int> GetSickLeavesNumber(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<SickLeaveRequestDTO[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id);
         Task<SickLeaveRequestDTO> GetByIdAsync(string id);

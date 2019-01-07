@@ -12,8 +12,6 @@ using VRdkHRMsystem.Models.AccountViewModels;
 
 namespace VRdkHRMsystem.Controllers
 {
-    [Authorize]
-    [Route("[controller]/[action]")]
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -211,8 +209,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logoff()
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");

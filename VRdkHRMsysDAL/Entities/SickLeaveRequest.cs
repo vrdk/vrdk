@@ -14,7 +14,6 @@ namespace VRdkHRMsysDAL.Entities
         public int? Duration { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime? CloseDate { get; set; }
-
         public Employee Employee { get; set; }
     }   
 }

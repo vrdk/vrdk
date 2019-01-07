@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.DTOs.Notification;
@@ -14,7 +14,7 @@ using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Models;
-using VRdkHRMsystem.Models.SharedViewModels.Vacation;
+using VRdkHRMsystem.Models.SharedModels.Vacation;
 using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
 using VRdkHRMsystem.Models.TeamleadViewModels.SickLeave;
 
@@ -80,9 +80,74 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProccessVacationRequest(string codeV)
+        public async Task<IActionResult> Vacations(int pageNumber = 0, string searchKey = null)
         {
-            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(codeV);
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var vacations = new VacationRequestViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                vacations = await _vacationService.GetPageAsync(pageNumber,
+                                                                          (int)PageSizeEnum.PageSize15,
+                                                                          RequestStatusEnum.Pending.ToString(),
+                                                                          searchKey,
+                                                                          req => (req.Employee.Team.TeamleadId == employee.EmployeeId)
+                                                                          && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
+                                                                          && req.Employee.OrganisationId == employee.OrganisationId);
+                count = await _vacationService.GetVacationsNumberAsync(searchKey,
+                                                                  req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                  && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
+                                                                  && req.Employee.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedVacations = new VacationRequestListViewModel
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Vacations = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(vacations)
+            };
+
+            return View(pagedVacations);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewVacationRequest(string id)
+        {
+            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (vacationRequest != null && vacationRequest.ProccessedbyId != null)
+            {
+                var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
+                var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
+                var model = _mapHelper.Map<VacationRequestDTO, VacationRequestCheckViewModel>(vacationRequest);
+                model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
+                model.VacationType = vacationRequest.VacationType;
+                model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
+                model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                model.RequestStatus = vacationRequest.RequestStatus;
+                if (vacationRequest.Employee.Team != null)
+                {
+                    var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
+                    model.TeamName = vacationRequest.Employee.Team.Name;
+                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                }
+                else
+                {
+                    model.TeamName = emptyValue;
+                    model.TeamleadFullName = emptyValue;
+                }
+
+                return PartialView("VacationViewModal", model);
+            }
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProccessVacationRequest(string id)
+        {
+            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
             if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
                 var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
@@ -92,7 +157,7 @@ namespace VRdkHRMsystem.Controllers
                 model.TeamName = vacationRequest.Employee.Team.Name;
                 model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
 
-                return View(model);
+                return PartialView("VacationProccessModal", model);
             }
 
             return View();
@@ -118,32 +183,62 @@ namespace VRdkHRMsystem.Controllers
                         TransactionId = Guid.NewGuid().ToString(),
                         EmployeeId = vacationRequest.EmployeeId,
                         Change = model.Duration,
-                        Description = model.ProccessComment ?? model.VacationType,
+                        Description =  model.VacationType,
                         TransactionDate = DateTime.UtcNow,
                         TransactionType = model.VacationType
                     };
+
                     await _transactionService.CreateAsync(transaction);
                     vacationRequest.TransactionId = transaction.TransactionId;
+                    var notifications = new NotificationDTO[]
+                    {
+                    new NotificationDTO
+                        {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = vacationRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на отпуск был подтверждён руководителем.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                        },
+                   new NotificationDTO
+                        {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Запрос на отпуск работника был подтверждён его руководителем.",
+                        NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                        IsChecked = false
+                        }
+                    };
+
+                    await _notificationService.CreateRangeAsync(notifications);
                 }
                 else
                 {
                     vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = vacationRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на отпуск был отклонён руководителем.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                    };
+
+                    await _notificationService.CreateAsync(notification);
                 }
+
                 await _vacationService.UpdateAsync(vacationRequest);
-                var notification = new NotificationDTO
-                {
-                    NotificationId = Guid.NewGuid().ToString(),
-                    EmployeeId = vacationRequest.EmployeeId,
-                    OrganisationId = user.OrganisationId,
-                    NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                    NotificationDate = DateTime.UtcNow,
-                    Description = $"Your vacation request was proccessed",
-                    IsChecked = false
-                };
-                await _notificationService.CreateAsync(notification);
             }
 
-            return RedirectToAction("Profile", "Profile");
+            return RedirectToAction("Vacations", "Teamlead");
         }
 
         [HttpGet]
@@ -184,41 +279,58 @@ namespace VRdkHRMsystem.Controllers
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                 {
                     sickLeaveRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был подтвердён.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                    };
+
+                    await _notificationService.CreateAsync(notification);
                 }
                 else
                 {
                     sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был отклонён.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                    };
+
+                    await _notificationService.CreateAsync(notification);
                 }
 
-                await _sickLeaveRequestService.UpdateAsync(sickLeaveRequest);
-                var notification = new NotificationDTO
-                {
-                    NotificationId = Guid.NewGuid().ToString(),
-                    EmployeeId = sickLeaveRequest.EmployeeId,
-                    OrganisationId = user.OrganisationId,
-                    NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                    NotificationDate = DateTime.UtcNow,
-                    Description = $"Your sick leave request was proccessed",
-                    IsChecked = false
-                };
-
-                await _notificationService.CreateAsync(notification);
+                await _sickLeaveRequestService.UpdateAsync(sickLeaveRequest);              
             }
 
             return RedirectToAction("Profile", "Profile");
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewVacationRequests()
+        public async Task<IActionResult> ViewVacationRequests(int pageNumber = 0, string searchKey = null)
         {
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            var requests = await _vacationService.GetForProccessAsync(req
-                                                        => req.Employee.Team.TeamleadId== employee.EmployeeId                                                       
-                                                        && req.Employee.OrganisationId == employee.OrganisationId);
+            var requests = await _vacationService.GetPageAsync(pageNumber,
+                                                                         (int)PageSizeEnum.PageSize15, 
+                                                                          RequestStatusEnum.Pending.ToString(),
+                                                                          searchKey,
+                                                                          req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                          && req.Employee.OrganisationId == employee.OrganisationId);
             var model = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(requests);
             return View(model);
         }
-        
+
         [HttpGet]
         public IActionResult ProccessCalendarDay(string codeE, string date)
         {
@@ -234,7 +346,7 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> ProccessCalendarDay(CalendarDayViewModel model)
         {
             var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
-            if(employee != null)
+            if (employee != null)
             {
                 if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
                 {
@@ -253,7 +365,8 @@ namespace VRdkHRMsystem.Controllers
                         OrganisationId = employee.OrganisationId,
                         NotificationType = NotificationTypeEnum.DayOff.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Day off for you was approved",
+                        Description = $"Подтверждение выходного дня.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
                         IsChecked = false
                     };
                     await _dayOffService.CreateAsync(dayOff);
@@ -277,14 +390,15 @@ namespace VRdkHRMsystem.Controllers
                         OrganisationId = employee.OrganisationId,
                         NotificationType = NotificationTypeEnum.WorkDay.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Work day for you was set",
+                        Description = $"Подтверждение рабочего дня.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
                         IsChecked = false
                     };
                     await _workDayService.CreateAsync(workDay);
                     await _notificationService.CreateAsync(notification);
                 }
             }
-           
+
             return View();
         }
 
@@ -292,7 +406,7 @@ namespace VRdkHRMsystem.Controllers
         {
             //if(Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             var abs = _absenceService.GetByEmployeeIdAsync(codeE);
-            if(abs == null)
+            if (abs == null)
             {
                 var absence = new AbsenceDTO
                 {

@@ -14,7 +14,7 @@ namespace VRdkHRMsysBLL.Services
 {
     public class VacationService : IVacationService
     {
-        private const string emptyValue = "None";
+        private const string emptyValue = "Нет";
         private readonly IVacationRequestRepository _vacationRepository;
         private readonly IMapHelper _mapHelper;
 
@@ -24,7 +24,18 @@ namespace VRdkHRMsysBLL.Services
             _vacationRepository = vacationRepository;
             _mapHelper = mapHelper;
         }
-      
+
+        public async Task<VacationRequestDTO[]> GetProfilePageAsync(int pageSize,string id,int pageNumber = 0)
+        {
+            var requests = await _vacationRepository.GetProfilePageAsync(pageNumber, id, pageNumber);
+            return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(requests);
+        }
+
+        public async Task<int> GetVacationsNumberAsync(string searchKey = null, Expression < Func<VacationRequest, bool>> condition = null)
+        {
+            return await _vacationRepository.GetVacationsCount(condition, searchKey);
+        }
+
         public async Task<VacationRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id)
         {
             var request = await _vacationRepository.GetByIdWithEmployeeWithTeamAsync(id);
@@ -39,13 +50,13 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task<VacationRequestDTO[]> GetAsync(Expression<Func<VacationRequest, bool>> condition = null)
         {
-            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(condition);
+            var reqs = await _vacationRepository.GetAsync(condition);
             return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(reqs);
         }
 
-        public async Task<VacationRequestViewDTO[]> GetForProccessAsync(Expression<Func<VacationRequest, bool>> condition = null)
+        public async Task<VacationRequestViewDTO[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null ,Expression<Func<VacationRequest, bool>> condition = null) 
         {
-            var reqs = await _vacationRepository.GetWithEmployeeWithTeamAsync(condition);
+            var reqs = await _vacationRepository.GetPageAsync(pageNumber,pageSize,priorityStatus, condition, searchKey);
             var requests = reqs != null ? reqs.Select(r => new VacationRequestViewDTO()
             {
                 EmployeeId = r.EmployeeId,
@@ -56,7 +67,8 @@ namespace VRdkHRMsysBLL.Services
                 Duration = r.Duration,
                 RequestStatus = r.RequestStatus,
                 TeamName = r.Employee.Team != null ? r.Employee.Team.Name : emptyValue,
-                VacationType = r.VacationType.Replace('_', ' ')
+                VacationType = r.VacationType,
+                Balance = r.Employee.EmployeeBalanceResiduals.FirstOrDefault(res=>res.Name == r.VacationType).ResidualBalance               
             }
             ).ToArray() : new VacationRequestViewDTO[] { };
 

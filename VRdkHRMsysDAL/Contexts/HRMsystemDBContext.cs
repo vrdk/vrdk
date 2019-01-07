@@ -270,6 +270,11 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("description")
                     .HasMaxLength(512);
 
+                entity.Property(e => e.NotificationRange)
+                   .IsRequired()
+                   .HasColumnName("notification_range")
+                   .HasMaxLength(512);
+
                 entity.Property(e => e.EmployeeId)
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Employee;
@@ -12,6 +13,7 @@ namespace VRdkHRMsysBLL.Services
 {
     public class SickLeaveService : ISickLeaveService
     {
+        private const string emptyValue = "Нет";
         private readonly ISickLeaveRequestRepository _sickLeaveRepository;
         private readonly IMapHelper _mapHelper;
 
@@ -32,6 +34,29 @@ namespace VRdkHRMsysBLL.Services
         {
             var request = await _sickLeaveRepository.GetByIdAsync(id);
             return _mapHelper.Map<SickLeaveRequest, SickLeaveRequestDTO>(request);
+        }
+
+        public async Task<int> GetSickLeavesNumber(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
+        {
+            return await _sickLeaveRepository.GetSickLeavesNumberAsync(searchKey, condition);
+        }
+
+        public async Task<SickLeaveViewDTO[]> GetPageAsync(int pageNumber, int pageSize,string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
+        {
+            var reqs = await _sickLeaveRepository.GetPageAsync(pageNumber, pageSize, priorityStatus, searchKey, condition);
+            var requests = reqs != null ? reqs.Select(req => new SickLeaveViewDTO
+            {
+               EmployeeId = req.EmployeeId,
+               SickLeaveId = req.SickLeaveId,
+               CreateDate = req.CreateDate,
+               CloseDate = req.CloseDate,
+               EmployeeFullName = $"{req.Employee.FirstName} {req.Employee.LastName}",
+               Duration = req.CloseDate == null ? (int)(DateTime.UtcNow.Date - req.CreateDate).TotalDays : (int)(req.CloseDate.Value - req.CreateDate).TotalDays,
+               RequestStatus = req.RequestStatus,
+               TeamName = req.Employee.Team != null ? req.Employee.Team.Name : emptyValue
+            }).ToArray() : new SickLeaveViewDTO[] { };
+
+            return requests;
         }
 
         public async Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id)

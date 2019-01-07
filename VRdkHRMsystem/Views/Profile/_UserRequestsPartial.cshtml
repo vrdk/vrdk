@@ -1,9 +1,10 @@
-﻿<div class="profile__right">
+﻿@model VRdkHRMsystem.Models.Profile.ProfileResidualsViewModel
+<div class="profile__right">
     <div class="profile__days">
         <div class="profile__block">
             <p class="profile__daystitle">Командировка</p>
             <div class="profile__daysblock">
-                <p class="profile__dayscount">15</p>
+                <p class="profile__dayscount">@Model.AssignmentBalance</p>
                 <p class="profile__days_word">Дней</p>
             </div>
         </div>
@@ -18,14 +19,14 @@
             <div class="profile__vacdays_wrapper">
                 <div>
                     <div class="profile__daysblock">
-                        <p class="profile__dayscount">15</p>
+                        <p class="profile__dayscount">@Model.PaidVacationBalance</p>
                         <p class="profile__days_word">Дней</p>
                         <p class="profile__days_leftword">Осталось</p>
                     </div>
                 </div>
                 <div>
                     <div class="profile__daysblock">
-                        <p class="profile__dayscount">15</p>
+                        <p class="profile__dayscount">@Model.UnpaidVacationBalance</p>
                         <p class="profile__days_word">Дней</p>
                         <p class="profile__days_leftword">Осталось</p>
                     </div>
@@ -36,15 +37,15 @@
         <div class="profile__block">
             <p class="profile__daystitle">Больничные</p>
             <div class="profile__daysblock">
-                <p class="profile__dayscount">15</p>
+                <p class="profile__dayscount">@Model.SickLeaveBalance</p>
                 <p class="profile__days_word">Дней</p>
             </div>
-            <a class="profile__daysbutton"  href="@Url.Action("RequestSickLeave","Request")" style="text-decoration: none">Сообщить о больничном</a>
+            <a class="profile__daysbutton" href="@Url.Action("RequestSickLeave","Request")" style="text-decoration: none">Сообщить о больничном</a>
         </div>
         <div class="profile__block">
             <p class="profile__daystitle">Прогулы</p>
             <div class="profile__daysblock">
-                <p class="profile__dayscount">15</p>
+                <p class="profile__dayscount">@Model.AbsenceBalance</p>
                 <p class="profile__days_word">Дней</p>
             </div>
         </div>
@@ -52,14 +53,16 @@
     <div class="profile__tabs_section">
         <div class="profile__tabs">
             <div class="profile__tabs_header">
-                <div class="profile__tab profile__tab_active">Мои отпуска</div>
+                <div class="profile__tab">Мои отпуска</div>
                 <div class="profile__tab">Мои больничные</div>
                 <div class="profile__tab">Мои командировки</div>
                 <div class="profile__tab">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post profile__tab_postactive">
+                <div class="profile__tabs_vacation profile__tab_post">
                     <div class="profile__tabs_vactitle profile__tabs_title">
+                        <div class="profile__header__img">
+                    </div>
                         <p class="profile__tabs_vacdate">Даты</p>
                         <p class="profile__tabs_vactype">Вид</p>
                         <p class="profile__tabs_vacstatus">Статус	</p>
@@ -69,7 +72,7 @@
                         <p class="profile__tabs_vacdate">12.12.2012 - 12.12.2012</p>
                         <p class="profile__tabs_vactype">Оплачено</p>
                         <div class="profile__tabs_vacstatus profile__tabs_vacstatus-item">
-                            <div class="profile__status_circle">
+                            <div class="profile__status_circle_Pending">
                                 <div></div>
                             </div>
                         </div>
@@ -86,7 +89,7 @@
                     <div class="profile__tabs_sickcontent profile__tabs_content">
                         <p class="profile__tabs_sickdate">12.12.2012 - 12.12.2012</p>
                         <div class="profile__tabs_sickstatus profile__tabs_sickstatus-item">
-                            <div class="profile__status_circle">
+                            <div class="profile__status_circle_Pending">
                                 <div></div>
                             </div>
                         </div>

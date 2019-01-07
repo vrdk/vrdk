@@ -15,12 +15,12 @@ namespace VRdkHRMsystem.Services
             var types = new VacationType[] {
                 new VacationType
                 {
-                    DisplayName = "Paid vacation",
+                    DisplayName = "Оплачиваемый отпуск",
                     Name = VacationTypeEnum.Paid_vacation.ToString()
                 },
                 new VacationType
                 {
-                      DisplayName = "Unpaid vacation",
+                      DisplayName = "Неоплачиваемый vacation",
                     Name = VacationTypeEnum.Unpaid_vacation.ToString()
                 }
             };
@@ -56,21 +56,20 @@ namespace VRdkHRMsystem.Services
             return employees.Select(emp => new SelectListItem() { Text = $"{emp.FirstName} {emp.LastName}", Value = emp.EmployeeId }).ToArray();
         }
 
-        public SelectListItem[] CreateStateList(bool userState)
+        public SelectListItem[] CreateStateList(string userState = null)
         {
             return new SelectListItem[]
-            {
-                new SelectListItem
-                {
-                    Text = "Работает",
-                    Value = true.ToString(),
-                    Selected = true.ToString() == userState.ToString()
-                },
+            {               
                 new SelectListItem
                 {
                     Text = "Уволен",
                     Value = false.ToString(),
-                    Selected = false.ToString() == userState.ToString()
+                    Selected = false.ToString() == userState?.ToString()
+                },new SelectListItem
+                {
+                    Text = "Работает",
+                    Value = true.ToString(),
+                    Selected = userState == null ? true : true.ToString() == userState.ToString()
                 }
             };
         }

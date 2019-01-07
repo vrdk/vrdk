@@ -1,0 +1,81 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Vacation.VacationRequestProccessViewModel
+@{
+    Layout = null;
+}
+<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal" style="border-radius:5px;">
+    <div  id="vacrequest">
+        <input asp-for="VacationId"  hidden/>
+        <input asp-for="VacationType" hidden />
+        <div class="modal__header" style="border-radius:5px;">
+            <p class="modal__title">Запрос на отпуск</p>
+        </div>
+        <div class="vacmodal__empinfo">
+            <img src="~/images/userphoto.png" alt="photo" />
+            <div>
+                <p class="vacmodal__name">@Model.EmployeeFullName</p>
+                <p class="vacmodal__post">@Model.Post</p>
+                <p class="vacmodal__team">@Model.TeamName - @Model.TeamleadFullName</p>
+            </div>
+        </div>
+        <div class="vacmodal__body">
+            <div class="vacmodal__body_left">
+                <div class="vacmodal__block">
+                    <p>Вид:</p>
+                    @if (Model.VacationType == "Paid_vacation")
+                    {
+                        <input class="input" type="text" readonly="readonly" placeholder="Оплачиваемый" />
+                    }
+                    else
+                    {
+                        <input class="input" type="text" readonly="readonly" placeholder="Неоплачиваемый" />
+                    }
+                </div>
+                <div class="vacmodal__block">
+                    <p>Комментарий:</p>
+                    <textarea class="input vacmodal__textarea" name="" cols="30" rows="10" readonly placeholder="@Model.Comment"></textarea>
+                </div>
+            </div>
+            <div class="vacmodal__body_right">
+                <div class="vacmodal__block">
+                    <p>C:</p>
+                    <input class="input" type="text" readonly placeholder="@Model.BeginDate.ToString("dd-MM-yyyy")" />
+                </div>
+                <div class="vacmodal__block">
+                    <p>По:</p>
+                    <input class="input" type="text" readonly placeholder="@Model.EndDate.ToString("dd-MM-yyyy")" />
+                </div>
+                <div class="vacmodal__block">
+                    <p>Длительность:</p>
+                    <input class="input" type="text" readonly placeholder="@Model.Duration" />
+                </div>
+            </div>
+        </div>
+        <div class="vacmodal__answer">
+            <p>Ответьте на запрос:</p>
+            <div class="vacmodal__radiosection">
+                <div class="vacmodal__labelwrapper">
+                    <input type="radio" name="Result" id="vacmodal__radio1" value="Approved" checked />
+                    <label for="vacmodal__radio1">
+                        <p>Подтвердить</p>
+                    </label>
+                </div>
+                <div class="vacmodal__labelwrapper">
+                    <input type="radio" name="Result" id="vacmodal__radio2" value="Denied" />
+                    <label for="vacmodal__radio2">
+                        <p>Отклонить</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="vacmodal__buttons">
+            <button class="button" data-dismiss="modal">
+                <img src="~/images/cancel.png" alt="cancel" />
+                <p>Отменить</p>
+            </button>
+            <button class="button" type="submit">
+                <img src="~/images/submit.png" alt="submit" />
+                <p>Готовo</p>
+            </button>
+        </div>
+    </div>
+</form>

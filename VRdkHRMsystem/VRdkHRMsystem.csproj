@@ -26,4 +26,19 @@
     <ProjectReference Include="..\VRdkHRMsysBLL\VRdkHRMsysBLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Teamlead\EmployeeProfileView.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\VacationProccessModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\Vacations.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\VacationViewModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.SharedViewModels.Vacation
+namespace VRdkHRMsystem.Models.SharedModels.Vacation
 {
     public class VacationRequestProccessViewModel
     {
@@ -17,6 +17,6 @@ namespace VRdkHRMsystem.Models.SharedViewModels.Vacation
         public int Duration { get; set; }
         public string Comment { get; set; }
         public string Result { get; set; }
-        public string ProccessComment { get; set; }
+        public string Post { get; set; }
     }
 }

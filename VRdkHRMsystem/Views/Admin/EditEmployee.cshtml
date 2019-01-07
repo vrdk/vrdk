@@ -97,21 +97,21 @@
                         Номер телефона
                         <span asp-validation-for="PhoneNumber" style="color: #ad545f;"></span>
                     </label>
-                    <input asp-for="PhoneNumber" class="input empprofileedit__input" type="text" autocomplete="off" />
+                    <input asp-for="PhoneNumber" id="phone" class="input empprofileedit__input" type="text" autocomplete="off" />
                 </div>
                 <div class="profile__datablock">
                     <label class="profile__blockname">
                         День рождения
                         <span asp-validation-for="BirthDate" style="color: #ad545f;"></span>
                     </label>
-                    <input asp-for="BirthDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker" value="@Model.BirthDate.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
+                    <input asp-for="BirthDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker__birthDate" value="@Model.BirthDate.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
                 </div>
                 <div class="profile__datablock">
                     <label class="profile__blockname">
                         Дата найма
                         <span asp-validation-for="HireDate" style="color: #ad545f;"></span>
                     </label>
-                    <input asp-for="HireDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker1" value="@Model.HireDate.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
+                    <input asp-for="HireDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker__hireDate" value="@Model.HireDate.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
                 </div>
                 <div class="profile__datablock">
                     <label class="profile__blockname">
@@ -120,11 +120,11 @@
                     </label>
                     @if (Model.DismissalDate == null)
                     {
-                        <input asp-for="DismissalDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker2" value="" autocomplete="off" />
+                        <input asp-for="DismissalDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker__dismissalDate" value="" autocomplete="off" />
                     }
                     else
                     {
-                        <input asp-for="DismissalDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker2" value="@Model.DismissalDate.Value.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
+                        <input asp-for="DismissalDate" class="input empprofileedit__input" type="text" id="empprofileedit__datepicker__dismissalDate" value="@Model.DismissalDate.Value.Date.ToString("dd-MM-yyyy")" autocomplete="off" />
                     }
                 </div>
                 <div class="profile__datablock">

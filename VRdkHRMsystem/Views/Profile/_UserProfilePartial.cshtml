@@ -1,10 +1,21 @@
 ﻿@model VRdkHRMsystem.Models.Profile.ProfileViewModel
 <div class="profile">
     <div class="profile__header">
+        @if (User.IsInRole("Administrator"))
+        {
+           <a href="@Url.Action("EditEmployee","Admin", new { id = Model.EmployeeId })"><div class="profile__header__img"></div></a>
+        }       
         <div class="profile__imgblock"><img src="~/images/profile/profilephoto.png" alt="photo" /></div>
         <p class="profile__name">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</p>
         <p class="profile__post">@Html.DisplayFor(model => model.Post)</p>
-        <p class="profile__status">@Html.DisplayFor(model => model.State)</p>
+        @if (Model.State == true)
+        {
+            <p class="profile__status_active">Работает</p>
+        }
+        else
+        {
+            <p class="profile__status_dismissed">Уволен</p>
+        }
     </div>
     <div class="profile__data">
         <div class="profile__datablock">

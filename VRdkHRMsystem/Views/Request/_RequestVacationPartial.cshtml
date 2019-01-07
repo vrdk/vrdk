@@ -44,18 +44,18 @@
                 <div class="vacrequest__body_right">
                     <div class="vacrequest__block">
                         <p>От</p>
-                        <input class="input" type="text" id="vacrequest__from_datepicker" name="BeginDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" />
+                        <input class="input" type="text" id="vacrequest__from_datepicker" name="BeginDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
                     </div>
                     <div class="vacrequest__block">
                         <p>До</p>
-                        <input class="input" type="text" id="vacrequest__to_datepicker" name="EndDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" />
+                        <input class="input" type="text" id="vacrequest__to_datepicker" name="EndDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off"/>
                     </div>
                     <div class="vacrequest__block">
                         <p>Длительность</p>
                         <input asp-for="Duration" readonly id="Duration" class="input" />
                     </div>
                     <div class="vacrequest__button_wrapper">
-                        <button class="empprofile__button button">
+                        <button class="empprofile__button button" type="button">
                             <img src="~/images/cancel.png" alt="cancel" />
                             <p>Отменить</p>
                         </button>

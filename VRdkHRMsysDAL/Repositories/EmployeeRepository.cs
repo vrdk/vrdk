@@ -16,7 +16,7 @@ namespace VRdkHRMsysDAL.Repositories
         public EmployeeRepository(HRMSystemDbContext context)
         {
             _context = context;
-        }
+        }                                                                                                              
 
         public async Task<Employee[]> GetAsync(Expression<Func<Employee, bool>> condition = null)
         {

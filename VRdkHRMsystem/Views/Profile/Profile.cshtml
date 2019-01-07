@@ -1,11 +1,11 @@
-﻿@model VRdkHRMsystem.Models.Profile.ProfileViewModel
+﻿@model VRdkHRMsystem.Models.Profile.CompositeProfileViewModel
 
 @{
     ViewData["Title"] = "View";
 }
 <div class="content">
     <div class="profile__globalwrapper">
-        @await  Html.PartialAsync("_UserProfilePartial", Model)
-        @await Html.PartialAsync("_UserRequestsPartial")
+        @await  Html.PartialAsync("_UserProfilePartial", Model.ProfileModel)
+        @await Html.PartialAsync("_UserRequestsPartial", Model.ResidualsModel)
     </div>
 </div>

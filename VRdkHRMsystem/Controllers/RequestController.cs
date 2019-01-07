@@ -108,7 +108,8 @@ namespace VRdkHRMsystem.Controllers
                     EmployeeId = employee.Team != null ? employee.Team.TeamleadId : null,
                     NotificationType = NotificationTypeEnum.Vacation.ToString(),
                     IsChecked = false,
-                    Description = $"{employee.FirstName} {employee.LastName} requested {NotificationTypeEnum.Vacation.ToString()}"
+                    NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                    Description = $"{employee.FirstName} {employee.LastName} запросил отпуск."
                 };
                 await _notificationService.CreateAsync(notification);
                 if (employee.TeamId != null)
@@ -183,11 +184,12 @@ namespace VRdkHRMsystem.Controllers
                 {
                     NotificationId = Guid.NewGuid().ToString(),
                     OrganisationId = employee.OrganisationId,
-                    EmployeeId = employee.Team?.TeamleadId,
+                    EmployeeId = employee.Team != null ? employee.Team.TeamleadId : null,
                     NotificationDate = DateTime.UtcNow,
                     NotificationType = NotificationTypeEnum.Vacation.ToString(),
                     IsChecked = false,
-                    Description = $"{employee.FirstName} {employee.LastName} from {employee.Team.Name} requested {NotificationTypeEnum.SickLeave.ToString()}"
+                    NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                    Description = $"{employee.FirstName} {employee.LastName} запросил больничный"
                 };
                 await _notificationService.CreateAsync(notification);
                 if (model.File != null)

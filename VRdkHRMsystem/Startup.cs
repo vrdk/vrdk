@@ -51,7 +51,6 @@ namespace VRdkHRMsystem
                 .AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
             {
-                // Password settings
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
                 options.Password.RequireNonAlphanumeric = false;
@@ -59,20 +58,18 @@ namespace VRdkHRMsystem
                 options.Password.RequireLowercase = false;
                 options.Password.RequiredUniqueChars = 6;
 
-                // Lockout settings
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                 options.Lockout.MaxFailedAccessAttempts = 10;
                 options.Lockout.AllowedForNewUsers = true;
-                // User settings
+
                 options.User.RequireUniqueEmail = true;
 
             });
-            // Add application services.
+ 
             services.AddScoped<IViewListMapper, ViewListMapper>();
             services.AddMvc();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {   
             if (env.IsDevelopment())
@@ -94,7 +91,7 @@ namespace VRdkHRMsystem
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Account}/{action=Login}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}");
             });
 
             container.AutoCrossWireAspNetComponents(app);

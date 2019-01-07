@@ -18,16 +18,56 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
+        public async Task<VacationRequest[]> GetProfilePageAsync(int pageSize , string id, int pageNumber = 0)
+        {
+            return await _context.VacationRequest.Where(req => req.EmployeeId == id).OrderBy(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+        }
+
+        public async Task<int> GetVacationsCount(Expression<Func<VacationRequest, bool>> condition = null, string searchKey = null)
+        {
+            return searchKey == null ? await _context.VacationRequest.Where(condition).CountAsync() :
+                                       await _context.VacationRequest.Where(condition).Include(r => r.Employee).ThenInclude(emp => emp.Team).
+                                                                      Where(req => req.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
+                                                                                || req.Employee.LastName.ToLower().Contains(searchKey.ToLower())
+                                                                                || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).CountAsync();
+        }
+
         public async Task<VacationRequest[]> GetAsync(Expression<Func<VacationRequest, bool>> condition = null)
         {
             return condition != null ? await _context.VacationRequest.Where(condition).ToArrayAsync() : await _context.VacationRequest.ToArrayAsync();          
         }
 
-        public async Task<VacationRequest[]> GetWithEmployeeWithTeamAsync(Expression<Func<VacationRequest, bool>> condition = null)
+        public async Task<VacationRequest[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, Expression<Func<VacationRequest, bool>> condition = null, string searchKey = null)
         {
-            return condition != null ? 
-                await _context.VacationRequest.Include(r=>r.Employee).ThenInclude(emp=>emp.Team).Where(condition).OrderByDescending(req=>req.RequestStatus).ThenByDescending(req=>req.CreateDate).ToArrayAsync() 
-              : await _context.VacationRequest.Include(r => r.Employee).ThenInclude(emp => emp.Team).OrderByDescending(req => req.RequestStatus).ThenByDescending(req => req.CreateDate).ToArrayAsync();
+            if(searchKey == null)
+            {
+                return condition != null ?
+                await _context.VacationRequest.Include(r => r.Employee).
+                                               ThenInclude(emp => emp.Team).
+                                               Include(req => req.Employee).
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).Where(condition).Skip(pageNumber * pageSize).Take(pageSize).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).ToArrayAsync()
+              : await _context.VacationRequest.Include(r => r.Employee).
+                                               ThenInclude(emp => emp.Team).
+                                               Include(req => req.Employee).
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).Skip(pageNumber * pageSize).Take(pageSize).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).ToArrayAsync();
+            }
+
+            return condition != null ?
+                await _context.VacationRequest.Include(r => r.Employee).
+                                               ThenInclude(emp => emp.Team).
+                                               Include(req => req.Employee).
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).
+                                               Where(condition).
+                                               Where(req => req.BeginDate.ToString().Contains(searchKey)
+                                                        || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                        || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).Skip(pageNumber * pageSize).Take(pageSize).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).ToArrayAsync()
+              : await _context.VacationRequest.Include(r => r.Employee).
+                                               ThenInclude(emp => emp.Team).
+                                               Include(req => req.Employee).
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).
+                                               Where(req => req.BeginDate.ToString().Contains(searchKey)
+                                                        || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                        || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).Skip(pageNumber * pageSize).Take(pageSize).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).ToArrayAsync();
         }
 
         public async Task<VacationRequest> GetByIdAsync(string id)
