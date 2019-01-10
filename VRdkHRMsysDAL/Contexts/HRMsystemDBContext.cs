@@ -71,6 +71,10 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("begin_date")
                     .HasColumnType("date");
 
+                entity.Property(e => e.CreateDate)
+                  .HasColumnName("create_date")
+                  .HasColumnType("date");
+
                 entity.Property(e => e.Duration).HasColumnName("duration");
 
                 entity.Property(e => e.EndDate)

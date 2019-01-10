@@ -82,6 +82,31 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Employees(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var employees = new EmployeeListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if(employee != null)
+            {
+                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId);
+                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedEmployees = new EmployeeListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
+            };
+
+            return View(pagedEmployees);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> EditEmployee(string id)
         {
             var employee = await _employeeService.GetByIdWithResidualsAsync(id);
@@ -108,7 +133,7 @@ namespace VRdkHRMsystem.Controllers
         [HttpPost]
         public async Task<IActionResult> EditEmployee(EditEmployeeViewModel model)
         {
-            var employee = await _employeeService.GetByIdWithResidualsAsync(model.EmployeeId);
+            var employee = await _employeeService.GetByIdWithTeamWithResidualsAsync(model.EmployeeId);
             if (employee != null)
             {
                 var user = await _userManager.FindByIdAsync(model.EmployeeId);
@@ -123,20 +148,8 @@ namespace VRdkHRMsystem.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 if (!roles.Contains(model.Role))
                 {
-                    if ((!roles.Contains(RoleEnum.Administrator.ToString())
-                    && model.Role == RoleEnum.Administrator.ToString())
-                    || (!roles.Contains(RoleEnum.Administrator.ToString())
-                    && !roles.Contains(RoleEnum.Teamlead.ToString())
-                    && model.Role == RoleEnum.Teamlead.ToString())
-                    )
-                    {
-                        await _userManager.AddToRoleAsync(user, model.Role.ToString());
-                    }
-                    else
-                    {
-                        await _userManager.RemoveFromRolesAsync(user, roles);
-                        await _userManager.AddToRoleAsync(user, model.Role);
-                    }
+                   await _userManager.RemoveFromRolesAsync(user, roles);
+                   await _userManager.AddToRoleAsync(user, model.Role);
                 }
                 await _userManager.UpdateAsync(user);
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance = model.AbsenceBalance;
@@ -145,8 +158,9 @@ namespace VRdkHRMsystem.Controllers
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance = model.UnpaidVacationBalance;
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance = model.SickLeaveBalance;
                 var newEmployee = _mapHelper.Map<EditEmployeeViewModel, EmployeeDTO>(model);
+                newEmployee.TeamId = employee.Team?.TeamId;
+                newEmployee.EmployeeBalanceResiduals = employee.EmployeeBalanceResiduals;
                 await _employeeService.UpdateAsync(newEmployee);
-                await _residualsService.UpdateRangeAsync(employee.EmployeeBalanceResiduals);
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -265,17 +279,16 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if(employee != null)
             {
-                vacations = await _vacationService.GetPageAsync(pageNumber,
-                                                                          (int)PageSizeEnum.PageSize15, 
-                                                                          RequestStatusEnum.Proccessing.ToString(),
-                                                                          searchKey,
-                                                                          req => (req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                          || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-                                                                          && req.Employee.OrganisationId == employee.OrganisationId);
+                vacations = await _vacationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, RequestStatusEnum.Proccessing.ToString(), searchKey,
+                                                                             req => (req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                             || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                                                                             && req.Employee.OrganisationId == employee.OrganisationId
+                                                                             && req.Employee.State);
                 count = await _vacationService.GetVacationsNumberAsync(searchKey, 
                                                                   req => (req.Employee.Team.TeamleadId == employee.EmployeeId
                                                                   || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-                                                                  && req.Employee.OrganisationId == employee.OrganisationId);
+                                                                  && req.Employee.OrganisationId == employee.OrganisationId
+                                                                  && req.Employee.State);
             }
 
             var pagedVacations = new VacationRequestListViewModel
@@ -299,8 +312,8 @@ namespace VRdkHRMsystem.Controllers
             if(employee!=null)
             {
                 sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,null, searchKey,
-                                                                  req => req.Employee.OrganisationId == employee.OrganisationId);
-                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId);
+                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
+                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
             }
 
             var pagedSickLeaves = new SickLeaveListViewModel()
@@ -505,7 +518,7 @@ namespace VRdkHRMsystem.Controllers
 
             var model = new AddAssignmentViewModel
             {
-                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeViewModel>(employees).ToArray(),
+                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeAssignmentViewModel>(employees).ToArray(),
                 OrganisationId = creator.OrganisationId
             };
 
@@ -522,7 +535,8 @@ namespace VRdkHRMsystem.Controllers
                 EndDate = model.EndDate,
                 Duration = model.EndDate.DayOfYear - model.BeginDate.DayOfYear,
                 Name = model.Name,
-                OrganisationId = model.OrganisationId
+                OrganisationId = model.OrganisationId,
+                CreateDate = DateTime.UtcNow.Date               
             };
             assignment.Employees = model.AssignmentMembers.Select(code => new AssignmentEmployeeDTO
             {

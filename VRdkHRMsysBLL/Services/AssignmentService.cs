@@ -22,6 +22,17 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
+        public async Task<int> GetAssignmentsNumberAsync(string searchKey = null, Expression<Func<AssignmentEmployee, bool>> condition = null)
+        {
+            return await _assignmentRepository.GetAssignmentsCountAsync(condition, searchKey);
+        }
+
+        public async Task<AssignmentEmployeeDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
+        {
+            var requests = await _assignmentRepository.GetProfilePageAsync(pageSize, id, pageNumber);
+            return _mapHelper.MapCollection<AssignmentEmployee, AssignmentEmployeeDTO>(requests);
+        }
+
         public async Task CreateAsync(AssignmentDTO assignment)
         {
             var assignmentToAdd = _mapHelper.Map<AssignmentDTO, Assignment>(assignment);

@@ -1,0 +1,92 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Employee.EmployeeListViewModel
+@{
+    ViewData["Title"] = "Employees";
+    string searchKey = ViewData["SearchKey"] as string;
+}
+<form asp-action="Employees" method="get" class="content">
+    <section class="listsection">
+        <div class="table">
+            <div class="table__header">
+                <p>Список сотрудников</p>
+                <div class="table__header_search">
+                    <input type="text" placeholder="Поиск" name="searchKey" value="@searchKey" autocomplete="off"/>
+                    <button type="submit"><img src="~/images/search.png" alt="search" /></button>
+                </div>
+            </div>
+            <div class="table__body">
+                @if (Model != null && Model.Employees.Count() != 0)
+                {
+                    <div class="table__body_title emplist__body_title">
+                        <p class="emplist__name">Имя</p>
+                        <p class="emplist__payvac">Команда</p>
+                        <p class="emplist__payvac">Баланс оплач. отп.</p>
+                        <p class="emplist__vac">Баланс неоплач. отп.</p>
+                        <p class="emplist__sickleavedays">Больничные</p>
+                        <p class="emplist__trips">Командировки</p>
+                        <p class="emplist__passes">Прогулы</p>
+                        <p class="emplist__info">Инфо</p>
+                    </div>
+                    foreach (var employee in Model.Employees)
+                    {
+                        <div class="table__body_content emplist__body_content">
+                            <div class="table__body_block">
+                                <p class="emplist__name">@employee.FirstName @employee.LastName</p>
+                                @if (employee.TeamName != null)
+                                {
+                                    <p class="emplist__payvac">@employee.TeamName</p>
+                                }
+                                else
+                                {
+                                    <p class="emplist__payvac">Нет</p>
+                                }
+                                <p class="emplist__payvac">@employee.PaidVacationBalance</p>
+                                <p class="emplist__vac">@employee.UnpaidVacationBalance</p>
+                                <p class="emplist__sickleavedays">@employee.SickLeaveBalance</p>
+                                <p class="emplist__trips">@employee.AssignmentBalance</p>
+                                <p class="emplist__passes">@employee.AbsenceBalance</p>
+                                <p class="emplist__info">
+                                    <a href="@Url.Action("EmployeeProfileView", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
+                                    @if (employee.TeamId != null)
+                                    {
+                                        <a><img src="~/images/users.png" alt="users" /></a>
+                                    }
+                                    <a href="@Url.Action("EditEmployee", new { id = employee.EmployeeId })"><img src="~/images/penciltable.png" alt="pencil" /></a>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                        <div class="table__body_content emplist__body_content">
+                            <div class="table__body_block">
+                                <p class="emplist__name">Нет записей</p>
+                            </div>
+                        </div>
+                }
+            </div>
+        </div>
+        @if (Model.Count > Model.PageSize)
+        {
+            <p style="margin-bottom:12px;">
+                @if (Model.PageNumber == 0)
+                {
+                    <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" /></a>
+                }
+                else
+                {
+                    <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                }
+
+                @if (Model.PageNumber == Model.Count / Model.PageSize)
+                {
+                    <a href="#!" class="disabled" style="cursor:default"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                }
+                else
+                {
+                    <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                }
+            </p>
+        }
+    </section>
+</form>

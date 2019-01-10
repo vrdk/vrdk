@@ -32,16 +32,19 @@ $(document).ready(function () {
     $("#phone").mask('(000) 000-0000');
 })
 
-function GetVacations(url, id) {
-    if ($(".profile__tabs_vacation").html() === '') {
-        url = url + id;
+function getprofilerequests(page_number, data_type) { 
+        url = "/profile/" + data_type + "spage?pageNumber=" + page_number;
+
         $.ajax({
             type: "Get",
             url: url,
             success: function (vacations_data) {
-                $(".profile__tabs_vacation").html(vacations_data);
+                if ($(".profile__tabs_" + data_type).html() !== '') {
+                    $(".profile__tabs_" + data_type).empty();
+                }   
+                $(".profile__tabs_" + data_type).html(vacations_data);
             }
         }
         );
-    }
+    
 }

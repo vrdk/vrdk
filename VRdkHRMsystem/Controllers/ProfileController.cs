@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
@@ -89,26 +90,83 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> VacationsPage(string id, int pageNumber = 0)
+        public async Task<IActionResult> VacationsPage(int pageNumber = 0)
         {
-            var requests = await _vacationService.GetProfilePageAsync((int)PageSizeEnum.PageSize5, id, pageNumber);
-            var model = _mapHelper.MapCollection<VacationRequestDTO, ProfileVacationsViewModel>(requests);
-            return View(model);
+            var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if(user != null)
+            {
+                    var requests = await _vacationService.GetProfilePageAsync((int)PageSizeEnum.PageSize5, user.EmployeeId, pageNumber);
+                    int count = await _vacationService.GetVacationsNumberAsync(null, req => req.EmployeeId == user.EmployeeId);
+                    var model = new ProfileVacationListViewModel
+                    {
+                        PageNumber = pageNumber,
+                        PageSize = (int)PageSizeEnum.PageSize5,
+                        Count = count,
+                        Vacations = _mapHelper.MapCollection<VacationRequestDTO, ProfileVacationsViewModel>(requests)
+                    };
+
+                    return PartialView(model);
+            }
+
+            return PartialView();
         }
 
         [HttpGet]
-        public async Task<IActionResult> SickLeaves(string codeE)
+        public async Task<IActionResult> SickleavesPage(int pageNumber = 0)
         {
-            var requests = await _sickLeaveService.GetAsync(req => req.EmployeeId == codeE);
-            var model = _mapHelper.MapCollection<SickLeaveRequestDTO, ProfileSickLeavesViewModel>(requests);
-            return View(model);
+            var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (user != null)
+            {
+                var requests = await _sickLeaveService.GetProfilePageAsync((int)PageSizeEnum.PageSize5, user.EmployeeId, pageNumber);
+                int count = await _sickLeaveService.GetSickLeavesNumber(null, req => req.EmployeeId == user.EmployeeId);
+                var model = new ProfileSickLeaveListViewModel
+                {
+                    EmployeeId = user.EmployeeId,
+                    PageNumber = pageNumber,
+                    PageSize = (int)PageSizeEnum.PageSize5,
+                    Count = count,
+                    SickLeaves = _mapHelper.MapCollection<SickLeaveRequestDTO, ProfileSickLeavesViewModel>(requests)
+                };
+
+                return PartialView(model);
+            }
+
+            return PartialView();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AssignmentsPage(int pageNumber = 0)
+        {
+            var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (user != null)
+            {
+                    var requests = await _assignmentService.GetProfilePageAsync((int)PageSizeEnum.PageSize5, user.EmployeeId, pageNumber);
+                    int count = await _assignmentService.GetAssignmentsNumberAsync(null, a => a.EmployeeId == user.EmployeeId);
+                var model = new ProfileAssignmentListViewModel
+                {
+                    PageNumber = pageNumber,
+                    PageSize = (int)PageSizeEnum.PageSize5,
+                    Count = count,
+                    Assignments = requests.Select(a => new ProfileAssignmentsViewModel
+                    {
+                        BeginDate = a.Assignment.BeginDate,
+                        EndDate = a.Assignment.EndDate,
+                        Duration = a.Assignment.Duration,
+                        Name = a.Assignment.Name
+                    }).ToArray()
+                    };
+
+                    return PartialView(model);
+            }
+
+            return PartialView();
         }
 
         [HttpGet]
         public async Task<IActionResult> Assignments(string codeE)
         {
             var assignments = await _assignmentService.GetByEmployeeIdAsync(codeE);
-            var model = assignments.Select(a     => new ProfileAssignmentsViewModel
+            var model = assignments.Select(a=> new ProfileAssignmentsViewModel
             {
                 BeginDate = a.Assignment.BeginDate,
                 EndDate = a.Assignment.EndDate,

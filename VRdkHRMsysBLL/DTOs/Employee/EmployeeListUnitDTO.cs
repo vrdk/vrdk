@@ -1,6 +1,6 @@
-﻿namespace VRdkHRMsystem.Models.SharedModels.Employee
+﻿namespace VRdkHRMsysBLL.DTOs.Employee
 {
-    public class EmployeeViewModel
+    public class EmployeeListUnitDTO
     {
         public string EmployeeId { get; set; }
         public string TeamId { get; set; }
@@ -11,6 +11,6 @@
         public int UnpaidVacationBalance { get; set; }
         public int SickLeaveBalance { get; set; }
         public int AbsenceBalance { get; set; }
-        public int AssignmentBalance { get; set; }
+        public int AssignmentBalance { get; set; }     
     }
 }

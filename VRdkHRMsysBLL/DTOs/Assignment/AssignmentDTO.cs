@@ -13,7 +13,7 @@ namespace VRdkHRMsysBLL.DTOs.Assignment
         public DateTime BeginDate { get; set; }
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
-
+        public DateTime CreateDate { get; set; }
         public AssignmentEmployeeDTO[] Employees { get; set; }
     }
 }

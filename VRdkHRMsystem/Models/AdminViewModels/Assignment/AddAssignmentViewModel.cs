@@ -13,6 +13,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Assignment
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
         public string[] AssignmentMembers { get; set; }
-        public EmployeeViewModel[] Employees { get; set; }
+        public EmployeeAssignmentViewModel[] Employees { get; set; }
     }
 }

@@ -24,6 +24,12 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
+        public async Task<SickLeaveRequestDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
+        {
+            var requests = await _sickLeaveRepository.GetProfilePageAsync(pageSize, id, pageNumber);
+            return _mapHelper.MapCollection<SickLeaveRequest, SickLeaveRequestDTO>(requests);
+        }
+
         public async Task<SickLeaveRequestDTO[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null)
         {
             var requests = await _sickLeaveRepository.GetAsync(condition);

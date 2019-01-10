@@ -11,5 +11,7 @@ namespace VRdkHRMsysBLL.Interfaces
         Task CreateAsync(AssignmentDTO assignment);
         Task<AssignmentDTO[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
         Task<AssignmentEmployeeDTO[]> GetByEmployeeIdAsync(string id);
+        Task<AssignmentEmployeeDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
+        Task<int> GetAssignmentsNumberAsync(string searchKey = null, Expression<Func<AssignmentEmployee, bool>> condition = null);
     }
 }

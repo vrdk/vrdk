@@ -1,0 +1,53 @@
+﻿@model VRdkHRMsystem.Models.Profile.SickLeave.ProfileSickLeaveListViewModel
+
+@if (Model != null && Model.SickLeaves.Count() != 0)
+{
+    foreach (var item in Model.SickLeaves)
+    {
+        <div class="profile__tabs_body_block">
+            <div class="profile__tabs_sickleavetitle profile__tabs_title">
+                <p class="profile__tabs_sickleavedate">Даты</p>
+                <p class="profile__tabs_sickleavestatus">Статус	</p>
+                <p class="profile__tabs_sickleaveduration">Срок</p>
+                <p class="profile__tabs_sickleavechoice">Действия</p>
+            </div>
+            <div class="profile__tabs_sickleavecontent profile__tabs_content">
+                <p class="profile__tabs_sickleavedate">@item.CreateDate.ToString("dd.MM.yyyy") - @(item.CloseDate == null ? " " : item.CloseDate.Value.Date.ToString("dd.MM.yyyy"))</p>
+                <div class="profile__tabs_sickleavestatus profile__tabs_sickleavestatus-item">
+                    <div class="profile__status_circle_@item.RequestStatus">
+                        <div></div>
+                    </div>
+                </div>
+                <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : (int)(item.CloseDate.Value - item.CreateDate).TotalDays)</p>
+                <div class="profile__tabs_sickleavechoice profile__tabs_sickleavechoice-item"><img src="~/images/pencil.png" alt="pencil" /><img src="~/images/cross2.png" alt="exit" /></div>
+            </div>
+        </div>
+    }
+    @if (Model.Count > Model.PageSize)
+    {
+        <p style="margin-left:48%; margin-top:10px;">
+            @if (Model.PageNumber == 0)
+            {
+                <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" style="cursor:not-allowed" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber-1)','sickleave')" style="cursor:pointer"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+            }
+            @if (Model.PageNumber == Model.Count / Model.PageSize)
+            {
+                <a href="#!" class="disabled" style="cursor:not-allowed"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber+1)','sickleave')" style="cursor:pointer"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+        </p>
+    }
+}
+else
+{
+    <div class="profile__tabs_sickleavecontent profile__tabs_content">
+        <p class="profile__tabs_sickleavedate">Нет записей</p>
+    </div>
+}

@@ -27,9 +27,5 @@ namespace VRdkHRMsysBLL.DTOs.Employee
         public string WorkEmail { get; set; }
         public TeamDTO Team { get; set; }
         public BalanceResidualsDTO[] EmployeeBalanceResiduals { get; set; }
-        public VacationRequestDTO[] Vacations { get; set; }
-        public SickLeaveRequestDTO[] SickLeaves { get; set; }
-        public AssignmentDTO[] Assignments { get; set; }
-        public AbsenceDTO[] Absences { get; set; }
     }
 }

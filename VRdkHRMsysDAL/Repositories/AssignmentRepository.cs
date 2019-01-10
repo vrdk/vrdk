@@ -30,6 +30,28 @@ namespace VRdkHRMsysDAL.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> GetAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null, string searchKey = null)
+        {
+            if (searchKey == null)
+            {
+                return condition != null ? await _context.AssignmentEmployee.Where(condition).CountAsync() :
+                                           await _context.AssignmentEmployee.CountAsync();
+            }
+
+            return condition != null ? await _context.AssignmentEmployee.Where(a => a.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
+                                                                                || a.Employee.LastName.ToLower().Contains(searchKey.ToLower())
+                                                                                || a.Assignment.Name.ToLower().Contains(searchKey.ToLower())).CountAsync() :
+                                       await _context.AssignmentEmployee.Where(condition).
+                                                                      Where(a => a.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
+                                                                                || a.Employee.LastName.ToLower().Contains(searchKey.ToLower())
+                                                                                || a.Assignment.Name.ToLower().Contains(searchKey.ToLower())).CountAsync();
+        }
+
+        public async Task<AssignmentEmployee[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
+        {
+            return await _context.AssignmentEmployee.Include(ae => ae.Assignment).Where(a=>a.EmployeeId == id).OrderByDescending(a => a.Assignment.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();                        
+        }
+
         public async Task<AssignmentEmployee[]> GetByEmployeeIdAsync(string id)
         {
             return await _context.AssignmentEmployee.Include(ae => ae.Assignment).Where(ae => ae.EmployeeId == id).ToArrayAsync();

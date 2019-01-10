@@ -15,5 +15,6 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<SickLeaveRequestDTO> GetByIdAsync(string id);
         Task CreateAsync(SickLeaveRequestDTO SickLeave);
         Task UpdateAsync(SickLeaveRequestDTO newRequest);
+        Task<SickLeaveRequestDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
     }
 }

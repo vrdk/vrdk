@@ -1,1 +1,60 @@
-﻿@model IEnumerable<VRdkHRMsystem.Models.Profile.Vacation.ProfileVacationsViewModel>
+﻿@model VRdkHRMsystem.Models.Profile.Vacation.ProfileVacationListViewModel
+
+@if (Model != null && Model.Vacations.Count() != 0)
+{
+    foreach (var item in Model.Vacations)
+    {
+        <div class="profile__tabs_body_block">
+            <div class="profile__tabs_vactitle profile__tabs_title">
+                <p class="profile__tabs_vacdate">Даты</p>
+                <p class="profile__tabs_vactype">Вид</p>
+                <p class="profile__tabs_vacstatus">Статуc</p>
+                <p class="profile__tabs_vacduration">Срок</p>
+            </div>
+            <div class="profile__tabs_vaccontent profile__tabs_content">
+                <p class="profile__tabs_vacdate">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
+                @if (item.VacationType == "Paid_vacation")
+                {
+                    <p class="profile__tabs_vactype">Оплачиваемый</p>
+                }
+                else
+                {
+                    <p class="profile__tabs_vactype">Неоплачиваемый</p>
+                }
+                <div class="profile__tabs_vacstatus profile__tabs_vacstatus-item">
+                    <div class="profile__status_circle_@item.RequestStatus">
+                        <div></div>
+                    </div>
+                </div>
+                <p class="profile__tabs_vacduration">@item.Duration</p>
+            </div>
+        </div>
+    }
+    @if (Model.Count > Model.PageSize)
+    {
+        <p style="margin-left:48%; margin-top:10px;">
+            @if (Model.PageNumber == 0)
+            {
+                <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" style="cursor:not-allowed" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber-1)','vacation')" style="cursor:pointer"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+            }
+            @if (Model.PageNumber == Model.Count / Model.PageSize)
+            {
+                <a href="#!" class="disabled" style="cursor:not-allowed"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber+1)','vacation')" style="cursor:pointer"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+        </p>
+    }
+}
+else
+{
+        <div class="profile__tabs_vaccontent profile__tabs_content">
+            <p class="profile__tabs_vactype">Нет записей</p>
+        </div>
+}

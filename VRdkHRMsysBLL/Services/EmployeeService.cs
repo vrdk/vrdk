@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
@@ -37,6 +38,32 @@ namespace VRdkHRMsysBLL.Services
             var employees = await _employeeRepository.GetWithTeamAsync(condition);
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
+
+        public async Task<int> GetEmployeesCountAsync(string searchKey = null, Expression<Func<Employee, bool>> condition = null)
+        {
+            return await _employeeRepository.GetEmployeesCount(condition, searchKey);
+        }
+
+        public async Task<EmployeeListUnitDTO[]> GetPageAsync(int pageNumber,int pageSize, string searchKey, Expression<Func<Employee, bool>> condition = null)
+        {
+            var emps = await _employeeRepository.GetPageWithTeamWithResidualsAsync(pageNumber, pageSize, searchKey, condition);
+            var employees = emps != null ? emps.Select(emp => new EmployeeListUnitDTO()
+            {
+                EmployeeId = emp.EmployeeId,
+                TeamId = emp.Team?.TeamId,
+                FirstName = emp.FirstName,
+                LastName = emp.LastName,
+                TeamName = emp.Team?.Name,
+                AbsenceBalance = emp.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance,
+                AssignmentBalance = emp.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance,
+                PaidVacationBalance = emp.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance,
+                UnpaidVacationBalance = emp.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance,
+                SickLeaveBalance = emp.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance
+            }).ToArray() : new EmployeeListUnitDTO[] {};
+
+            return employees;
+        }
+
 
         public async Task<EmployeeDTO> GetByEmailAsync(string email)
         {
@@ -96,11 +123,30 @@ namespace VRdkHRMsysBLL.Services
         }
         public async Task UpdateAsync(EmployeeDTO newEmployee)
         {
-            var currentEmployee = await _employeeRepository.GetByIdWithResidualsAsync(newEmployee.EmployeeId);
+            var currentEmployee = await _employeeRepository.GetByIdAsync(newEmployee.EmployeeId);
             if(currentEmployee != null)
             {
-                _mapHelper.MapChanges(newEmployee, currentEmployee);    
-                await _employeeRepository.UpdateAsync();
+                currentEmployee.FirstName = newEmployee.FirstName;
+                currentEmployee.LastName = newEmployee.LastName;
+                currentEmployee.State = newEmployee.State;
+                currentEmployee.BirthDate = newEmployee.BirthDate;
+                currentEmployee.DismissalDate = newEmployee.DismissalDate;
+                currentEmployee.HireDate = newEmployee.HireDate;
+                currentEmployee.PersonalEmail = newEmployee.PersonalEmail;
+                currentEmployee.WorkEmail = newEmployee.WorkEmail;
+                currentEmployee.PostId = newEmployee.PostId;
+                currentEmployee.PhoneNumber = newEmployee.PhoneNumber;
+                foreach(var res in currentEmployee.EmployeeBalanceResiduals)
+                {
+                    foreach(var newRes in newEmployee.EmployeeBalanceResiduals)
+                    {
+                        if (res.Name == newRes.Name)
+                        {
+                            res.ResidualBalance = newRes.ResidualBalance;
+                        }                    
+                    }
+                }
+                await _employeeRepository.UpdateAsync(currentEmployee);
             }         
         }
 

@@ -1,0 +1,47 @@
+﻿@model VRdkHRMsystem.Models.Profile.Assignment.ProfileAssignmentListViewModel
+
+@if (Model != null && Model.Assignments.Count() != 0)
+{
+    foreach (var item in Model.Assignments)
+    {
+<div class="profile__tabs_body_block">
+    <div class="profile__tabs_assignmentstitle profile__tabs_title">
+        <p class="profile__tabs_assignmentdate">Даты</p>
+        <p class="profile__tabs_assignmentname">Название</p>
+        <p class="profile__tabs_assignmentduration">Срок</p>
+    </div>
+    <div class="profile__tabs_assignmentcontent profile__tabs_content">
+        <p class="profile__tabs_assignmentdate">@item.BeginDate.ToString("dd.mm.yyyy") - @item.EndDate.ToString("dd.mm.yyyy")</p>
+        <p class="profile__tabs_assignmentname">@item.Name</p>
+        <p class="profile__tabs_assignmentduration">@item.Duration</p>
+    </div>
+</div>
+    }
+    @if (Model.Count > Model.PageSize)
+    {
+        <p style="margin-left:48%; margin-top:10px;">
+            @if (Model.PageNumber == 0)
+            {
+                <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" style="cursor:not-allowed" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber-1)','assignment')" style="cursor:pointer"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+            }
+            @if (Model.PageNumber == Model.Count / Model.PageSize)
+            {
+                <a href="#!" class="disabled" style="cursor:not-allowed"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+            else
+            {
+                <a onclick="getprofilerequests('@(Model.PageNumber+1)','assignment')" style="cursor:pointer"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            }
+        </p>
+    }
+}
+else
+{
+        <div class="profile__tabs_assignmentcontent profile__tabs_content">
+            <p class="profile__tabs_assignmentdate">Нет записей</p>
+        </div>
+}

@@ -2,6 +2,7 @@
 <div class="profile__right">
     <div class="profile__days">
         <div class="profile__block">
+            <input asp-for="EmployeeId" hidden />
             <p class="profile__daystitle">Командировка</p>
             <div class="profile__daysblock">
                 <p class="profile__dayscount">@Model.AssignmentBalance</p>
@@ -53,72 +54,29 @@
     <div class="profile__tabs_section">
         <div class="profile__tabs">
             <div class="profile__tabs_header">
-                <div class="profile__tab">Мои отпуска</div>
-                <div class="profile__tab">Мои больничные</div>
-                <div class="profile__tab">Мои командировки</div>
+                <div class="profile__tab" onclick="getprofilerequests('0','vacation')">Мои отпуска</div>
+                <div class="profile__tab" onclick="getprofilerequests('0','sickleave')">Мои больничные</div>
+                <div class="profile__tab" onclick="getprofilerequests('0','assignment')">Мои командировки</div>
                 <div class="profile__tab">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post">
-                    <div class="profile__tabs_vactitle profile__tabs_title">
-                        <div class="profile__header__img">
-                    </div>
-                        <p class="profile__tabs_vacdate">Даты</p>
-                        <p class="profile__tabs_vactype">Вид</p>
-                        <p class="profile__tabs_vacstatus">Статус	</p>
-                        <p class="profile__tabs_vacduration">Срок</p>
-                    </div>
-                    <div class="profile__tabs_vaccontent profile__tabs_content">
-                        <p class="profile__tabs_vacdate">12.12.2012 - 12.12.2012</p>
-                        <p class="profile__tabs_vactype">Оплачено</p>
-                        <div class="profile__tabs_vacstatus profile__tabs_vacstatus-item">
-                            <div class="profile__status_circle_Pending">
-                                <div></div>
-                            </div>
-                        </div>
-                        <p class="profile__tabs_vacduration">12.12.2012 - 12.12.2012</p>
-                    </div>
-                </div>
-                <div class="profile__tabs_sick profile__tab_post">
-                    <div class="profile__tabs_sicktitle profile__tabs_title">
-                        <p class="profile__tabs_sickdate">Даты</p>
-                        <p class="profile__tabs_sickstatus">Статус	</p>
-                        <p class="profile__tabs_sickduration">Срок</p>
-                        <p class="profile__tabs_sickchoice">Действия</p>
-                    </div>
-                    <div class="profile__tabs_sickcontent profile__tabs_content">
-                        <p class="profile__tabs_sickdate">12.12.2012 - 12.12.2012</p>
-                        <div class="profile__tabs_sickstatus profile__tabs_sickstatus-item">
-                            <div class="profile__status_circle_Pending">
-                                <div></div>
-                            </div>
-                        </div>
-                        <p class="profile__tabs_sickduration">12.12.2012 - 12.12.2012</p>
-                        <div class="profile__tabs_sickchoice profile__tabs_sickchoice-item"><img src="~/images/pencil.png" alt="pencil" /><img src="~/images/cross2.png" alt="exit" /></div>
-                    </div>
-                </div>
-                <div class="profile__tabs_trips profile__tab_post">
-                    <div class="profile__tabs_tripstitle profile__tabs_title">
-                        <p class="profile__tabs_tripdate">Даты</p>
-                        <p class="profile__tabs_tripname">Статус	</p>
-                        <p class="profile__tabs_tripduration">Срок</p>
-                    </div>
-                    <div class="profile__tabs_tripcontent profile__tabs_content">
-                        <p class="profile__tabs_tripdate">12.12.2012 - 12.12.2012</p>
-                        <p class="profile__tabs_tripname">Полет в Чехию</p>
-                        <p class="profile__tabs_tripduration">12.12.2012 - 12.12.2012</p>
-                    </div>
-                </div>
+                <div class="profile__tabs_vacation profile__tab_post"></div>                              
+                <div class="profile__tabs_sickleave profile__tab_post"></div>
+                <div class="profile__tabs_assignment profile__tab_post"></div>               
                 <div class="profile__tabs_passes profile__tab_post">
-                    <div class="profile__tabs_passestitle profile__tabs_title">
-                        <p class="profile__tabs_passesdates">Даты</p>
-                        <div class="profile__tabs_arrows"><img src="~/images/angle-left.png" alt="angle" /><img src="~/images/angle-right.png" alt="angle" /></div>
-                    </div>
-                    <div class="profile__tabs_passescontent profile__tabs_content">
-                        <p class="profile__tabs_passesdate">12.12.2012</p>
-                        <p class="profile__tabs_passesdate">12.12.2012</p>
-                        <p class="profile__tabs_passesdate">12.12.2012</p>
-                        <p class="profile__tabs_passesdate">12.12.2012</p>
+                    <div class="profile__tabs_body_block">
+                        <div class="profile__tabs_passestitle profile__tabs_title">
+                            <p class="profile__tabs_passesdates">Даты</p>
+                            <div class="profile__tabs_arrows"><img src="images/angle-left.png" alt="angle" /><img src="images/angle-right.png" alt="angle" /></div>
+                        </div>
+                        <div class="profile__tabs_passescontent profile__tabs_content">
+                            <p class="profile__tabs_passesdate">12.12.2012</p>
+                            <p class="profile__tabs_passesdate">12.12.2012</p>
+                            <p class="profile__tabs_passesdate">12.12.2012</p>
+                            <p class="profile__tabs_passesdate">12.12.2012</p>
+                            <p class="profile__tabs_passesdate">12.12.2012</p>
+
+                        </div>
                     </div>
                 </div>
             </div>

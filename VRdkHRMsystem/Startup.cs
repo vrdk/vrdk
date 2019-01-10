@@ -91,7 +91,7 @@ namespace VRdkHRMsystem
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Profile}/{action=Profile}/{id?}");
             });
 
             container.AutoCrossWireAspNetComponents(app);

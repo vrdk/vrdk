@@ -27,13 +27,13 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task<VacationRequestDTO[]> GetProfilePageAsync(int pageSize,string id,int pageNumber = 0)
         {
-            var requests = await _vacationRepository.GetProfilePageAsync(pageNumber, id, pageNumber);
+            var requests = await _vacationRepository.GetProfilePageAsync(pageSize, id, pageNumber);
             return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(requests);
         }
 
         public async Task<int> GetVacationsNumberAsync(string searchKey = null, Expression < Func<VacationRequest, bool>> condition = null)
         {
-            return await _vacationRepository.GetVacationsCount(condition, searchKey);
+            return await _vacationRepository.GetVacationsCountAsync(condition, searchKey);
         }
 
         public async Task<VacationRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id)

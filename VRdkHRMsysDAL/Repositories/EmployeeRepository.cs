@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,6 +27,37 @@ namespace VRdkHRMsysDAL.Repositories
         public async Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null)
         {
             return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).ToArrayAsync() : await _context.Employee.Include(emp => emp.Team).ToArrayAsync();
+        }
+
+        public async Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition = null, string searchKey = null)
+        {
+            return searchKey == null ? await _context.Employee.Where(condition).CountAsync() :
+                                       await _context.Employee.Where(condition).Where(emp => emp.Team.Name.ToLower().Contains(searchKey.ToLower())
+                                                                                || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                                || emp.EmployeeBalanceResiduals.Any(res => res.ResidualBalance.ToString().Contains(searchKey))).CountAsync();
+
+        }
+
+        public async Task<Employee[]> GetPageWithTeamWithResidualsAsync(int pageNumber, int pageSize, string searchKey, Expression<Func<Employee, bool>> condition = null)
+        {
+            if(searchKey == null)
+            {
+                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp=>emp.Team.Name).ToArrayAsync() :
+                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp => emp.Team.Name).ToArrayAsync();
+            }
+
+            var a = _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).Where(emp=> emp.Team.Name.ToLower().Contains(searchKey.ToLower())
+                                                                   || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                   || emp.EmployeeBalanceResiduals.Any(res => res.ResidualBalance.ToString().Contains(searchKey))).ToArray();
+                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
+                                                                   Where(emp=>emp.Team.Name.ToLower().Contains(searchKey.ToLower())
+                                                                   || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                   || emp.EmployeeBalanceResiduals.Any(res=>res.ResidualBalance.ToString().Contains(searchKey))).OrderBy(emp => emp.Team.Name).Skip(pageNumber*pageSize).Take(pageSize).ToArrayAsync() :
+                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
+                                                                   Where(emp => emp.Team.Name.ToLower().Contains(searchKey.ToLower())
+                                                                   || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                   || emp.EmployeeBalanceResiduals.Any(res => res.ResidualBalance.ToString().Contains(searchKey))).
+                                                                   OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }
 
         public async Task<Employee> GetByIdAsync(string id)
@@ -77,6 +109,12 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task UpdateAsync()
         {
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Employee entity)
+        {
+            _context.Employee.Update(entity);
             await _context.SaveChangesAsync();
         }
     }
