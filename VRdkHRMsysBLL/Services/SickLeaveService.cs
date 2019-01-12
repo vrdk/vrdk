@@ -64,7 +64,7 @@ namespace VRdkHRMsysBLL.Services
                CreateDate = req.CreateDate,
                CloseDate = req.CloseDate,
                EmployeeFullName = $"{req.Employee.FirstName} {req.Employee.LastName}",
-               Duration = req.CloseDate == null ? (int)(DateTime.UtcNow.Date - req.CreateDate).TotalDays : (int)(req.CloseDate.Value - req.CreateDate).TotalDays,
+               Duration = req.CloseDate == null ? (int)(DateTime.UtcNow.Date - req.CreateDate).TotalDays : req.Duration,
                RequestStatus = req.RequestStatus,
                TeamName = req.Employee.Team != null ? req.Employee.Team.Name : emptyValue
             }).ToArray() : new SickLeaveViewDTO[] { };
@@ -92,6 +92,7 @@ namespace VRdkHRMsysBLL.Services
                 currentRequest.CloseDate = newRequest.CloseDate;
                 currentRequest.RequestStatus = newRequest.RequestStatus;
                 currentRequest.Duration = newRequest.Duration;
+                currentRequest.Comment = newRequest.Comment;
                 if(currentRequest.Employee != null && newRequest.Employee != null && currentRequest.Employee.EmployeeBalanceResiduals != null && newRequest.Employee.EmployeeBalanceResiduals != null)
                 {
                     currentRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance = newRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;

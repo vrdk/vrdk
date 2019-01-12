@@ -3,39 +3,38 @@
 @{
     ViewData["Title"] = "AddTeam";
 }
-<div class="content">
-    <form asp-action="AddTeam" method="post">
-        <input asp-for="OrganisationId" hidden />
-        <div class="teamprofile">
-            <div class="teamprofile__leader">
-                <div class="teamprofile__info">
-                    <p>Название команды</p>
-                    <input asp-for="Name" class="input" type="text" />
-                </div>
-                <div class="teamprofile__teamlead" style="padding:20px;">
-                    <p>Team Lead:</p>
-                    <select class="emplits__empselect teamprofile__select" asp-for="TeamleadId" asp-items="Model.Teamleads" style="width:100%;" hidden></select>
-                </div>
+<form asp-action="AddTeam" method="post" class="content">
+    <input asp-for="OrganisationId" hidden />
+    <div class="teamprofile">
+        <div class="teamprofile__leader">
+            <div class="teamprofile__info">
+                <p>Название команды</p>
+                <input asp-for="Name" class="input" type="text" />
             </div>
-            <div class="teamprofile__members">
-                <p>Учасники</p>
-                <div class="teamprofile__members_wrapper" style="padding:20px;">
-                    <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
-                </div>
-                <div class="teamprofile__empbuttons">
-                    <button class="empprofile__button button">
-                        <img src="~/images/cancel.png" alt="cancel" />
-                        <p>Отменить</p>
-                    </button>
-                    <button class="empprofile__button button" type="submit">
-                        <img src="~/images/submit.png" alt="submit" />
-                        <p>Создать</p>
-                    </button>
-                </div>
+            <div class="teamprofile__teamlead" style="padding:20px;">
+                <p>Team Lead:</p>
+                <select class="emplits__empselect teamprofile__select" asp-for="TeamleadId" asp-items="Model.Teamleads" style="width:100%;" hidden></select>
             </div>
         </div>
-    </form>
-</div>
+        <div class="teamprofile__members">
+            <p>Учасники</p>
+            <div class="teamprofile__members_wrapper" style="padding:20px;">
+                <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
+            </div>
+            <div class="teamprofile__empbuttons">
+                <button class="empprofile__button button">
+                    <img src="~/images/cancel.png" alt="cancel" />
+                    <p>Отменить</p>
+                </button>
+                <button class="empprofile__button button" type="submit">
+                    <img src="~/images/submit.png" alt="submit" />
+                    <p>Создать</p>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>

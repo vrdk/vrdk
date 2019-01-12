@@ -18,15 +18,15 @@
                         <div></div>
                     </div>
                 </div>
-                <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : (int)(item.CloseDate.Value - item.CreateDate).TotalDays)</p>
+                <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
                 <div class="profile__tabs_sickleavechoice profile__tabs_sickleavechoice-item">
                     @if (item.RequestStatus != "Denied")
                     {
-                        <img src="~/images/pencil.png" alt="pencil" />
+                        <img src="~/images/pencil.png" alt="pencil" onclick="proccessSickleave('update','@item.SickLeaveId')" style="cursor:pointer"/>
                     }
                     @if (item.RequestStatus == "Approved")
                     {
-                        <img src="~/images/cross2.png" alt="exit" onclick="closesickleave('@item.SickLeaveId')" style="cursor:pointer"/>
+                        <img src="~/images/cross2.png" alt="exit" onclick="proccessSickleave('close','@item.SickLeaveId')" style="cursor:pointer"/>
                     }
                 </div>
             </div>

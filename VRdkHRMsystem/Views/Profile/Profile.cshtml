@@ -5,7 +5,11 @@
 }
 <div class="content">
     <div class="profile__globalwrapper">
-        @await  Html.PartialAsync("_UserProfilePartial", Model.ProfileModel)
+        @await Html.PartialAsync("_UserProfilePartial", Model.ProfileModel)
         @await Html.PartialAsync("_UserRequestsPartial", Model.ResidualsModel)
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

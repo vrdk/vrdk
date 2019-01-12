@@ -7,9 +7,9 @@
         </div>
         <div class="sickmessagemodal__body">
             <p>Коментарий</p>
-            <textarea class="input vacrequest__block" type="text">@Model.Comment</textarea>
+            <textarea class="input vacrequest__block" type="text" readonly>@Model.Comment</textarea>
             <div style="margin:15px 0px 15px 0px;">
-                <p>Дата: 01.09.2017</p>
+                <p>Дата: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
             </div>
             <div>
                 @foreach (var file in Model.Files)
@@ -21,16 +21,6 @@
                     </p>
                 }
             </div>
-            @*@if (Model.Files.Count() < 3)
-            {
-                <div class="sickmessage__upload sickmodal__upload">
-                    <label class="sickmessage__ulpoad_label" for="File">
-                        <img src="~/images/camera.png" alt="cross" />
-                        <p>Добавить фотографию</p>
-                    </label>
-                    <input class="sickmessage__ulpoad_my" type="file" id="File" name="File" multiple="multiple" />
-                </div>
-            }*@
         </div>
         <div class="vacmodal__buttons">
             <button class="button" type="button" data-dismiss="modal">

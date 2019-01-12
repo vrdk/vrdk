@@ -1,0 +1,45 @@
+﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.UpdateSickLeaveViewModel
+
+<form asp-action="UpdateSickleave" asp-controller="Request" method="post" enctype="multipart/form-data" class="box-modal vacmodal" style="border-radius:5px;">
+    <input asp-for="SickLeaveId" hidden />
+    <div class="modal__header" style="border-radius:5px;">
+        <p class="modal__title">Сообщение о болезни</p>
+    </div>
+    <div class="sickmessagemodal__body">
+        <p>Коментарий</p>
+        <textarea class="input vacrequest__block" type="text" name="Comment">@Model.Comment</textarea>
+        <div style="margin:15px 0px 15px 0px;">
+            <p>Дата: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
+        </div>
+        <div>
+            @foreach (var file in Model.ExistingFiles)
+            {
+                <p>
+                    Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                    </a>
+                </p>
+            }
+        </div>
+        @if (Model.ExistingFiles.Count() < 3)
+        {
+            <div class="sickmessage__upload sickmodal__upload">
+                <label class="sickmessage__ulpoad_label" for="File">
+                    <img src="~/images/camera.png" alt="cross" />
+                    <p>Добавить фото</p>
+                </label>
+                <input class="sickmessage__ulpoad_my" type="file" id="File" name="File" multiple="multiple" />
+            </div>
+        }
+    </div>
+    <div class="vacmodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Назад</p>
+        </button>
+        <button class="button" type="submit">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Обновить</p>
+        </button>
+    </div>
+</form>

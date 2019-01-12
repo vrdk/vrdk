@@ -40,7 +40,7 @@
                                     <p class="sicklist__dates">@item.CreateDate.ToString("dd.MM.yyyy") - @item.CloseDate.Value.ToString("dd.MM.yyyy")</p>
                                 }
 
-                                <p class="sicklist__duration">@item.Duration</p>
+                                    <p class="sicklist__duration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
                                 <div class="sicklist__info">
                                     <div class="profile__status_circle_@item.RequestStatus">
                                         <div></div>

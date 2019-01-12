@@ -52,8 +52,8 @@ function getprofilerequests(page_number, data_type) {
         }
         );  
 }
-function closesickleave(id) {
-    url = "/request/closesickleave?id=" + id;
+function proccessSickleave(method, id) {
+    url = "/request/" + method + "sickleave?id=" + id;
     $.ajax({
         type: "Get",
         url: url,
@@ -64,4 +64,5 @@ function closesickleave(id) {
         }
     });
 }
+
 

@@ -203,18 +203,18 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateSickLeave(string codeS)
+        public async Task<IActionResult> UpdateSickLeave(string id)
         {
-            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(codeS);
+            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
             if (sickLeaveRequest != null)
             {
                 var model = _mapHelper.Map<SickLeaveRequestDTO, UpdateSickLeaveViewModel>(sickLeaveRequest);
                 model.ExistingFiles = await _fileManagmentService.GetSickLeaveFilesAsync(model.SickLeaveId);
 
-                return View(model);
+                return PartialView("UpdateSickleaveModal", model);
             }
 
-            return View();
+            return PartialView("UpdateSickleaveModal");
         }
 
         [HttpPost]
@@ -225,9 +225,9 @@ namespace VRdkHRMsystem.Controllers
             {
                 request.Comment = model.Comment;
                 await _sickLeaveService.UpdateAsync(request);
-                if (model.UploadedFile != null)
+                if (model.File != null)
                 {
-                    await _fileManagmentService.UploadSickLeaveFileAsync(model.UploadedFile, request.SickLeaveId);
+                    await _fileManagmentService.UploadSickLeaveFileAsync(model.File, request.SickLeaveId);
                 }
             }
 
@@ -256,7 +256,8 @@ namespace VRdkHRMsystem.Controllers
             if(request != null && request.RequestStatus == RequestStatusEnum.Approved.ToString())
             {
                 request.CloseDate = DateTime.UtcNow.Date;
-                request.Duration = DateTime.UtcNow.Date != request.CreateDate.Date ? (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays : 1;
+                var c = (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays;
+                request.Duration = (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays != 0 ? (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays : 1;
                 request.RequestStatus = RequestStatusEnum.Closed.ToString();
                 request.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance += request.Duration.Value;
                 await _sickLeaveService.UpdateAsync(request);
