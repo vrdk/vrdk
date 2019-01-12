@@ -27,7 +27,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\Teamlead\EmployeeProfileView.cshtml">
+    <Content Update="Views\Admin\SickleaveProccessModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Request\CloseSickleaveModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\EmployeeProfile.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Teamlead\VacationProccessModal.cshtml">

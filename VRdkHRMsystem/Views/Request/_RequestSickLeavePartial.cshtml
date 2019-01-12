@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.RequestSickLeaveViewModel
 
-<form asp-action="RequestSickLeave" method="post">
+<form asp-action="RequestSickLeave" method="post" enctype="multipart/form-data">
     <div class="profile__right">
         <div class="profile__days sickmessage__days">
             <div class="profile__block">
@@ -20,13 +20,15 @@
                         <p>Коментарий</p>
                         <textarea class="input" type="text" name="Comment"></textarea>
                     </div>
+                    <p></p>
                 </div>
+                
                 <div class="sickmessage__upload">
                     <label class="sickmessage__ulpoad_label" for="File">
                         <img src="~/images/camera.png" alt="cross" />
-                        <p>Загрузить фото</p>
+                        <p id="fileUploadLabel">Загрузить фото</p>
                     </label>
-                    <input class="sickmessage__ulpoad_my" type="file" id="File" name="myfile" multiple="multiple" />
+                    <input asp-for="File" class="sickmessage__ulpoad_my" type="file" id="File" multiple="multiple" accept="image/*"/>
                 </div>
                 <div class="vacrequest__body_right sickmessage__body_right">
                     <div class="vacrequest__button_wrapper sickmessage__button_wrapper">

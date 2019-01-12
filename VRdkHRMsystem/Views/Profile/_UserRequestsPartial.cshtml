@@ -33,7 +33,7 @@
                     </div>
                 </div>
             </div>
-            <a class="profile__daysbutton profile__daysbutton_vac" href="@Url.Action("RequestVacation","Request")" style="text-decoration: none">Запросить отпуск</a>
+            <a class="profile__daysbutton profile__daysbutton_vac" href="@Url.Action("RequestVacation","Request", new { id = Model.EmployeeId })" style="text-decoration: none">Запросить отпуск</a>
         </div>
         <div class="profile__block">
             <p class="profile__daystitle">Больничные</p>
@@ -41,7 +41,7 @@
                 <p class="profile__dayscount">@Model.SickLeaveBalance</p>
                 <p class="profile__days_word">Дней</p>
             </div>
-            <a class="profile__daysbutton" href="@Url.Action("RequestSickLeave","Request")" style="text-decoration: none">Сообщить о больничном</a>
+            <a class="profile__daysbutton" href="@Url.Action("RequestSickLeave","Request", new { id = Model.EmployeeId })" style="text-decoration: none">Сообщить о больничном</a>
         </div>
         <div class="profile__block">
             <p class="profile__daystitle">Прогулы</p>
@@ -60,14 +60,14 @@
                 <div class="profile__tab">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post"></div>                              
+                <div class="profile__tabs_vacation profile__tab_post"></div>
                 <div class="profile__tabs_sickleave profile__tab_post"></div>
-                <div class="profile__tabs_assignment profile__tab_post"></div>               
+                <div class="profile__tabs_assignment profile__tab_post"></div>
                 <div class="profile__tabs_passes profile__tab_post">
                     <div class="profile__tabs_body_block">
                         <div class="profile__tabs_passestitle profile__tabs_title">
                             <p class="profile__tabs_passesdates">Даты</p>
-                            <div class="profile__tabs_arrows"><img src="images/angle-left.png" alt="angle" /><img src="images/angle-right.png" alt="angle" /></div>
+                            <div class="profile__tabs_arrows"><img src="~/images/angle-left.png" alt="angle" /><img src="~/images/angle-right.png" alt="angle" /></div>
                         </div>
                         <div class="profile__tabs_passescontent profile__tabs_content">
                             <p class="profile__tabs_passesdate">12.12.2012</p>
@@ -83,3 +83,9 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="request_modal" role="dialog" style="">
+    <div class="modal-dialog">
+        <div id="modal_place"></div>
+    </div>
+</div>
+

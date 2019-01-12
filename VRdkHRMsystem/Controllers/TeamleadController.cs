@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.DayOff;
+using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
 using VRdkHRMsysBLL.DTOs.Transaction;
@@ -14,6 +15,8 @@ using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Models;
+using VRdkHRMsystem.Models.SharedModels.Employee;
+using VRdkHRMsystem.Models.SharedModels.SickLeave;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
 using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
 using VRdkHRMsystem.Models.TeamleadViewModels.SickLeave;
@@ -32,7 +35,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IResidualsService _residualsService;
         private readonly ITransactionService _transactionService;
         private readonly IPostService _postService;
-        private readonly ISickLeaveService _sickLeaveRequestService;
+        private readonly ISickLeaveService _sickLeaveService;
         private readonly ITeamService _teamService;
         private readonly IAssignmentService _assignmentService;
         private readonly INotificationService _notificationService;
@@ -68,7 +71,7 @@ namespace VRdkHRMsystem.Controllers
             _residualsService = residualsService;
             _transactionService = transactionService;
             _postService = postService;
-            _sickLeaveRequestService = sickLeaveRequestService;
+            _sickLeaveService = sickLeaveRequestService;
             _teamService = teamService;
             _assignmentService = assignmentService;
             _notificationService = notificationService;
@@ -77,6 +80,29 @@ namespace VRdkHRMsystem.Controllers
             _dayOffService = dayOffService;
             _mapHelper = mapHelper;
             _fileManagmentService = fileManagmentService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EmployeeProfile(string id)
+        {
+            var employee = await _employeeService.GetByIdWithResidualsAsync(id);
+            var model = new EmployeeProfileViewModel();
+            if (employee != null)
+            {
+                var user = await _userManager.FindByIdAsync(employee.EmployeeId);
+                var role = await _userManager.GetRolesAsync(user);
+                var posts = await _postService.GetPostsByOrganisationIdAsync(employee.OrganisationId);
+                model = _mapHelper.Map<EmployeeDTO, EmployeeProfileViewModel>(employee);
+                model.AbsenceBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance;
+                model.AssignmentBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance;
+                model.PaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance;
+                model.UnpaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance;
+                model.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
+                model.Role = role.First();
+                model.Post = posts.FirstOrDefault(p => p.PostId == employee.PostId).Name;
+            }
+
+            return View(model);
         }
 
         [HttpGet]
@@ -174,10 +200,7 @@ namespace VRdkHRMsystem.Controllers
                 vacationRequest.ProccessedbyId = user.Id;
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                 {
-                    var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
-                    vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
-                    residual.ResidualBalance -= vacationRequest.Duration;
-                    await _residualsService.UpdateAsync(residual);
+                    vacationRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
                     var transaction = new TransactionDTO()
                     {
                         TransactionId = Guid.NewGuid().ToString(),
@@ -188,8 +211,6 @@ namespace VRdkHRMsystem.Controllers
                         TransactionType = model.VacationType
                     };
 
-                    await _transactionService.CreateAsync(transaction);
-                    vacationRequest.TransactionId = transaction.TransactionId;
                     var notifications = new NotificationDTO[]
                     {
                     new NotificationDTO
@@ -242,12 +263,77 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProccessSickLeaveRequest(string codeS)
+        public async Task<IActionResult> Sickleaves(int pageNumber = 0, string searchKey = null)
         {
-            var sickLeaveRequest = await _sickLeaveRequestService.GetByIdWithEmployeeWithTeamAsync(codeS);
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var sickLeaves = new SickLeaveViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
+                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
+            }
+
+            var pagedSickLeaves = new SickLeaveListViewModel()
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
+            };
+
+            return View(pagedSickLeaves);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckSickleaveRequest(string id)
+        {
+            var sickLiveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (sickLiveRequest != null)
+            {
+                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLiveRequest);
+                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLiveRequest.SickLeaveId);
+                var posts = await _postService.GetPostsByOrganisationIdAsync(sickLiveRequest.Employee.OrganisationId);
+                model.EmployeeFullName = $"{sickLiveRequest.Employee.FirstName} {sickLiveRequest.Employee.LastName}";
+                model.Post = posts.FirstOrDefault(p => p.PostId == sickLiveRequest.Employee.PostId).Name;
+                if (sickLiveRequest.Employee.Team != null)
+                {
+                    var teamlead = await _employeeService.GetByIdAsync(sickLiveRequest.Employee.Team.TeamleadId);
+                    model.TeamName = sickLiveRequest.Employee.Team.Name;
+                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                    if (teamlead.WorkEmail == User.Identity.Name)
+                    {
+
+                        return PartialView("SickleaveProccessModal", model);
+                    }
+                }
+                else
+                {
+                    model.TeamName = emptyValue;
+                    model.TeamleadFullName = emptyValue;
+                }
+
+                if (sickLiveRequest.ProccessedbyId != null)
+                {
+                    var proccessor = await _employeeService.GetByIdAsync(sickLiveRequest.ProccessedbyId);
+                    model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                }
+
+                return PartialView("SickleaveViewModal", model);
+            }
+
+            return PartialView("SickleaveViewModal");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ProccessSickLeaveRequest(string id)
+        {
+            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
             if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
-                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveRequestProccessViewModel>(sickLeaveRequest);
+                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLeaveRequest);
                 model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(model.SickLeaveId);
                 model.EmployeeFullName = $"{sickLeaveRequest.Employee.FirstName} {sickLeaveRequest.Employee.LastName}";
                 if (sickLeaveRequest.Employee.Team != null)
@@ -262,23 +348,23 @@ namespace VRdkHRMsystem.Controllers
                     model.TeamleadFullName = emptyValue;
                 }
 
-                return View(model);
+                return PartialView("SickleaveProccessModal", model);
             }
 
-            return View();
+            return PartialView("SickleaveProccessModal");
         }
 
         [HttpPost]
-        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveRequestProccessViewModel model)
+        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveCheckViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            var sickLeaveRequest = await _sickLeaveRequestService.GetByIdAsync(model.SickLeaveId);
+            var sickLeaveRequest = await _sickLeaveService.GetByIdAsync(model.SickLeaveId);
             if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
                 sickLeaveRequest.ProccessedbyId = user.Id;
                 if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                 {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
+                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
                     var notification = new NotificationDTO
                     {
                         NotificationId = Guid.NewGuid().ToString(),
@@ -311,10 +397,10 @@ namespace VRdkHRMsystem.Controllers
                     await _notificationService.CreateAsync(notification);
                 }
 
-                await _sickLeaveRequestService.UpdateAsync(sickLeaveRequest);              
+                await _sickLeaveService.UpdateAsync(sickLeaveRequest);              
             }
 
-            return RedirectToAction("Profile", "Profile");
+            return RedirectToAction("Sickleaves", "Teamlead");
         }
 
         [HttpGet]

@@ -1,0 +1,59 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.SickLeave.SickLeaveCheckViewModel
+
+<form asp-action="ProccessSickLeaveRequest" asp-controller="Teamlead" method="post" class="box-modal vacmodal" style="border-radius:5px;">
+    <input asp-for="SickLeaveId" hidden />
+    <div class="modal__header" style="border-radius:5px;">
+        <p class="modal__title">Сообщение о болезни</p>
+    </div>
+    <div class="vacmodal__empinfo">
+        <img src="~/images/userphoto.png" alt="photo" />
+        <div>
+            <p class="vacmodal__name">@Model.EmployeeFullName</p>
+            <p class="vacmodal__post">@Model.Post</p>
+            <p class="vacmodal__team">@Model.TeamName - @Model.TeamleadFullName</p>
+        </div>
+    </div>
+    <div class="sickmessagemodal__body">
+        <div>
+            <p>Дата: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
+        </div>
+        <textarea class="input" name="" cols="30" rows="10" readonly="readonly">@Model.Comment</textarea>
+        <div>
+            @foreach (var file in Model.Files)
+            {
+                <p>
+                    Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                    </a>
+                </p>
+            }
+        </div>
+    </div>
+    <div class="vacmodal__answer">
+        <p>Ответьте на запрос:</p>
+        <div class="vacmodal__radiosection">
+            <div class="vacmodal__labelwrapper">
+                <input type="radio" name="Result" id="sickmessagemodal__radio1" value="Approved" checked/>
+                <label for="sickmessagemodal__radio1">
+                    <p>Подтвердить</p>
+                </label>
+            </div>
+            <div class="vacmodal__labelwrapper">
+                <input type="radio" name="Result" id="sickmessagemodal__radio2" value="Denied" />
+                <label for="sickmessagemodal__radio2">
+                    <p>Отклонить</p>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="vacmodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Отменить</p>
+        </button>
+        <button class="button" type="submit">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Готовo</p>
+        </button>
+    </div>
+</form>

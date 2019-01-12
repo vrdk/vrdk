@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.SickLeave;
 using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
@@ -39,6 +40,12 @@ namespace VRdkHRMsysBLL.Services
         public async Task<SickLeaveRequestDTO> GetByIdAsync(string id)
         {
             var request = await _sickLeaveRepository.GetByIdAsync(id);
+            return _mapHelper.Map<SickLeaveRequest, SickLeaveRequestDTO>(request);
+        }
+
+        public async Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithResidualsAsync(string id)
+        {
+            var request = await _sickLeaveRepository.GetByIdWithEmployeeWithResidualsAsync(id);
             return _mapHelper.Map<SickLeaveRequest, SickLeaveRequestDTO>(request);
         }
 
@@ -82,7 +89,14 @@ namespace VRdkHRMsysBLL.Services
             var currentRequest = await _sickLeaveRepository.GetByIdAsync(newRequest.SickLeaveId);
             if (currentRequest != null)
             {
-                _mapHelper.MapChanges(newRequest, currentRequest);
+                currentRequest.CloseDate = newRequest.CloseDate;
+                currentRequest.RequestStatus = newRequest.RequestStatus;
+                currentRequest.Duration = newRequest.Duration;
+                if(currentRequest.Employee != null && newRequest.Employee != null && currentRequest.Employee.EmployeeBalanceResiduals != null && newRequest.Employee.EmployeeBalanceResiduals != null)
+                {
+                    currentRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance = newRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
+                }
+                
                 await _sickLeaveRepository.UpdateAsync();
             }
         }

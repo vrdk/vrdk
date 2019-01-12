@@ -1,18 +1,17 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.SickLeave.SickLeaveListViewModel
 
 @{
-    ViewData["Title"] = "SickLeaves";
     var searchKey = ViewData["SearchKey"] as string;
-    var urlForCheck = "/Admin/CheckSickleaveRequest?id=";
+    var urlForCheck = "/Teamlead/CheckSickleaveRequest?id=";
 }
 
-<form asp-action="SickLeaves" method="get" class="content">
+<form asp-action="Sickleaves" method="get" class="content">
     <section class="listsection">
         <div class="table">
             <div class="table__header">
                 <p>Список сообщений о болезнях</p>
                 <div class="table__header_search">
-                    <input type="text" placeholder="Найти больничный..." name="searchKey" value="@searchKey"/>
+                    <input type="text" placeholder="Найти больничный..." name="searchKey" value="@searchKey" />
                     <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
@@ -46,8 +45,8 @@
                                     <div class="profile__status_circle_@item.RequestStatus">
                                         <div></div>
                                     </div>
-                                   <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;"/></a> 
-                                   <img src="~/images/pencil.png" alt="pencil" onclick="ShowRequestPopup('@urlForCheck','@item.SickLeaveId')"/>
+                                    <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;" /></a>
+                                    <img src="~/images/pencil.png" alt="pencil" onclick="ShowRequestPopup('@urlForCheck','@item.SickLeaveId')" />
                                 </div>
                             </div>
                         </div>

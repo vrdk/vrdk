@@ -12,14 +12,23 @@
                 <p class="profile__tabs_sickleavechoice">Действия</p>
             </div>
             <div class="profile__tabs_sickleavecontent profile__tabs_content">
-                <p class="profile__tabs_sickleavedate">@item.CreateDate.ToString("dd.MM.yyyy") - @(item.CloseDate == null ? " " : item.CloseDate.Value.Date.ToString("dd.MM.yyyy"))</p>
+                <p class="profile__tabs_sickleavedate">@item.CreateDate.ToString("dd.MM.yyyy") - @(item.CloseDate == null ? "..." : item.CloseDate.Value.Date.ToString("dd.MM.yyyy"))</p>
                 <div class="profile__tabs_sickleavestatus profile__tabs_sickleavestatus-item">
                     <div class="profile__status_circle_@item.RequestStatus">
                         <div></div>
                     </div>
                 </div>
                 <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : (int)(item.CloseDate.Value - item.CreateDate).TotalDays)</p>
-                <div class="profile__tabs_sickleavechoice profile__tabs_sickleavechoice-item"><img src="~/images/pencil.png" alt="pencil" /><img src="~/images/cross2.png" alt="exit" /></div>
+                <div class="profile__tabs_sickleavechoice profile__tabs_sickleavechoice-item">
+                    @if (item.RequestStatus != "Denied")
+                    {
+                        <img src="~/images/pencil.png" alt="pencil" />
+                    }
+                    @if (item.RequestStatus == "Approved")
+                    {
+                        <img src="~/images/cross2.png" alt="exit" onclick="closesickleave('@item.SickLeaveId')" style="cursor:pointer"/>
+                    }
+                </div>
             </div>
         </div>
     }

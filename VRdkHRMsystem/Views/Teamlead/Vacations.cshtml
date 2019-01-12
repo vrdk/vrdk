@@ -50,7 +50,7 @@
                                     <div class="profile__status_circle_@item.RequestStatus" style="margin-right:5px;">
                                         <div></div>
                                     </div>
-                                    <a href="@Url.Action("EmployeeProfileView","Teamlead", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" /></a>
+                                    <a href="@Url.Action("EmployeeProfile","Teamlead", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" /></a>
                                     @if (item.RequestStatus != "Approved" && item.RequestStatus != "Denied")
                                     {
                                         <img src="~/images/penciltable.png" alt="pencil" style="cursor:pointer;" onclick="ShowRequestPopup('@urlForProccess','@item.VacationId')" />

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VRdkHRMsysBLL.DTOs.BalanceResiduals
+﻿namespace VRdkHRMsysBLL.DTOs.BalanceResiduals
 {
     public class BalanceResidualsDTO
     {

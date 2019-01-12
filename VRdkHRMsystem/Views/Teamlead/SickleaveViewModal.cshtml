@@ -1,0 +1,67 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.SickLeave.SickLeaveCheckViewModel
+
+<div class="box-modal vacmodal" id="sickmessagecheck" style="border-radius:5px;">
+    <div class="modal__header" style="border-radius:5px;">
+        <p class="modal__title">Сообщение о болезни</p>
+    </div>
+    <div class="vacmodal__empinfo">
+        <img src="~/images/userphoto.png" alt="photo" />
+        <div>
+            <p class="vacmodal__name">@Model.EmployeeFullName</p>
+            <p class="vacmodal__post">@Model.Post</p>
+            <p class="vacmodal__team">@Model.TeamName - @Model.TeamleadFullName</p>
+        </div>
+    </div>
+    <div class="sickmessagemodal__body">
+        <div>
+
+            @if (Model.CloseDate != null)
+            {
+                <p>
+                    Дата: @Model.CreateDate.ToString("dd.MM.yyyy") Закрыт: @Model.CloseDate.Value.ToString("dd.MM.yyyy")
+                </p>
+            }
+            else
+            {
+                <p>
+                    Дата: @Model.CreateDate.ToString("dd.MM.yyyy")
+                </p>
+            }
+        </div>
+        <textarea class="input" name="" cols="30" rows="10" readonly="readonly">@Model.Comment</textarea>
+        <div>
+            @foreach (var file in Model.Files)
+            {
+                <p>
+                    Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                    </a>
+                </p>
+            }
+        </div>
+    </div>
+    @if (Model.ProccessedByName != null && Model.ProccessedByName != string.Empty)
+    {
+        if (Model.RequestStatus == "Denied")
+        {
+            <div class="vacmodal__submitedby sickmessagemodal__submitedby">
+                <img src="~/images/submited.png" alt="submited" />
+                <p>Отклонил: @Model.ProccessedByName</p>
+            </div>
+        }
+        else
+        {
+            <div class="vacmodal__submitedby sickmessagemodal__submitedby">
+                <img src="~/images/submited.png" alt="submited" />
+                <p>Подтвердил: @Model.ProccessedByName</p>
+            </div>
+        }
+
+    }
+    <div class="vacmodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Закрыть</p>
+        </button>
+    </div>
+</div>

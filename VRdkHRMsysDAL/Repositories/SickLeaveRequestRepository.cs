@@ -48,11 +48,12 @@ namespace VRdkHRMsysDAL.Repositories
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(condition).
-                                                Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
-                                                Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
-                                               
+                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+
+
             }
 
             return condition != null ?
@@ -61,12 +62,12 @@ namespace VRdkHRMsysDAL.Repositories
                                                 Where(condition).
                                                 Where(req=> $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                          || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                OrderByDescending(req=>req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                          || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
 
         }
 
@@ -78,6 +79,11 @@ namespace VRdkHRMsysDAL.Repositories
         public async Task<SickLeaveRequest[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null)
         {
             return condition != null ? await _context.SickLeaveRequest.Where(condition).ToArrayAsync() : await _context.SickLeaveRequest.ToArrayAsync();
+        }
+
+        public async Task<SickLeaveRequest> GetByIdWithEmployeeWithResidualsAsync(string id)
+        {
+            return await _context.SickLeaveRequest.Include(req=>req.Employee).ThenInclude(emp=>emp.EmployeeBalanceResiduals).FirstOrDefaultAsync(req => req.SickLeaveId.Equals(id));
         }
 
         public async Task<SickLeaveRequest> GetByIdAsync(string id)

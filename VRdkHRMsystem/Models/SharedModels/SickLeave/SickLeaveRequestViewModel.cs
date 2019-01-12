@@ -12,5 +12,6 @@ namespace VRdkHRMsystem.Models.SharedModels.SickLeave
         public DateTime CreateDate { get; set; }
         public DateTime? CloseDate { get; set; }
         public string RequestStatus { get; set; }
+
     }
 }

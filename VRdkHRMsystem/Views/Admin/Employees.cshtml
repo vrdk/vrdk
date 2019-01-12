@@ -22,7 +22,7 @@
                         <p class="emplist__payvac">Баланс оплач. отп.</p>
                         <p class="emplist__vac">Баланс неоплач. отп.</p>
                         <p class="emplist__sickleavedays">Больничные</p>
-                        <p class="emplist__trips">Командировки</p>
+                        <p class="emplist__assignments">Командировки</p>
                         <p class="emplist__passes">Прогулы</p>
                         <p class="emplist__info">Инфо</p>
                     </div>
@@ -42,10 +42,10 @@
                                 <p class="emplist__payvac">@employee.PaidVacationBalance</p>
                                 <p class="emplist__vac">@employee.UnpaidVacationBalance</p>
                                 <p class="emplist__sickleavedays">@employee.SickLeaveBalance</p>
-                                <p class="emplist__trips">@employee.AssignmentBalance</p>
+                                <p class="emplist__assignments">@employee.AssignmentBalance</p>
                                 <p class="emplist__passes">@employee.AbsenceBalance</p>
                                 <p class="emplist__info">
-                                    <a href="@Url.Action("EmployeeProfileView", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
+                                    <a href="@Url.Action("EmployeeProfile", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
                                     @if (employee.TeamId != null)
                                     {
                                         <a><img src="~/images/users.png" alt="users" /></a>

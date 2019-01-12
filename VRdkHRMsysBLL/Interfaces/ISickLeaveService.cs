@@ -12,6 +12,7 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<int> GetSickLeavesNumber(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<SickLeaveRequestDTO[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithTeamAsync(string id);
+        Task<SickLeaveRequestDTO> GetByIdWithEmployeeWithResidualsAsync(string id);
         Task<SickLeaveRequestDTO> GetByIdAsync(string id);
         Task CreateAsync(SickLeaveRequestDTO SickLeave);
         Task UpdateAsync(SickLeaveRequestDTO newRequest);

@@ -13,6 +13,7 @@ using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
 using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
 using VRdkHRMsystem.Models.RequestViewModels.Vacation;
+using VRdkHRMsystem.Models.SharedModels.SickLeave;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -50,7 +51,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> RequestVacation(string codeE = null)
+        public async Task<IActionResult> RequestVacation(string id = null)
         {
             EmployeeDTO employee;
             CompositeRequestVacationViewModel model = new CompositeRequestVacationViewModel
@@ -58,9 +59,9 @@ namespace VRdkHRMsystem.Controllers
                 ProfileModel = new ProfileViewModel(),
                 RequestVacationModel = new RequestVacationViewModel()
             };
-            if (codeE != null)
+            if (id != null)
             {
-                employee = await _employeeService.GetByIdWithTeamWithResidualsAsync(codeE);
+                employee = await _employeeService.GetByIdWithTeamWithResidualsAsync(id);
             }
             else
             {
@@ -129,7 +130,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> RequestSickLeave(string codeE = null)
+        public async Task<IActionResult> RequestSickLeave(string id = null)
         {
             EmployeeDTO employee;
             CompositeRequestSickLeaveViewModel model = new CompositeRequestSickLeaveViewModel
@@ -137,9 +138,9 @@ namespace VRdkHRMsystem.Controllers
                 ProfileModel = new ProfileViewModel(),
                 RequestSickLeaveModel = new RequestSickLeaveViewModel()
             };
-            if (codeE != null)
+            if (id != null)
             {
-                employee = await _employeeService.GetByIdWithTeamWithResidualsAsync(codeE);
+                employee = await _employeeService.GetByIdWithTeamWithResidualsAsync(id);
             }
             else
             {
@@ -233,14 +234,37 @@ namespace VRdkHRMsystem.Controllers
             return RedirectToAction("Profile", "Profile");
         }
 
-        public async Task<OkResult> CloseSickLeave(string codeS)
+        [HttpGet]
+        public async Task<IActionResult> CloseSickleave(string id)
         {
-            var request = await _sickLeaveService.GetByIdAsync(codeS);
-            request.CloseDate = DateTime.UtcNow.Date;
-            request.Duration = request.CloseDate?.DayOfYear != request.CreateDate.DayOfYear ? request.CloseDate?.DayOfYear - request.CreateDate.DayOfYear : 1;
-            request.RequestStatus = RequestStatusEnum.Closed.ToString();
-            await _sickLeaveService.UpdateAsync(request);
-            return Ok();
+            var sickLiveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (sickLiveRequest != null)
+            {
+                var model = _mapHelper.Map<SickLeaveRequestDTO, CloseSickLeaveViewModel>(sickLiveRequest);
+                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLiveRequest.SickLeaveId);     
+
+                return PartialView("CloseSickleaveModal", model);
+            }
+
+            return PartialView("CloseSickleaveModal");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> CloseSickLeave(CloseSickLeaveViewModel model)
+        {
+            var request = await _sickLeaveService.GetByIdWithEmployeeWithResidualsAsync(model.SickLeaveId);
+            if(request != null && request.RequestStatus == RequestStatusEnum.Approved.ToString())
+            {
+                request.CloseDate = DateTime.UtcNow.Date;
+                request.Duration = DateTime.UtcNow.Date != request.CreateDate.Date ? (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays : 1;
+                request.RequestStatus = RequestStatusEnum.Closed.ToString();
+                request.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance += request.Duration.Value;
+                await _sickLeaveService.UpdateAsync(request);
+
+                return RedirectToAction("Profile", "Profile");
+            }
+
+            return RedirectToAction("Profile", "Profile");
         }
     }
 }
