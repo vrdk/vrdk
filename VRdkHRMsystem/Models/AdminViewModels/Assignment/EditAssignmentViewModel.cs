@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace VRdkHRMsystem.Models.AdminViewModels.Assignment
 {
-    public class AddAssignmentViewModel
+    public class EditAssignmentViewModel
     {
+        public string AssignmentId { get; set; }
         public string OrganisationId { get; set; }
         [Required(ErrorMessage = " заполните")]
         public string Name { get; set; }

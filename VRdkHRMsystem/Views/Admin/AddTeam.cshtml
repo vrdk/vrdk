@@ -22,7 +22,7 @@
                 <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
             </div>
             <div class="teamprofile__empbuttons">
-                <button class="empprofile__button button">
+                <button class="empprofile__button button" type="button" onclick="window.history.back()">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Отменить</p>
                 </button>
@@ -40,7 +40,7 @@
     <script>
         $(document).ready(function () {
             $('#teamMembers').select2({
-                placeholder: "Выберите..."
+                placeholder: "Выберите cотрудников..."
             });
             $('.emplits__empselect').select2();
         });

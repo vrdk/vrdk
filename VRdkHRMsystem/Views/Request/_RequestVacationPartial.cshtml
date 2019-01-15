@@ -43,16 +43,18 @@
                 </div>
                 <div class="vacrequest__body_right">
                     <div class="vacrequest__block">
-                        <p>От</p>
-                        <input class="input" type="text" id="vacrequest__from_datepicker" name="BeginDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
+                        <p>От<span asp-validation-for="BeginDate" style="color: #ad545f; padding:0"></span></p>
+                        <input asp-for="BeginDate" class="input" type="text" id="vacrequest__from_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
                     </div>
                     <div class="vacrequest__block">
-                        <p>До</p>
-                        <input class="input" type="text" id="vacrequest__to_datepicker" name="EndDate" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off"/>
+                        <p>До<span asp-validation-for="EndDate" style="color: #ad545f; padding:0"></span></p>
+                        <input asp-for="EndDate" class="input" type="text" id="vacrequest__to_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off"/>
                     </div>
                     <div class="vacrequest__block">
                         <p>Длительность</p>
+                        <span asp-validation-for="Duration" style="color: #ad545f; padding:0"></span>
                         <input asp-for="Duration" readonly id="Duration" class="input" />
+
                     </div>
                     <div class="vacrequest__button_wrapper">
                         <button class="empprofile__button button" type="button">

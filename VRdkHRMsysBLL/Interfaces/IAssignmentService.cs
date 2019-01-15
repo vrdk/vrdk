@@ -8,10 +8,16 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface IAssignmentService
     {
+        Task Update(AssignmentDTO entity);
+        Task DeleteAsync(AssignmentDTO entity);
         Task CreateAsync(AssignmentDTO assignment);
+        Task AddToAssignmentAsync(string[] employeeIds, string assignmentId);
+        Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId);
+        Task<AssignmentDTO> GetByIdWithEmployeesAsync(string id);
         Task<AssignmentDTO[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
-        Task<AssignmentEmployeeDTO[]> GetByEmployeeIdAsync(string id);
+        Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null);
         Task<AssignmentEmployeeDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
-        Task<int> GetAssignmentsNumberAsync(string searchKey = null, Expression<Func<AssignmentEmployee, bool>> condition = null);
+        Task<int> GetProfileAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null);
+        Task<AssignmentListUnitDTO[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Assignment, bool>> condition = null, string searchKey = null);
     }
 }

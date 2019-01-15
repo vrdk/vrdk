@@ -44,7 +44,7 @@ namespace VRdkHRMsysBLL.Services
                 currentResiduals.OrderBy(r => r.ResidualId);
                 for (int i = 0; i < currentResiduals.Length; i++)
                 {
-                    _mapHelper.MapChanges(newResiduals[i], currentResiduals[i]);
+                    currentResiduals[i].ResidualBalance = newResiduals[i].ResidualBalance;
                 }
 
                 await _residualsRepository.UpdateAsync();
@@ -58,10 +58,10 @@ namespace VRdkHRMsysBLL.Services
         }
         public async Task UpdateAsync(BalanceResidualsDTO newResidual)
         {
-            var currentRequest = await _residualsRepository.GetByIdAsync(newResidual.ResidualId);
-            if (currentRequest != null)
+            var currentResidual = await _residualsRepository.GetByIdAsync(newResidual.ResidualId);
+            if (currentResidual != null)
             {
-                _mapHelper.MapChanges(newResidual, currentRequest);
+                currentResidual.ResidualBalance = newResidual.ResidualBalance;
                 await _residualsRepository.UpdateAsync();
             }
         }

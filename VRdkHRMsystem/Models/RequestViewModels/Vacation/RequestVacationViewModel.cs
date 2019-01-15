@@ -11,15 +11,15 @@ namespace VRdkHRMsystem.Models.RequestViewModels.Vacation
         [Required]
         public string VacationType { get; set; }
         public IEnumerable<SelectListItem> VacationTypes { get; set; }
-        [Required]
+        [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Date)]
         public DateTime BeginDate { get; set; }
-        [Required]
+        [Required(ErrorMessage =" заполните")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
-        [StringLength(128)]
+        [StringLength(128, ErrorMessage = " слишком длинное сообщение")]
         public string Comment { get; set; }
-        [Required]
+        [Range(1, 365, ErrorMessage = "> 0 и < 365")]
         public int Duration { get; set; }
         public int PaidVacationResiduals { get; set; }
         public int UnpaidVaccationResiduals { get; set; }

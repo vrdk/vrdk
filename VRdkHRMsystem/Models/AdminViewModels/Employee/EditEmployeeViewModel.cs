@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VRdkHRMsystem.Models.AdminViewModels.Employee
 {
-
     public class EditEmployeeViewModel
     {
         public string EmployeeId { get; set; }

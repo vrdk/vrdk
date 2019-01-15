@@ -56,6 +56,11 @@ namespace VRdkHRMsystem.Services
             return employees.Select(emp => new SelectListItem() { Text = $"{emp.FirstName} {emp.LastName}", Value = emp.EmployeeId }).ToArray();
         }
 
+        public SelectListItem[] CreateSelectedEmployeesList(EmployeeDTO[] employees, string[] selectedEmployees)
+        {
+            return employees.Select(emp => new SelectListItem() { Text = $"{emp.FirstName} {emp.LastName}", Value = emp.EmployeeId, Selected =  selectedEmployees.Contains(emp.EmployeeId)}).ToArray();
+        }
+
         public SelectListItem[] CreateStateList(string userState = null)
         {
             return new SelectListItem[]

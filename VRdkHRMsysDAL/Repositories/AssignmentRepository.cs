@@ -26,51 +26,88 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task DeleteAsync (Assignment entity)
         {
-            _context. Assignment.Remove(entity);
+            _context.Assignment.Remove(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> GetAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null, string searchKey = null)
+        public async Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null)
         {
-            if (searchKey == null)
+            if(searchKey == null)
             {
-                return condition != null ? await _context.AssignmentEmployee.Where(condition).CountAsync() :
-                                           await _context.AssignmentEmployee.CountAsync();
+                return condition != null ? await _context.Assignment.Where(condition).CountAsync() :
+                                           await _context.Assignment.CountAsync();
+
             }
 
-            return condition != null ? await _context.AssignmentEmployee.Where(a => a.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
-                                                                                || a.Employee.LastName.ToLower().Contains(searchKey.ToLower())
-                                                                                || a.Assignment.Name.ToLower().Contains(searchKey.ToLower())).CountAsync() :
-                                       await _context.AssignmentEmployee.Where(condition).
-                                                                      Where(a => a.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
-                                                                                || a.Employee.LastName.ToLower().Contains(searchKey.ToLower())
-                                                                                || a.Assignment.Name.ToLower().Contains(searchKey.ToLower())).CountAsync();
+            return condition != null ? await _context.Assignment.Where(a=>a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync() :
+                                      await _context.Assignment.Where(condition).
+                                                                Where(a => a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync();
+        }
+
+        public async Task<int> GetProfileAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null)
+        {
+            return condition != null ? await _context.AssignmentEmployee.CountAsync() :
+                                    await _context.AssignmentEmployee.Where(condition).CountAsync();
+           
+        }
+
+        public async Task<Assignment[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Assignment, bool>> condition = null, string searchKey = null)
+        {
+            if(searchKey == null)
+            {
+                return condition != null ? await _context.Assignment.Include(a => a.AssignmentEmployee).Where(condition).OrderByDescending(a=>a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                           await _context.Assignment.Include(a => a.AssignmentEmployee).OrderByDescending(a => a.CreateDate).Skip(pageNumber*pageSize).Take(pageSize).ToArrayAsync();
+            }
+
+            return condition != null ? await _context.Assignment.Include(a => a.AssignmentEmployee).Where(condition).
+                                                                 Where(a=>a.AssignmentEmployee.Count().ToString().Contains(searchKey) || a.Name.ToLower().Contains(searchKey.ToLower())).
+                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                       await _context.Assignment.Include(a => a.AssignmentEmployee).Where(a => a.AssignmentEmployee.Count().ToString().Contains(searchKey) || a.Name.ToLower().Contains(searchKey.ToLower())).
+                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }
 
         public async Task<AssignmentEmployee[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
         {
-            return await _context.AssignmentEmployee.Include(ae => ae.Assignment).Where(a=>a.EmployeeId == id).OrderByDescending(a => a.Assignment.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();                        
+            return await _context.AssignmentEmployee.Include(ae => ae.Assignment).Where(a => a.EmployeeId == id).OrderByDescending(a => a.Assignment.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }
 
-        public async Task<AssignmentEmployee[]> GetByEmployeeIdAsync(string id)
-        {
-            return await _context.AssignmentEmployee.Include(ae => ae.Assignment).Where(ae => ae.EmployeeId == id).ToArrayAsync();
-        }
-
-        public async Task< Assignment[]> GetAsync(Expression<Func< Assignment, bool>> condition = null)
+        public async Task< Assignment[]> GetAsync(Expression<Func<Assignment, bool>> condition = null)
         {
             return condition != null ? await _context.Assignment.Where(condition).ToArrayAsync() : await _context.Assignment.ToArrayAsync();
         }
 
         public async Task<Assignment[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null)
         {
-            return condition != null ? await _context.Assignment.Include(a=>a.Employees).ThenInclude(ae=>ae.Employee).Where(condition).ToArrayAsync()
-                                     : await _context.Assignment.Include(a => a.Employees).ThenInclude(ae => ae.Employee).ToArrayAsync();
+            return condition != null ? await _context.Assignment.Include(a=>a.AssignmentEmployee).ThenInclude(ae=>ae.Employee).Where(condition).ToArrayAsync()
+                                     : await _context.Assignment.Include(a => a.AssignmentEmployee).ThenInclude(ae => ae.Employee).ToArrayAsync();
+        }
+
+        public async Task<Assignment> GetByIdWithEmployeesAsync(string id)
+        {
+            return await _context.Assignment.Include(a => a.AssignmentEmployee).ThenInclude(ae => ae.Employee).ThenInclude(emp=>emp.EmployeeBalanceResiduals).FirstOrDefaultAsync(a=>a.AssignmentId == id);
         }
 
         public async Task< Assignment> GetByIdAsync(string id)
         {
-            return await _context. Assignment.FirstOrDefaultAsync(ab => ab. AssignmentId.Equals(id));
+            return await _context. Assignment.FirstOrDefaultAsync(a => a. AssignmentId == id);
+        }
+
+        public async Task AddToAssignmentAsync(string[] employeeIds, string assignmentId)
+        {
+            _context.AssignmentEmployee.AddRange(employeeIds.Select(id => new AssignmentEmployee
+            {
+                AssignmentId = assignmentId,
+                EmployeeId = id,
+                RowId = Guid.NewGuid().ToString()
+            }));
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId)
+        {
+             _context.AssignmentEmployee.RemoveRange(_context.AssignmentEmployee.Where(ae => employeeIds.Contains(ae.EmployeeId) && ae.AssignmentId == assignmentId));
+            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync()

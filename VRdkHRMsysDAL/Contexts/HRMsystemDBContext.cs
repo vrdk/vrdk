@@ -106,7 +106,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.HasOne(d => d.Assignment)
-                    .WithMany(p => p.Employees)
+                    .WithMany(p => p.AssignmentEmployee)
                     .HasForeignKey(d => d.AssignmentId)
                     .HasConstraintName("FK__assignmen__assig__5BE2A6F2");
 

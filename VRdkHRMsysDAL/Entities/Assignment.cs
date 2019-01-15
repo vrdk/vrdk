@@ -7,7 +7,7 @@ namespace VRdkHRMsysDAL.Entities
     {
         public Assignment()
         {
-            Employees = new HashSet<AssignmentEmployee>();
+            AssignmentEmployee = new HashSet<AssignmentEmployee>();
         }
 
         public string AssignmentId { get; set; }
@@ -18,6 +18,6 @@ namespace VRdkHRMsysDAL.Entities
         public DateTime EndDate { get; set; }
         public int Duration { get; set; }
 
-        public ICollection<AssignmentEmployee> Employees { get; set; }
+        public ICollection<AssignmentEmployee> AssignmentEmployee { get; set; }
     }
 }

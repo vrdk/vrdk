@@ -139,7 +139,7 @@ namespace VRdkHRMsystem.Controllers
             if (user != null)
             {
                     var requests = await _assignmentService.GetProfilePageAsync((int)PageSizeEnum.PageSize5, user.EmployeeId, pageNumber);
-                    int count = await _assignmentService.GetAssignmentsNumberAsync(null, a => a.EmployeeId == user.EmployeeId);
+                    int count = await _assignmentService.GetProfileAssignmentsCountAsync(a => a.EmployeeId == user.EmployeeId);
                 var model = new ProfileAssignmentListViewModel
                 {
                     PageNumber = pageNumber,
@@ -158,20 +158,6 @@ namespace VRdkHRMsystem.Controllers
             }
 
             return PartialView();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Assignments(string codeE)
-        {
-            var assignments = await _assignmentService.GetByEmployeeIdAsync(codeE);
-            var model = assignments.Select(a=> new ProfileAssignmentsViewModel
-            {
-                BeginDate = a.Assignment.BeginDate,
-                EndDate = a.Assignment.EndDate,
-                Duration = a.Assignment.Duration,
-                Name = a.Assignment.Name
-            }).ToArray();
-            return View(model);
         }
 
         [HttpGet]

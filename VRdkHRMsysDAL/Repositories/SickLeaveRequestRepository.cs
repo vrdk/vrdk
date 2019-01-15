@@ -48,10 +48,10 @@ namespace VRdkHRMsysDAL.Repositories
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(condition).
-                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
-                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
 
 
             }
@@ -62,12 +62,13 @@ namespace VRdkHRMsysDAL.Repositories
                                                 Where(condition).
                                                 Where(req=> $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                          || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                OrderByDescending(req=>req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                         OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req=>req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                          || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                         OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+
 
         }
 

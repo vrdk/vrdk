@@ -25,7 +25,7 @@
                         {
                             foreach (var item in Model.Notifications)
                             {
-                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked, role = "Administrator" })">
+                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked, role = "Admin" })">
                                     <div class="table__body_block">
 
                                         <p class="notiflist__date">@item.NotificationDate.ToShortDateString() в @item.NotificationDate.ToShortTimeString()</p>
@@ -83,7 +83,7 @@
                         <a asp-action="Notifications" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-isAdministrator="@Model.IsAdministrator" asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
                     }
 
-                    @if (Model.PageNumber == Model.Count / Model.PageSize)
+                    @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                     {
                         <a href="#!" class="disabled" style="cursor:default"><img src="~/images/arrow-right.png" alt="arrow" /></a>
                     }

@@ -20,6 +20,7 @@ using VRdkHRMsystem.Models;
 using VRdkHRMsystem.Models.AdminViewModels.Assignment;
 using VRdkHRMsystem.Models.AdminViewModels.Employee;
 using VRdkHRMsystem.Models.AdminViewModels.Team;
+using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
@@ -48,7 +49,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IFileManagmentService _fileManagmentService;
 
         public AdminController(
-           UserManager<ApplicationUser> userManager,
+            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IPostService postService,
             IEmployeeService employeeService,
@@ -79,6 +80,30 @@ namespace VRdkHRMsystem.Controllers
             _emailSender = emailSender;
             _listMapper = listMapper;
             _mapHelper = mapHelper;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var assignments = new AssignmentListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId, searchKey);
+                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedAssignments = new AssignmentListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
+            };
+
+            return View(pagedAssignments);
         }
 
         [HttpGet]
@@ -376,7 +401,7 @@ namespace VRdkHRMsystem.Controllers
                     var teamlead = await _employeeService.GetByIdAsync(sickLiveRequest.Employee.Team.TeamleadId);
                     model.TeamName = sickLiveRequest.Employee.Team.Name;
                     model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                    if (teamlead.WorkEmail == User.Identity.Name)
+                    if (teamlead.WorkEmail == User.Identity.Name && sickLiveRequest.RequestStatus != RequestStatusEnum.Closed.ToString())
                     {
                         return PartialView("SickleaveProccessModal", model);
                     }
@@ -542,91 +567,232 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddAssignment(string codeE = null)
+        public async Task<IActionResult> EditAssignment(string id)
+        {
+            var assignment = await _assignmentService.GetByIdWithEmployeesAsync(id);
+            if (assignment != null)
+            {
+                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == assignment.OrganisationId);
+                var assignmentEmployees = assignment.AssignmentEmployee.Select(a => a.Employee.EmployeeId).ToArray();
+                var model = new EditAssignmentViewModel
+                {
+                    AssignmentId = assignment.AssignmentId,
+                    Name = assignment.Name,
+                    Duration = assignment.Duration,
+                    BeginDate = assignment.BeginDate,
+                    EndDate = assignment.EndDate,
+                    OrganisationId = assignment.OrganisationId,
+                    Employees = _listMapper.CreateSelectedEmployeesList(employees, assignmentEmployees)
+                };
+
+                return PartialView("EditAssignmentModal", model);
+            }
+
+            return RedirectToAction("Assignments", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAssignment(EditAssignmentViewModel model)
+        {
+            var assignment = await _assignmentService.GetByIdWithEmployeesAsync(model.AssignmentId);
+            if (assignment != null)
+            {
+                if (model.AssignmentMembers != null && model.AssignmentMembers.Count() != 0)
+                {
+                    var assignmentEmployees = assignment.AssignmentEmployee.Select(a => a.Employee.EmployeeId).ToArray();
+                    var removedFromAssignment = assignmentEmployees.Except(model.AssignmentMembers).ToArray();
+                    var addedToAssignment = model.AssignmentMembers.Except(assignmentEmployees).ToArray();
+                    if (removedFromAssignment != null && removedFromAssignment.Count() != 0)
+                    {
+                        var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
+                                                                                         FirstOrDefault(r => removedFromAssignment.Any(m => m == r.EmployeeId)
+                                                                                            && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r => r != null).ToArray();
+                        foreach (var res in residuals)
+                        {
+                            res.ResidualBalance -= assignment.Duration;
+                        }
+
+                        await _residualsService.UpdateRangeAsync(residuals);
+                        await _assignmentService.RemoveFromAssignmentAsync(removedFromAssignment, assignment.AssignmentId);
+                    }
+
+                    if (assignment.Duration != model.Duration)
+                    {
+                        var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
+                                                                                       FirstOrDefault(r => !removedFromAssignment.Any(m => m == r.EmployeeId) 
+                                                                                                           && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r=>r != null).ToArray();
+                        foreach (var res in residuals)
+                        {
+                            res.ResidualBalance += model.Duration - assignment.Duration;
+                        }
+
+                        await _residualsService.UpdateRangeAsync(residuals);
+                    }
+                    assignment.Duration = model.Duration;
+                    assignment.BeginDate = model.BeginDate;
+                    assignment.EndDate = model.EndDate;
+                    if (addedToAssignment != null && addedToAssignment.Count() != 0)
+                    {                      
+                        var employees = await _employeeService.GetWithTeam(emp => addedToAssignment.Any(m => m == emp.EmployeeId));
+                        var residuals = await _residualsService.GetAsync(res => addedToAssignment.Any(m => m == res.EmployeeId) && res.Name == ResidualTypeEnum.Assignment.ToString());
+                        foreach (var res in residuals)
+                        {
+                            res.ResidualBalance += assignment.Duration;
+                        }
+
+                        await _residualsService.UpdateRangeAsync(residuals);
+                        List<NotificationDTO> notificationList = new List<NotificationDTO>();
+                        foreach (var employee in employees)
+                        {
+                            notificationList.Add(new NotificationDTO
+                            {
+                                NotificationId = Guid.NewGuid().ToString(),
+                                EmployeeId = employee.EmployeeId,
+                                OrganisationId = employee.OrganisationId,
+                                NotificationType = NotificationTypeEnum.Assignment.ToString(),
+                                NotificationDate = DateTime.UtcNow,
+                                Description = "Вы были отмечены как участник командировки.",
+                                NotificationRange = NotificationRangeEnum.User.ToString(),
+                                IsChecked = false
+                            });
+                            if (employee.TeamId != null)
+                            {
+                                notificationList.Add(new NotificationDTO
+                                {
+                                    NotificationId = Guid.NewGuid().ToString(),
+                                    EmployeeId = employee.Team.TeamleadId,
+                                    OrganisationId = employee.OrganisationId,
+                                    NotificationType = NotificationTypeEnum.Assignment.ToString(),
+                                    NotificationDate = DateTime.UtcNow,
+                                    Description = $"Ваш работник, {employee.FirstName} {employee.LastName}, был отмечен как участник командировки.",
+                                    NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                                    IsChecked = false
+                                });
+                            }
+                        }
+
+                        await _assignmentService.AddToAssignmentAsync(addedToAssignment, assignment.AssignmentId);
+                        await _notificationService.CreateRangeAsync(notificationList.ToArray());                       
+                    }
+
+                    await _assignmentService.Update(assignment);
+                }
+                else
+                {
+                    var assignmentEmployees = assignment.AssignmentEmployee.Select(a => a.Employee.EmployeeId).ToArray();
+                    var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
+                                                                                        FirstOrDefault(r => assignmentEmployees.Any(m => m == r.EmployeeId)
+                                                                                           && r.Name == ResidualTypeEnum.Assignment.ToString())).ToArray();
+                    foreach (var res in residuals)
+                    {
+                        res.ResidualBalance += assignment.Duration;
+                    }
+
+                    await _residualsService.UpdateRangeAsync(residuals);
+                    await _assignmentService.RemoveFromAssignmentAsync(assignmentEmployees, assignment.AssignmentId);
+                    await _assignmentService.DeleteAsync(assignment);
+                }
+
+                return RedirectToAction("Assignments","Admin");
+            }
+
+            return RedirectToAction("Assignments", "Admin");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddAssignment(string id = null)
         {
             EmployeeDTO creator;
-            if (codeE == null)
+            if (id == null)
             {
                 creator = await _employeeService.GetByEmailWithTeamAsync(User.Identity.Name);
             }
             else
             {
-                creator = await _employeeService.GetByIdWithTeamAsync(codeE);
+                creator = await _employeeService.GetByIdWithTeamAsync(id);
             }
 
-            var employees = await _employeeService.GetAsync(emp => emp.OrganisationId.Equals(creator.OrganisationId));
-
-            var model = new AddAssignmentViewModel
+            if (creator != null)
             {
-                Employees = _mapHelper.MapCollection<EmployeeDTO, EmployeeAssignmentViewModel>(employees).ToArray(),
-                OrganisationId = creator.OrganisationId
-            };
+                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == creator.OrganisationId);
 
-            return View(model);
+                var model = new AddAssignmentViewModel
+                {
+                    Employees = _listMapper.CreateEmployeesList(employees),
+                    OrganisationId = creator.OrganisationId
+                };
+
+                return PartialView("AddAssignmentModal", model);
+            }
+
+            return RedirectToAction("Assignments", "Admin");
         }
 
         [HttpPost]
         public async Task<IActionResult> AddAssignment(AddAssignmentViewModel model)
         {
-            var assignment = new AssignmentDTO
+            if (ModelState.IsValid)
             {
-                AssignmentId = Guid.NewGuid().ToString(),
-                BeginDate = model.BeginDate,
-                EndDate = model.EndDate,
-                Duration = model.EndDate.DayOfYear - model.BeginDate.DayOfYear,
-                Name = model.Name,
-                OrganisationId = model.OrganisationId,
-                CreateDate = DateTime.UtcNow.Date
-            };
-            assignment.Employees = model.AssignmentMembers.Select(code => new AssignmentEmployeeDTO
-            {
-                AssignmentId = assignment.AssignmentId,
-                EmployeeId = code,
-                RowId = Guid.NewGuid().ToString()
-            }).ToArray();
-
-            await _assignmentService.CreateAsync(assignment);
-            var employees = await _employeeService.GetWithTeam(emp => model.AssignmentMembers.Any(m => m == emp.EmployeeId));
-            var residuals = await _residualsService.GetAsync(res => model.AssignmentMembers.Any(m => m == res.EmployeeId) && res.Name == ResidualTypeEnum.Assignment.ToString());
-            foreach (var res in residuals)
-            {
-                res.ResidualBalance += assignment.Duration;
-            }
-
-            await _residualsService.UpdateRangeAsync(residuals);
-            List<NotificationDTO> notificationList = new List<NotificationDTO>();
-            foreach (var employee in employees)
-            {
-                notificationList.Add(new NotificationDTO
+                var assignment = new AssignmentDTO
                 {
-                    NotificationId = Guid.NewGuid().ToString(),
-                    EmployeeId = employee.EmployeeId,
-                    OrganisationId = employee.OrganisationId,
-                    NotificationType = NotificationTypeEnum.Assignment.ToString(),
-                    NotificationDate = DateTime.UtcNow,
-                    Description = "Вы были отмечены как участник командировки.",
-                    NotificationRange = NotificationRangeEnum.User.ToString(),
-                    IsChecked = false
-                });
-                if (employee.TeamId != null)
+                    AssignmentId = Guid.NewGuid().ToString(),
+                    BeginDate = model.BeginDate,
+                    EndDate = model.EndDate,
+                    Duration = model.EndDate.DayOfYear - model.BeginDate.DayOfYear,
+                    Name = model.Name,
+                    OrganisationId = model.OrganisationId,
+                    CreateDate = DateTime.UtcNow.Date
+                };
+                assignment.AssignmentEmployee = model.AssignmentMembers.Select(code => new AssignmentEmployeeDTO
+                {
+                    AssignmentId = assignment.AssignmentId,
+                    EmployeeId = code,
+                    RowId = Guid.NewGuid().ToString()
+                }).ToArray();
+
+                await _assignmentService.CreateAsync(assignment);
+                var employees = await _employeeService.GetWithTeam(emp => model.AssignmentMembers.Any(m => m == emp.EmployeeId));
+                var residuals = await _residualsService.GetAsync(res => model.AssignmentMembers.Any(m => m == res.EmployeeId) && res.Name == ResidualTypeEnum.Assignment.ToString());
+                foreach (var res in residuals)
+                {
+                    res.ResidualBalance += assignment.Duration;
+                }
+
+                await _residualsService.UpdateRangeAsync(residuals);
+                List<NotificationDTO> notificationList = new List<NotificationDTO>();
+                foreach (var employee in employees)
                 {
                     notificationList.Add(new NotificationDTO
                     {
                         NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = employee.Team.TeamleadId,
+                        EmployeeId = employee.EmployeeId,
                         OrganisationId = employee.OrganisationId,
                         NotificationType = NotificationTypeEnum.Assignment.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш работник, {employee.FirstName} {employee.LastName}, был отмечен как участник командировки.",
-                        NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                        Description = "Вы были отмечены как участник командировки.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
                         IsChecked = false
                     });
+                    if (employee.TeamId != null)
+                    {
+                        notificationList.Add(new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = employee.Team.TeamleadId,
+                            OrganisationId = employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.Assignment.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш работник, {employee.FirstName} {employee.LastName}, был отмечен как участник командировки.",
+                            NotificationRange = NotificationRangeEnum.Organisation.ToString(),
+                            IsChecked = false
+                        });
+                    }
                 }
+
+                await _notificationService.CreateRangeAsync(notificationList.ToArray());
             }
 
-            await _notificationService.CreateRangeAsync(notificationList.ToArray());
-
-            return RedirectToAction("Profile", "Profile");
+            return RedirectToAction("Assignments", "Admin");
         }
     }
 }
