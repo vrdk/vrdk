@@ -10,10 +10,6 @@
         <div class="table">
             <div class="table__header">
                 <p>Список командировок</p>
-                <button class="assignmentlist__button" type="button" onclick="addAssignment()">
-                    <img src="~/images/plus.png" alt="plus" />
-                    <p>Добавить<span> командировку</span></p>
-                </button>
                 <div class="table__header_search">
                     <input type="text" placeholder="Найти" name="searchKey" value="@searchKey" />
                     <button type="submit"><img src="~/images/search.png" alt="search" /></button>
@@ -37,7 +33,7 @@
                                 <p class="assignmentlist__countmembers">@item.EmployeesCount</p>
                                 <p class="assignmentlist__dates">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
                                 <p class="assignmentlist__duration">@item.Duration</p>
-                                <p class="assignmentlist__info"><img src="~/images/penciltable.png" alt="pencil" onclick="editAssignment('@item.AssignmentId')"/></p>
+                                <p class="assignmentlist__info"><img src="~/images/users.png" alt="pencil" onclick="checkAssignment('@item.AssignmentId')"/></p>
                             </div>
                         </div>
                     }

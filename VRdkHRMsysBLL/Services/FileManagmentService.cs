@@ -20,6 +20,17 @@ namespace VRdkHRMsysBLL.Services
             _configuration = configuration;
         }
 
+        public async Task UploadDefaultUserPhoto(string fileName)
+        {
+            var defaultPhoto = await DownloadFileAsync("default.png", "photos");
+            await UploadFileInBlocks(defaultPhoto, $"{fileName}.png", "photos");
+        }
+
+        public async Task UploadUserPhoto(IFormFile file, string containerName, string fileName)
+        {
+            await UploadFile(file, containerName, fileName);
+        }
+
         public async Task UploadSickLeaveFileAsync(IFormFile file, string containerName)
         {
                 await UploadFile(file, containerName);
@@ -56,10 +67,17 @@ namespace VRdkHRMsysBLL.Services
             return content;
         }
 
-        private async Task UploadFile(IFormFile file, string containerName)
+        private async Task UploadFile(IFormFile file, string containerName, string fileName = null)
         {
             var byteFile = ConvertToByteArray(file);
-            await UploadFileInBlocks(byteFile, file.FileName, containerName);
+            if(fileName == null)
+            {
+                await UploadFileInBlocks(byteFile, file.FileName, containerName);
+            }
+            else
+            {
+                await UploadFileInBlocks(byteFile, $"{fileName}.png", containerName);
+            }
         }
 
         private async Task<byte[]> DownloadFileInBlocks(string fileName, string containerName)

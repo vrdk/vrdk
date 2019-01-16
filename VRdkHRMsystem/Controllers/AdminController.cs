@@ -265,6 +265,15 @@ namespace VRdkHRMsystem.Controllers
                     string callbackUrl = Url.Action("SetPasswordAndConfrimEmail", "Account", new { id = user.Id, resetCode = passwordResetCode, confirmCode = emailConfirmationCode }, Request.Scheme);
                     await _emailSender.SendPasswordResetLink(model.WorkEmail, "", "Set password", "",
                       $"Please set your password by clicking here: <a href='{callbackUrl}'>link</a>");
+
+                    if(model.Photo != null)
+                    {
+                        await _fileManagmentService.UploadUserPhoto(model.Photo, "photos", employee.EmployeeId);
+                    }
+                    else
+                    {
+                        await _fileManagmentService.UploadDefaultUserPhoto(employee.EmployeeId);
+                    }
                 }
 
                 return RedirectToAction("Profile", "Profile");

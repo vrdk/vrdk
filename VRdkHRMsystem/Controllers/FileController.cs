@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VRdkHRMsysBLL.Interfaces;
 
@@ -14,11 +12,20 @@ namespace VRdkHRMsystem.Controllers
         private readonly IFileManagmentService _fileManagmentService;
         private readonly IEmployeeService _employeeService;
 
+       
         public FileController(IFileManagmentService fileManagmentService,
                               IEmployeeService employeeService)
         {
             _fileManagmentService = fileManagmentService;
             _employeeService = employeeService;
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> UploadUserPhoto(IFormFile photo, string id)
+        {           
+            await _fileManagmentService.UploadUserPhoto(photo, "photos", id);
+            return Json(true);
         }
 
         public async Task<FileResult> DownloadFile(string fileName,string containerName)

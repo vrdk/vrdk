@@ -46,8 +46,9 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<int> GetProfileAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null)
         {
-            return condition != null ? await _context.AssignmentEmployee.CountAsync() :
-                                    await _context.AssignmentEmployee.Where(condition).CountAsync();
+            return condition != null ? await _context.AssignmentEmployee.Where(condition).CountAsync() :
+                                       await _context.AssignmentEmployee.CountAsync();
+                                      
            
         }
 

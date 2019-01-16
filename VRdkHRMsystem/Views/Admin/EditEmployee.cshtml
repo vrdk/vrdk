@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "EditEmployee";
+    var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
 <form asp-action="EditEmployee" method="post" class="content">
     <div class="profile__globalwrapper">
@@ -9,11 +10,12 @@
         <input asp-for="EmployeeId" hidden />
         <div class="profile empprofileedit">
             <div class="empprofile__header empprofileedit__header">
-                <div class="profile__imgblock"><img src="~/images/profile/profilephoto.png" alt="photo" /></div>
-                <button class="empprofile__button button empprofileedit__button">
+                <div class="profile__imgblock"><img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" id="user_photo" style="object-fit: cover;"/></div>
+                <label class=" empprofile__button button empprofileedit__button" for="Photo" id="photoUploadLabel">
                     <img src="~/images/plus.png" alt="plus" />
-                    <p>Загрузить фотографию</p>
-                </button>
+                    <p>Изменить фото</p>
+                    <input class="sickmessage__ulpoad_my" type="file" id="Photo" multiple="multiple" accept="image/*" onchange="setupCropper(this)" />
+                </label>
             </div>
             <div class="profile__data">
                 <div class="profile__datablock">
@@ -135,16 +137,41 @@
             <div class="empprofileedit__buttonwrapper">
                 <button class="empprofile__button button" type="button" onclick="window.history.back()">
                     <img src="~/images/cancel.png" alt="cancel" />
-                    <p>Отменить</p>
+                    <p>Назад</p>
                 </button>
                 <button class="empprofile__button button" type="submit">
                     <img src="~/images/submit.png" alt="submit" />
-                    <p>Готово</p>
+                    <p>Сохранить изменения</p>
                 </button>
             </div>
         </div>
     </div>
 </form>
+<div class="modal fade" id="user_photo_modal">
+    <div class="modal-dialog modal-content" style="width:700px;">
+        <div id="questionmodal1" style="width:auto">
+            <div class="modal__header" style="border-radius: 6px;">
+                <p class="modal__title">Изменить фото</p>
+            </div>
+            <div class=" questionmodal__question" style="max-height:300px;overflow:hidden;">
+                <img style="max-width:100%;height:auto" id="image" src="" alt="">
+            </div>
+            <div class="vacmodal__buttons">
+                <button class="button" type="button" data-dismiss="modal">
+                    <img src="~/images/cancel.png" alt="cancel" />
+                    <p>Отменить</p>
+                </button>
+                <button class="button" type="button" onclick="setImage()" data-dismiss="modal">
+                    <img src="~/images/submit.png" alt="submit" />
+                    <p>Изменить</p>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/cropper.min.js"></script>
+    <script src="~/js/photoCropping.js"></script>
+    <link rel="stylesheet" href="~/css/cropper.min.css" />
 }

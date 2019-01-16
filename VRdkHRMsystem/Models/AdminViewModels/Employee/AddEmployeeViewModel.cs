@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -56,5 +57,6 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         [Display(Name = "Assignment balance")]
         [Range(0,100)]
         public int AssignmentBalance { get; set; }
+        public IFormFile Photo { get; set; }
     }
 }

@@ -8,8 +8,7 @@ $(document).ready(function () {
     $("#vacrequest__to_datepicker").mask('00.00.0000');
     $("#phone").mask('(000) 000-0000');
     $("#File").on('change', function () {
-        $("#fileUploadLabel").empty();
-        $("#fileUploadLabel").html("Фото загружено");
+        $("#fileUploadText").html("Фото загружено");
     });
 });
 
@@ -25,6 +24,16 @@ function GetDiff(fromId, toId) {
 function CalcDiff(fromId, toId) {
     if (document.getElementById(fromId).value && document.getElementById(toId).value) {
         document.getElementById("Duration").value = GetDiff(fromId, toId);
+    }
+}
+
+function changeUserPhoto(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#user_photo').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(input.files[0]);
     }
 }
 
@@ -130,3 +139,15 @@ function editAssignment(id) {
     });
 }
 
+function checkAssignment(id) {
+    url = "/teamlead/checkassignment?id=" + id;
+    $.ajax({
+        type: "Get",
+        url: url,
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#request_modal').modal();
+            $('#modal_place').html(modal_html);
+        }
+    });
+}

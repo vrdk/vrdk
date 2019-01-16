@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VRdkHRMsysBLL.DTOs.Absence;
+using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
@@ -15,9 +16,12 @@ using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Models;
+using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
+using VRdkHRMsystem.Models.SharedViewModels.Employee;
+using VRdkHRMsystem.Models.TeamleadViewModels.Assignment;
 using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
 using VRdkHRMsystem.Models.TeamleadViewModels.SickLeave;
 
@@ -325,6 +329,83 @@ namespace VRdkHRMsystem.Controllers
             }
 
             return PartialView("SickleaveViewModal");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Employees(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var employees = new EmployeeListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+            }
+
+            var pagedEmployees = new EmployeeListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
+            };
+
+            return View(pagedEmployees);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var assignments = new AssignmentListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId 
+                                                                                                                && a.AssignmentEmployee.Any(ae=>ae.Employee.Team.TeamleadId == employee.EmployeeId), searchKey);
+
+                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId));
+            }
+
+            var pagedAssignments = new AssignmentListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
+            };
+
+            return View(pagedAssignments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CheckAssignment(string id)
+        {
+            var assignment = await _assignmentService.GetByIdWithEmployeesAsync(id);
+            if (assignment != null)
+            {
+                var assignmentEmployees = assignment.AssignmentEmployee.Select(a => a.Employee.EmployeeId).ToArray();
+                var model = new AssignmentCheckViewModel
+                {
+                    Name = assignment.Name,
+                    BeginDate = assignment.BeginDate,
+                    EndDate = assignment.EndDate,
+                    AssignmentMembers = assignment.AssignmentEmployee.Select(ae => new EmployeeAssignmentViewModel
+                    {
+                        EmployeeId = ae.Employee.EmployeeId,
+                        FirstName = ae.Employee.FirstName,
+                        LastName = ae.Employee.LastName
+                    }).ToArray()
+                };
+
+                return PartialView("AssignmentViewModal", model);
+            }
+
+            return RedirectToAction("Assignments", "Teamlead");
         }
 
         [HttpGet]

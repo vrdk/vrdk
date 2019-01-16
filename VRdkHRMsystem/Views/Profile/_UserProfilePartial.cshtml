@@ -1,11 +1,14 @@
 ﻿@model VRdkHRMsystem.Models.Profile.ProfileViewModel
+@{
+    var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
+}
 <div class="profile">
     <div class="profile__header">
         @if (User.IsInRole("Administrator"))
         {
            <a href="@Url.Action("EditEmployee","Admin", new { id = Model.EmployeeId })"><div class="profile__header__img"></div></a>
         }       
-        <div class="profile__imgblock"><img src="~/images/profile/profilephoto.png" alt="photo" /></div>
+        <div class="profile__imgblock"><img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" /></div>
         <p class="profile__name">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</p>
         <p class="profile__post">@Html.DisplayFor(model => model.Post)</p>
         @if (Model.State == true)
