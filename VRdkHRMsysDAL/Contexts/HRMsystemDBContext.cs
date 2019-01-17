@@ -51,7 +51,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Absence)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__absence__employe__5812160E");
-               
             });
 
             modelBuilder.Entity<Assignment>(entity =>
@@ -62,18 +61,14 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("assignment_id")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.OrganisationId)
-                    .IsRequired()
-                    .HasColumnName("organisation_id")
-                    .HasMaxLength(450);
-
                 entity.Property(e => e.BeginDate)
                     .HasColumnName("begin_date")
                     .HasColumnType("date");
 
                 entity.Property(e => e.CreateDate)
-                  .HasColumnName("create_date")
-                  .HasColumnType("date");
+                    .HasColumnName("create_date")
+                    .HasColumnType("date")
+                    .HasDefaultValueSql("(getdate())");
 
                 entity.Property(e => e.Duration).HasColumnName("duration");
 
@@ -85,11 +80,21 @@ namespace VRdkHRMsysDAL.Contexts
                     .IsRequired()
                     .HasColumnName("name")
                     .HasMaxLength(512);
+
+                entity.Property(e => e.OrganisationId)
+                    .HasColumnName("organisation_id")
+                    .HasMaxLength(450);
+
+                entity.HasOne(d => d.Organisation)
+                    .WithMany(p => p.Assignment)
+                    .HasForeignKey(d => d.OrganisationId)
+                    .HasConstraintName("FK__assignmen__organ__607251E5");
             });
 
             modelBuilder.Entity<AssignmentEmployee>(entity =>
             {
-                entity.HasKey(e => e.RowId);
+                entity.HasKey(e => e.RowId)
+                    .HasName("PK__assignme__6965AB577132819A");
 
                 entity.ToTable("assignment_employee");
 
@@ -133,6 +138,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(512);
 
                 entity.Property(e => e.DayOffState)
+                    .IsRequired()
                     .HasColumnName("day_off_state")
                     .HasMaxLength(512);
 
@@ -155,17 +161,12 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.ToTable("employee");
 
                 entity.HasIndex(e => e.WorkEmail)
-                .HasName("UQ__employee__0DD4ED7945AA3853")
-                .IsUnique();
+                    .HasName("UQ__employee__0DD4ED7945AA3853")
+                    .IsUnique();
 
                 entity.Property(e => e.EmployeeId)
                     .HasColumnName("employee_id")
-                     .ValueGeneratedNever();
-
-                entity.Property(e => e.PhoneNumber)
-                    .HasColumnName("phone_number")
-                    .HasMaxLength(128);
-                   
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.BirthDate)
                     .HasColumnName("birth_date")
@@ -194,6 +195,17 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("organisation_id")
                     .HasMaxLength(450);
 
+                entity.Property(e => e.PersonalEmail)
+                    .IsRequired()
+                    .HasColumnName("personal_email")
+                    .HasMaxLength(512);
+
+                entity.Property(e => e.PhoneNumber)
+                    .IsRequired()
+                    .HasColumnName("phone_number")
+                    .HasMaxLength(128)
+                    .HasDefaultValueSql("('0970301467')");
+
                 entity.Property(e => e.PostId)
                     .IsRequired()
                     .HasColumnName("post_id")
@@ -201,20 +213,14 @@ namespace VRdkHRMsysDAL.Contexts
 
                 entity.Property(e => e.State).HasColumnName("state");
 
-                
                 entity.Property(e => e.TeamId)
                     .HasColumnName("team_id")
                     .HasMaxLength(450);
 
                 entity.Property(e => e.WorkEmail)
-                      .IsRequired()
-                      .HasColumnName("work_email")
-                      .HasMaxLength(512);
-
-                entity.Property(e => e.PersonalEmail)
-                      .IsRequired()
-                      .HasColumnName("personal_email")
-                      .HasMaxLength(512);
+                    .IsRequired()
+                    .HasColumnName("work_email")
+                    .HasMaxLength(512);
 
                 entity.HasOne(d => d.Organisation)
                     .WithMany(p => p.Employee)
@@ -229,15 +235,15 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasConstraintName("FK__employee__post_i__412EB0B6");
 
                 entity.HasOne(d => d.Team)
-                    .WithMany(p => p.Employee)
+                    .WithMany(p => p.Employees)
                     .HasForeignKey(d => d.TeamId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__employee__team_i__3F466844");
+                    .HasConstraintName("FK__employee__team_i__151B244E");
             });
 
             modelBuilder.Entity<EmployeeBalanceResiduals>(entity =>
             {
-                entity.HasKey(e => e.ResidualId);
+                entity.HasKey(e => e.ResidualId)
+                    .HasName("PK__employee__A916765B3A700CC8");
 
                 entity.ToTable("employee_balance_residuals");
 
@@ -249,11 +255,12 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
 
-                entity.Property(e => e.ResidualBalance).HasColumnName("residual_balance");
-
                 entity.Property(e => e.Name)
+                    .IsRequired()
                     .HasColumnName("name")
                     .HasMaxLength(512);
+
+                entity.Property(e => e.ResidualBalance).HasColumnName("residual_balance");
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.EmployeeBalanceResiduals)
@@ -274,11 +281,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("description")
                     .HasMaxLength(512);
 
-                entity.Property(e => e.NotificationRange)
-                   .IsRequired()
-                   .HasColumnName("notification_range")
-                   .HasMaxLength(512);
-
                 entity.Property(e => e.EmployeeId)
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
@@ -288,6 +290,12 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.Property(e => e.NotificationDate)
                     .HasColumnName("notification_date")
                     .HasColumnType("datetime");
+
+                entity.Property(e => e.NotificationRange)
+                    .IsRequired()
+                    .HasColumnName("notification_range")
+                    .HasMaxLength(512)
+                    .HasDefaultValueSql("('user')");
 
                 entity.Property(e => e.NotificationType)
                     .IsRequired()
@@ -353,9 +361,11 @@ namespace VRdkHRMsysDAL.Contexts
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__post__organisati__398D8EEE");
             });
+
             modelBuilder.Entity<SickLeaveRequest>(entity =>
             {
-                entity.HasKey(e => e.SickLeaveId);
+                entity.HasKey(e => e.SickLeaveId)
+                    .HasName("PK__sick_lea__BC1B4FECC4FCD277");
 
                 entity.ToTable("sick_leave_request");
 
@@ -382,16 +392,18 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
 
-                entity.Property(e => e.TransactionId)
-                 .HasColumnName("transaction_id")
-                 .HasMaxLength(450);
-
-                entity.Property(e => e.ProccessedbyId).HasColumnName("proccessedby_id").HasMaxLength(450); ;
+                entity.Property(e => e.ProccessedbyId)
+                    .HasColumnName("proccessedby_id")
+                    .HasMaxLength(450);
 
                 entity.Property(e => e.RequestStatus)
                     .IsRequired()
                     .HasColumnName("request_status")
                     .HasMaxLength(512);
+
+                entity.Property(e => e.TransactionId)
+                    .HasColumnName("transaction_id")
+                    .HasMaxLength(450);
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.SickLeaveRequest)
@@ -420,14 +432,21 @@ namespace VRdkHRMsysDAL.Contexts
 
                 entity.Property(e => e.TeamleadId)
                     .IsRequired()
-                    .HasColumnName("teamLead_id")
-                    .HasMaxLength(450);
+                    .HasColumnName("teamlead_id")
+                    .HasMaxLength(450)
+                    .HasDefaultValueSql("('1e60d24b-57f1-4beb-b5d9-4888d154ad50')");
 
                 entity.HasOne(d => d.Organisation)
                     .WithMany(p => p.Team)
                     .HasForeignKey(d => d.OrganisationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__team__organisati__3C69FB99");
+
+                entity.HasOne(d => d.Teamlead)
+                    .WithMany(p => p.TeamNavigation)
+                    .HasForeignKey(d => d.TeamleadId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__team__teamlead_i__214BF109");
             });
 
             modelBuilder.Entity<Transaction>(entity =>
@@ -455,6 +474,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnType("date");
 
                 entity.Property(e => e.TransactionType)
+                    .IsRequired()
                     .HasColumnName("transaction_type")
                     .HasMaxLength(512);
 
@@ -462,12 +482,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Transaction)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__transacti__emplo__47DBAE45");       
+                    .HasConstraintName("FK__transacti__emplo__47DBAE45");
             });
 
             modelBuilder.Entity<VacationRequest>(entity =>
             {
-                entity.HasKey(e => e.VacationId);
+                entity.HasKey(e => e.VacationId)
+                    .HasName("PK__vacation__F558A74CDAEC33E6");
 
                 entity.ToTable("vacation_request");
 
@@ -494,26 +515,29 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
 
-                entity.Property(e => e.TransactionId)
-                   .HasColumnName("transaction_id")
-                   .HasMaxLength(450);
-
                 entity.Property(e => e.EndDate)
                     .HasColumnName("end_date")
                     .HasColumnType("date");
 
                 entity.Property(e => e.ProccessDate)
                     .HasColumnName("proccess_date")
-                    .HasColumnType("date");
+                    .HasColumnType("datetime");
 
-                entity.Property(e => e.ProccessedbyId).HasColumnName("proccessedby_id").HasMaxLength(450);
+                entity.Property(e => e.ProccessedbyId)
+                    .HasColumnName("proccessedby_id")
+                    .HasMaxLength(450);
 
                 entity.Property(e => e.RequestStatus)
                     .IsRequired()
                     .HasColumnName("request_status")
                     .HasMaxLength(512);
 
+                entity.Property(e => e.TransactionId)
+                    .HasColumnName("transaction_id")
+                    .HasMaxLength(450);
+
                 entity.Property(e => e.VacationType)
+                    .IsRequired()
                     .HasColumnName("vacation_type")
                     .HasMaxLength(512);
 
@@ -522,8 +546,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__vacation___emplo__4D94879B");
-
-                entity.Property(req => req.RequestStatus).IsConcurrencyToken();
             });
 
             modelBuilder.Entity<WorkDay>(entity =>

@@ -1,0 +1,48 @@
+﻿@model VRdkHRMsystem.Models.AdminViewModels.Team.EditTeamViewModel
+
+@{
+    ViewData["Title"] = "AddTeam";
+}
+<form asp-action="EditTeam" method="post" class="content">
+    <input asp-for="TeamId" hidden />
+    <div class="teamprofile">
+        <div class="teamprofile__leader">
+            <div class="teamprofile__info">
+                <p>Название команды</p>
+                <input asp-for="Name" class="input" type="text" />
+            </div>
+            <div class="teamprofile__teamlead" style="padding:20px;">
+                <p>Team Lead:</p>
+                <select class="emplits__empselect teamprofile__select" asp-for="TeamleadId" asp-items="Model.Teamleads" style="width:100%;" hidden></select>
+            </div>
+        </div>
+        <div class="teamprofile__members">
+            <p>Учасники</p>
+            <div class="teamprofile__members_wrapper" style="padding:20px;">
+                <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
+            </div>
+            <div class="teamprofile__empbuttons">
+                <button class="empprofile__button button" type="button" onclick="window.history.back()">
+                    <img src="~/images/cancel.png" alt="cancel" />
+                    <p>Назад</p>
+                </button>
+                <button class="empprofile__button button" type="submit">
+                    <img src="~/images/submit.png" alt="submit" />
+                    <p>Изменить</p>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#teamMembers').select2({
+                placeholder: "Выберите cотрудников..."
+            });
+            $('.emplits__empselect').select2();
+        });
+    </script>
+}

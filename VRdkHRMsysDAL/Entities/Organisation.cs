@@ -7,9 +7,10 @@ namespace VRdkHRMsysDAL.Entities
     {
         public Organisation()
         {
+            Assignment = new HashSet<Assignment>();
             Employee = new HashSet<Employee>();
-            Post = new HashSet<Post>();
             Notification = new HashSet<Notification>();
+            Post = new HashSet<Post>();
             Team = new HashSet<Team>();
         }
 
@@ -17,9 +18,10 @@ namespace VRdkHRMsysDAL.Entities
         public string Name { get; set; }
         public DateTime RegistrationDate { get; set; }
 
-        public ICollection<Employee> Employee { get; set; }
-        public ICollection<Notification> Notification { get; set; }
-        public ICollection<Post> Post { get; set; }
-        public ICollection<Team> Team { get; set; }
+        public virtual ICollection<Assignment> Assignment { get; set; }
+        public virtual ICollection<Employee> Employee { get; set; }
+        public virtual ICollection<Notification> Notification { get; set; }
+        public virtual ICollection<Post> Post { get; set; }
+        public virtual ICollection<Team> Team { get; set; }
     }
 }

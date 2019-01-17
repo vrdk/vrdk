@@ -7,7 +7,7 @@ namespace VRdkHRMsysDAL.Entities
     {
         public Team()
         {
-            Employee = new HashSet<Employee>();
+            Employees = new HashSet<Employee>();
         }
 
         public string TeamId { get; set; }
@@ -16,6 +16,7 @@ namespace VRdkHRMsysDAL.Entities
         public string Name { get; set; }
 
         public Organisation Organisation { get; set; }
-        public ICollection<Employee> Employee { get; set; }
+        public ICollection<Employee> Employees { get; set; }
+        public Employee Teamlead { get; set; }
     }
 }

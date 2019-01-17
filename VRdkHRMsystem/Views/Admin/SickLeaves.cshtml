@@ -12,7 +12,7 @@
             <div class="table__header">
                 <p>Список сообщений о болезнях</p>
                 <div class="table__header_search">
-                    <input type="text" placeholder="Найти больничный..." name="searchKey" value="@searchKey"/>
+                    <input type="text" placeholder="Найти больничный..." name="searchKey" value="@searchKey" />
                     <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
@@ -46,8 +46,8 @@
                                     <div class="profile__status_circle_@item.RequestStatus">
                                         <div></div>
                                     </div>
-                                   <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;"/></a> 
-                                   <img src="~/images/pencil.png" alt="pencil" onclick="ShowRequestPopup('@urlForCheck','@item.SickLeaveId')"/>
+                                    <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;" /></a>
+                                    <img src="~/images/pencil.png" alt="pencil" onclick="ShowRequestPopup('@urlForCheck','@item.SickLeaveId')" />
                                 </div>
                             </div>
                         </div>
@@ -71,7 +71,7 @@
                 <p style="margin-bottom:12px;">
                     @if (Model.PageNumber == 0)
                     {
-                        <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" style="cursor:not-allowed"/></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {
@@ -80,7 +80,7 @@
 
                     @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                     {
-                        <a href="#!"><img src="~/images/arrow-right.png" alt="arrow" class="disabled" style="cursor:not-allowed"/></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {

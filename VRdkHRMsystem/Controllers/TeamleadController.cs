@@ -10,6 +10,7 @@ using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
+using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.DTOs.Transaction;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.DTOs.WorkDay;
@@ -19,11 +20,11 @@ using VRdkHRMsystem.Models;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
+using VRdkHRMsystem.Models.SharedModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
 using VRdkHRMsystem.Models.SharedViewModels.Employee;
 using VRdkHRMsystem.Models.TeamleadViewModels.Assignment;
 using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
-using VRdkHRMsystem.Models.TeamleadViewModels.SickLeave;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -84,6 +85,40 @@ namespace VRdkHRMsystem.Controllers
             _dayOffService = dayOffService;
             _mapHelper = mapHelper;
             _fileManagmentService = fileManagmentService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TeamProfile(string id)
+        {
+            var team = await _teamService.GetByIdAsync(id);
+
+            var model = _mapHelper.Map<TeamDTO, TeamProfileViewModel>(team);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Teams(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var teams = new TeamListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                teams = await _teamService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId);
+                count = await _teamService.GetTeamsCountAsync(searchKey, t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedTeams = new TeamListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Teams = _mapHelper.MapCollection<TeamListUnitDTO, TeamViewModel>(teams)
+            };
+
+            return View(pagedTeams);
         }
 
         [HttpGet]
@@ -222,7 +257,7 @@ namespace VRdkHRMsystem.Controllers
                         NotificationId = Guid.NewGuid().ToString(),
                         EmployeeId = vacationRequest.EmployeeId,
                         OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
                         Description = $"Ваш запрос на отпуск был подтверждён руководителем.",
                         NotificationRange = NotificationRangeEnum.User.ToString(),
@@ -232,7 +267,7 @@ namespace VRdkHRMsystem.Controllers
                         {
                         NotificationId = Guid.NewGuid().ToString(),
                         OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
                         Description = $"Запрос на отпуск работника был подтверждён его руководителем.",
                         NotificationRange = NotificationRangeEnum.Organisation.ToString(),
@@ -250,7 +285,7 @@ namespace VRdkHRMsystem.Controllers
                         NotificationId = Guid.NewGuid().ToString(),
                         EmployeeId = vacationRequest.EmployeeId,
                         OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
                         Description = $"Ваш запрос на отпуск был отклонён руководителем.",
                         NotificationRange = NotificationRangeEnum.User.ToString(),
@@ -307,7 +342,7 @@ namespace VRdkHRMsystem.Controllers
                     var teamlead = await _employeeService.GetByIdAsync(sickLiveRequest.Employee.Team.TeamleadId);
                     model.TeamName = sickLiveRequest.Employee.Team.Name;
                     model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                    if (teamlead.WorkEmail == User.Identity.Name)
+                    if (teamlead.WorkEmail == User.Identity.Name && sickLiveRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
                     {
 
                         return PartialView("SickleaveProccessModal", model);

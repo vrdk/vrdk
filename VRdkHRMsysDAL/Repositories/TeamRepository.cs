@@ -17,15 +17,49 @@ namespace VRdkHRMsysDAL.Repositories
         {
             _context = context;
         }
+        public async Task<int> GetTeamsCountAsync(string searchKey = null, Expression<Func<Team, bool>> condition = null)
+        {
+            if(searchKey == null)
+            {
+                return condition != null ? await _context.Team.Where(condition).CountAsync() :
+                                           await _context.Team.CountAsync();
+            }
+
+            return condition != null ? await _context.Team.Where(condition).Where(t => t.Employees.Count.ToString() == searchKey
+                                                                                    || $"{t.Teamlead.FirstName} {t.Teamlead.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                                    || t.Name.ToLower().Contains(searchKey.ToLower())).CountAsync() :
+                                       await _context.Team.Where(t => t.Employees.Count.ToString() == searchKey
+                                                                   || $"{t.Teamlead.FirstName} {t.Teamlead.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                   || t.Name.ToLower().Contains(searchKey.ToLower())).CountAsync();
+        }
+
+        public async Task<Team[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<Team, bool>> condition = null)
+        {
+            if(searchKey == null)
+            {
+                return condition != null ? await _context.Team.Include(t=> t.Employees).Include(t => t.Teamlead).Where(condition).Skip(pageNumber*pageSize).Take(pageSize).ToArrayAsync() : 
+                                           await _context.Team.Include(t => t.Employees).Include(t => t.Teamlead).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+            }
+
+            return condition != null ? await _context.Team.Include(t => t.Employees).Include(t => t.Teamlead).Where(condition).
+                                                                                                              Where(t=>t.Employees.Count.ToString() == searchKey
+                                                                                                                   || $"{t.Teamlead.FirstName} {t.Teamlead.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                                                                   || t.Name.ToLower().Contains(searchKey.ToLower())).
+                                                                                                                   Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                       await _context.Team.Include(t => t.Employees).Include(t => t.Teamlead).Where(t => t.Employees.Count.ToString() == searchKey
+                                                                                                                   || $"{t.Teamlead.FirstName} {t.Teamlead.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                                                                   || t.Name.ToLower().Contains(searchKey.ToLower())).
+                                                                                                                   Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+        }
 
         public async Task<Team[]> GetAsync(Expression<Func<Team, bool>> condition = null)
         {
-            return condition != null ? await _context.Team.Where(condition).ToArrayAsync() : await _context.Team.ToArrayAsync();
+            return condition != null ? await _context.Team.Include(t=>t.Employees).Include(t=>t.Teamlead).Where(condition).ToArrayAsync() : await _context.Team.Include(t => t.Teamlead).ToArrayAsync();
         }
 
         public async Task<Team> GetByIdAsync(string id)
         {
-            return await _context.Team.FirstOrDefaultAsync(team => team.TeamId.Equals(id));
+            return await _context.Team.Include(t=>t.Employees).Include(t=>t.Teamlead).FirstOrDefaultAsync(team => team.TeamId.Equals(id));
         }
 
         public async Task UpdateAsync()

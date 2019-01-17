@@ -50,7 +50,7 @@
                                     <div class="profile__status_circle_@item.RequestStatus" style="margin-right:5px;">
                                         <div></div>
                                     </div>
-                                    <a href="@Url.Action("EmployeeProfileView","Admin", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" /></a>
+                                    <a href="@Url.Action("EmployeeProfile","Admin", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" style="margin-top:5px;" /></a>
                                     @if (item.RequestStatus != "Approved" && item.RequestStatus != "Denied")
                                     {
                                         <img src="~/images/penciltable.png" alt="pencil" style="cursor:pointer;" onclick="ShowRequestPopup('@urlForProccess','@item.VacationId')" />
@@ -68,7 +68,7 @@
                 {
                     <div class="table__body_content vaclist__body_content">
                         <div class="table__body_block">
-                            <p class="vaclist__name">Нет записей</p>                            
+                            <p class="vaclist__name">Нет записей</p>
                         </div>
                     </div>
                 }
@@ -80,7 +80,7 @@
                 <p style="margin-bottom:12px;">
                     @if (Model.PageNumber == 0)
                     {
-                        <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled"  style="cursor:not-allowed"/></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {
@@ -89,7 +89,7 @@
 
                     @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                     {
-                        <a href="#!" class="disabled"><img src="~/images/arrow-right.png" alt="arrow"  style="cursor:not-allowed"/></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {
@@ -101,7 +101,7 @@
     </section>
 </form>
 <div class="modal fade" id="request_modal" role="dialog" style="">
-        <div class="modal-dialog modal-content">
-            <div id="modal_place" ></div>
-        </div>
+    <div class="modal-dialog modal-content">
+        <div id="modal_place"></div>
+    </div>
 </div>

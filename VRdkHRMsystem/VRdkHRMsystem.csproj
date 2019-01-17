@@ -42,6 +42,12 @@
     <Content Update="Views\Teamlead\Employees.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Teamlead\TeamProfile.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\Teams.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Teamlead\VacationProccessModal.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

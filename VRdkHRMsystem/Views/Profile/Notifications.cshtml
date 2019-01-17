@@ -76,7 +76,7 @@
                 <p style="margin-bottom:12px;">
                     @if (Model.PageNumber == 0)
                     {
-                        <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" /></a>
+                    <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {
@@ -85,7 +85,7 @@
 
                     @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                     {
-                        <a href="#!" class="disabled" style="cursor:default"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {

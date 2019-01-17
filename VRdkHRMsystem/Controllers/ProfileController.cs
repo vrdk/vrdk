@@ -202,6 +202,7 @@ namespace VRdkHRMsystem.Controllers
             var notification = await _notificationService.GetByIdAsync(notificationId);
             if(notification != null)
             {
+                
                 if (!isChecked)
                 {
                    await _notificationService.CheckNotificationAsync(notification.NotificationId);

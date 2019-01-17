@@ -11,7 +11,6 @@ $(document).ready(function () {
         $("#fileUploadText").html("Фото загружено");
     });
 });
-
 function GetDiff(fromId, toId) {
     var d1 = document.getElementById(toId).value;
     var endDate = new Date(d1.split('.')[2], d1.split('.')[1] - 1, d1.split('.')[0]);
@@ -48,6 +47,19 @@ function ShowRequestPopup(url, id) {
             $('#modal_place').html(modal_html);
         }
     });
+}
+
+function getinitialprofilerequests(page_number, data_type) {
+    url = "/profile/" + data_type + "spage?pageNumber=" + page_number;
+    $.ajax({
+        type: "Get",
+        url: url,
+        success: function (requests_data) {
+            $(".profile__tabs_" + data_type).html(requests_data);
+            $("#" + data_type).removeAttr('onclick');
+        }
+    }
+    );
 }
 function getprofilerequests(page_number, data_type) {
     url = "/profile/" + data_type + "spage?pageNumber=" + page_number;

@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -16,6 +19,44 @@ namespace VRdkHRMsysBLL.Services
         {
             _teamRepository = teamRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task<int> GetTeamsCountAsync(string searchKey = null, Expression<Func<Team, bool>> condition = null)
+        {
+            return await _teamRepository.GetTeamsCountAsync(searchKey, condition);
+        }
+
+        public async Task<TeamListUnitDTO[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<Team, bool>> condition = null)
+        {
+            var teams = await _teamRepository.GetPageAsync(pageNumber, pageSize, searchKey, condition);
+
+            var teamsList = teams != null ? teams.Select(t => new TeamListUnitDTO
+            {
+                TeamId = t.TeamId,
+                Name = t.Name,
+                TeamleadName = $"{t.Teamlead.FirstName} {t.Teamlead.LastName}",
+                MembersCount = t.Employees.Count()
+            }).ToArray() : new TeamListUnitDTO[] { };
+
+            return teamsList;            
+        }
+
+        public async Task<TeamDTO> GetByIdAsync(string id)
+        {
+            var team = await _teamRepository.GetByIdAsync(id);
+            return _mapHelper.Map<Team, TeamDTO>(team);
+        }
+
+        public async Task UpdateAsync(TeamDTO newTeam)
+        {
+            var currentTeam = await  _teamRepository.GetByIdAsync(newTeam.TeamId);
+            if(currentTeam != null)
+            {
+                currentTeam.TeamleadId = newTeam.TeamleadId;
+                currentTeam.Name = newTeam.Name;
+            }
+
+            await _teamRepository.UpdateAsync();
         }
 
         public async Task CreateAsync(TeamDTO team)

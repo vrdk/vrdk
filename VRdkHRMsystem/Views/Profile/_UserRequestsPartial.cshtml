@@ -54,15 +54,21 @@
     <div class="profile__tabs_section">
         <div class="profile__tabs">
             <div class="profile__tabs_header">
-                <div class="profile__tab" onclick="getprofilerequests('0','vacation')">Мои отпуска</div>
-                <div class="profile__tab" onclick="getprofilerequests('0','sickleave')">Мои больничные</div>
-                <div class="profile__tab" onclick="getprofilerequests('0','assignment')">Мои командировки</div>
+                <div class="profile__tab" id="vacation" onclick="getinitialprofilerequests('0','vacation')">Мои отпуска</div>
+                <div class="profile__tab" id="sickleave" onclick="getinitialprofilerequests('0','sickleave')">Мои больничные</div>
+                <div class="profile__tab" id="assignment" onclick="getinitialprofilerequests('0','assignment')">Мои командировки</div>
                 <div class="profile__tab">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post"></div>
-                <div class="profile__tabs_sickleave profile__tab_post"></div>
-                <div class="profile__tabs_assignment profile__tab_post"></div>
+                <div class="profile__tabs_vacation profile__tab_post">
+                    <div class="profile__tabs_vaccontent profile__tabs_content">Загрузка...</div>
+                </div>
+                <div class="profile__tabs_sickleave profile__tab_post">
+                    <div class="profile__tabs_vaccontent profile__tabs_content">Загрузка...</div>
+                </div>
+                <div class="profile__tabs_assignment profile__tab_post">
+                    <div class="profile__tabs_vaccontent profile__tabs_content">Загрузка...</div>
+                </div>
                 <div class="profile__tabs_passes profile__tab_post">
                     <div class="profile__tabs_body_block">
                         <div class="profile__tabs_passestitle profile__tabs_title">

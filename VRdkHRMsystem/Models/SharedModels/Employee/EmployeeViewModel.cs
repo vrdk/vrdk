@@ -12,5 +12,6 @@
         public int SickLeaveBalance { get; set; }
         public int AbsenceBalance { get; set; }
         public int AssignmentBalance { get; set; }
+        public bool State { get; set; }
     }
 }

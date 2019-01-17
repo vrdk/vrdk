@@ -23,6 +23,7 @@ using VRdkHRMsystem.Models.AdminViewModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
+using VRdkHRMsystem.Models.SharedModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
 using VRdkHRMsystem.Models.SharedViewModels.Employee;
 
@@ -81,6 +82,97 @@ namespace VRdkHRMsystem.Controllers
             _listMapper = listMapper;
             _mapHelper = mapHelper;
         }
+        [HttpGet]
+        public async Task<IActionResult> EditTeam(string id)
+        {
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if(viewer != null)
+            {
+                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);
+                var team = await _teamService.GetByIdAsync(id);
+                var teamMembers = team.Employees.Select(m => m.EmployeeId).ToArray();
+                var model = new EditTeamViewModel
+                {
+                    TeamId = team.TeamId,
+                    Name = team.Name,
+                    Employees = _listMapper.CreateSelectedEmployeesList(employees.Where(emp => emp.TeamId == null || emp.TeamId == team.TeamId).ToArray(), teamMembers),
+                    Teamleads = _listMapper.CreateSelectedEmployeesList(employees,new string[] { team.TeamleadId })
+                };
+
+                return View(model);
+            }
+
+            return RedirectToAction("Teams", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTeam(EditTeamViewModel model)
+        {
+            var team = await _teamService.GetByIdAsync(model.TeamId);
+            if(team != null)
+            {
+                var teamMembers = team.Employees.Select(e => e.EmployeeId).ToArray();
+                var removedFromTeam = teamMembers.Except(model.TeamMembers).ToArray();
+                var addedToTeam = model.TeamMembers.Except(teamMembers).ToArray();
+                if(removedFromTeam != null && removedFromTeam.Count() != 0)
+                {
+                    await _employeeService.RemoveFromTeamAsync(removedFromTeam);
+                }
+
+                if(addedToTeam != null && addedToTeam.Count() != 0)
+                {
+                    await _employeeService.AddToTeamAsync(addedToTeam, team.TeamId);
+                }
+
+                if(team.TeamleadId != model.TeamleadId)
+                {
+                    team.TeamleadId = model.TeamleadId;                   
+                }
+
+                team.Name = model.Name;
+
+                await _teamService.UpdateAsync(team);
+
+                return RedirectToAction("Teams", "Admin");
+            }
+
+            return RedirectToAction("Teams", "Admin");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> TeamProfile(string id)
+        {
+            var team = await _teamService.GetByIdAsync(id);
+
+            var model = _mapHelper.Map<TeamDTO, TeamProfileViewModel>(team);
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Teams(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var teams = new TeamListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                teams = await _teamService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, t => t.OrganisationId == viewer.OrganisationId);
+                count = await _teamService.GetTeamsCountAsync(searchKey, t => t.OrganisationId == viewer.OrganisationId);
+            }
+
+            var pagedTeams = new TeamListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Teams = _mapHelper.MapCollection<TeamListUnitDTO, TeamViewModel>(teams)
+            };
+
+            return View(pagedTeams);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
@@ -410,7 +502,7 @@ namespace VRdkHRMsystem.Controllers
                     var teamlead = await _employeeService.GetByIdAsync(sickLiveRequest.Employee.Team.TeamleadId);
                     model.TeamName = sickLiveRequest.Employee.Team.Name;
                     model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                    if (teamlead.WorkEmail == User.Identity.Name && sickLiveRequest.RequestStatus != RequestStatusEnum.Closed.ToString())
+                    if (teamlead.WorkEmail == User.Identity.Name && sickLiveRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
                     {
                         return PartialView("SickleaveProccessModal", model);
                     }
@@ -527,16 +619,16 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddTeam(string codeE = null)
+        public async Task<IActionResult> AddTeam(string id = null)
         {
             EmployeeDTO creator;
-            if (codeE == null)
+            if (id == null)
             {
                 creator = await _employeeService.GetByEmailWithTeamAsync(User.Identity.Name);
             }
             else
             {
-                creator = await _employeeService.GetByIdWithTeamAsync(codeE);
+                creator = await _employeeService.GetByIdWithTeamAsync(id);
             }
 
             var employees = await _employeeService.GetAsync(emp => emp.OrganisationId.Equals(creator.OrganisationId));

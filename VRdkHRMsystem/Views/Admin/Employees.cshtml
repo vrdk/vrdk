@@ -9,7 +9,7 @@
             <div class="table__header">
                 <p>Список сотрудников</p>
                 <div class="table__header_search">
-                    <input type="text" placeholder="Поиск" name="searchKey" value="@searchKey" autocomplete="off"/>
+                    <input type="text" placeholder="Поиск" name="searchKey" value="@searchKey" autocomplete="off" />
                     <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
@@ -58,11 +58,11 @@
                 }
                 else
                 {
-                        <div class="table__body_content emplist__body_content">
-                            <div class="table__body_block">
-                                <p class="emplist__name">Нет записей</p>
-                            </div>
+                    <div class="table__body_content emplist__body_content">
+                        <div class="table__body_block">
+                            <p class="emplist__name">Нет записей</p>
                         </div>
+                    </div>
                 }
             </div>
         </div>
@@ -71,7 +71,7 @@
             <p style="margin-bottom:12px;">
                 @if (Model.PageNumber == 0)
                 {
-                    <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled"  style="cursor:not-allowed"/></a>
+                    <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                 }
                 else
                 {
@@ -80,7 +80,7 @@
 
                 @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                 {
-                    <a href="#!" class="disabled"><img src="~/images/arrow-right.png" alt="arrow"  style="cursor:not-allowed"/></a>
+                    <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                 }
                 else
                 {

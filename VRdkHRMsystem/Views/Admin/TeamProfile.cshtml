@@ -1,0 +1,57 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Team.TeamProfileViewModel
+
+@{
+    var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
+}
+<div class="content">
+    <div class="teamprofile">
+        <div class="teamprofile__leader">
+            @if (User.IsInRole("Administrator"))
+            {
+                <a href="@Url.Action("EditTeam","Admin", new { id = Model.TeamId })"><div class="teamprofile__leader_pencil"></div></a>
+            }
+            <div class="teamprofile__info">
+                <p>Название команды</p>
+                <p class="teamprofile__name">"@Model.Name"</p>
+            </div>
+            <div class="teamprofile__teamlead">
+                <p>Руководитель:</p>
+                <div class="teamprofile__member teamprofile__member_lead">
+                    <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Admin", new { id = Model.Teamlead.EmployeeId })"><img src="@($"{photoBlobUrl}{Model.Teamlead.EmployeeId}.png")" style="border-radius:50%;" alt="userphoto" /></a></div>
+                    <p class="teamprofile__username">@Model.Teamlead.FirstName @Model.Teamlead.LastName</p>
+                    <div class="teamprofile__userstatus"></div>
+                </div>
+            </div>
+        </div>
+        <div class="teamprofile__members">
+            <p>Учасники: @Model.Employees.Count()</p>
+            <div class="teamprofile__members_wrapper">
+                @if (Model.Employees != null && Model.Employees.Count() != 0)
+                {
+                    foreach (var member in Model.Employees)
+                    {
+                        <div class="teamprofile__member">
+                            <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Admin", new { id = member.EmployeeId })"><img src="@($"{photoBlobUrl}{member.EmployeeId}.png")" style="border-radius:50%;" alt="userphoto" /></a></div>
+                            <p class="teamprofile__username">@member.FirstName @member.LastName</p>
+                            @if (member.State)
+                            {
+                                <div class="teamprofile__userstatus"></div>
+                            }
+                            else
+                            {
+                                <div class="teamprofile__userstatus teamprofile__userstatus_grey"></div>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="teamprofile__member">
+                        <p class="teamprofile__username">Нет сотрудников</p>
+                        <div class="teamprofile__userstatus"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
