@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using VRdkHRMsysBLL.DTOs.Employee;
 
 namespace VRdkHRMsysBLL.DTOs.Absence
 {
@@ -9,5 +8,6 @@ namespace VRdkHRMsysBLL.DTOs.Absence
         public string AbsenceId { get; set; }
         public string EmployeeId { get; set; }
         public DateTime AbsenceDate { get; set; }
+        public EmployeeDTO Employee { get; set; }
     }
 }

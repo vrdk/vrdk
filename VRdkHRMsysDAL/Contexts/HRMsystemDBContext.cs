@@ -48,7 +48,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Absence)
+                    .WithMany(p => p.Absences)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__absence__employe__5812160E");
             });
@@ -151,7 +151,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnType("datetime");
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.DayOff)
+                    .WithMany(p => p.DayOffs)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__day_off__employe__68487DD7");
             });
@@ -308,7 +308,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.Notification)
+                    .WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__notificat__emplo__681373AD");
 
@@ -406,7 +406,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(450);
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.SickLeaveRequest)
+                    .WithMany(p => p.SickLeaves)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__sick_leav__emplo__52593CB8");
@@ -542,7 +542,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasMaxLength(512);
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.VacationRequest)
+                    .WithMany(p => p.Vacations)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__vacation___emplo__4D94879B");
@@ -573,7 +573,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnType("date");
 
                 entity.HasOne(d => d.Employee)
-                    .WithMany(p => p.WorkDay)
+                    .WithMany(p => p.WorkDays)
                     .HasForeignKey(d => d.EmployeeId)
                     .HasConstraintName("FK__work_day__employ__6D0D32F4");
             });

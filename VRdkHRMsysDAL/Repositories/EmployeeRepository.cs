@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,7 +16,26 @@ namespace VRdkHRMsysDAL.Repositories
         public EmployeeRepository(HRMSystemDbContext context)
         {
             _context = context;
-        }                                                                                                              
+        }
+
+        public async Task<Employee[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year)
+        {
+            return await _context.Employee.Where(e => e.TeamId == teamId || e.EmployeeId == teamleadId).OrderBy(e=>e.EmployeeId == teamleadId? 0 : 1).Select(e => new Employee
+            {
+                EmployeeId = e.EmployeeId,
+                FirstName = e.FirstName,
+                LastName = e.LastName,
+                Vacations = e.Vacations.Where(v=>((v.BeginDate.Month == month && v.BeginDate.Year == year) || (v.EndDate.Month == month && v.EndDate.Year == year))  && v.RequestStatus == "Approved").ToList(),
+                SickLeaves = e.SickLeaves.Where(s=>((s.CreateDate.Month == month && s.CreateDate.Year == year) || (s.CloseDate == null) || (s.CloseDate != null && s.CloseDate.Value.Month == month && s.CloseDate.Value.Year == year)) && (s.RequestStatus == "Approved" || s.RequestStatus == "Closed")).ToList(),
+                Assignments = e.Assignments.Where(a=>(a.Assignment.BeginDate.Month == month && a.Assignment.BeginDate.Year == year) || (a.Assignment.EndDate.Month == month && a.Assignment.EndDate.Year == year) ).Select(a=>new AssignmentEmployee
+                {
+                    Assignment = a.Assignment
+                }).ToList(),
+                Absences = e.Absences.Where(a=>a.AbsenceDate.Month == month && a.AbsenceDate.Year == year).ToList(),
+                WorkDays = e.WorkDays.Where(w=>w.WorkDayDate.Month == month && w.WorkDayDate.Year == year).ToList(),
+                DayOffs = e.DayOffs.Where(d=>d.DayOffDate.Month == month && d.DayOffDate.Year == year).ToList()              
+            }).ToArrayAsync();
+        }
 
         public async Task<Employee[]> GetAsync(Expression<Func<Employee, bool>> condition = null)
         {

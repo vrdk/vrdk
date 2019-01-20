@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -16,13 +17,16 @@ using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
+using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
+using VRdkHRMsystem.Models.SharedModels.Calendar;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
 using VRdkHRMsystem.Models.SharedModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
 using VRdkHRMsystem.Models.SharedViewModels.Employee;
+using VRdkHRMsystem.Models.TeamleadViewModels.Absence;
 using VRdkHRMsystem.Models.TeamleadViewModels.Assignment;
 using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
 
@@ -47,12 +51,14 @@ namespace VRdkHRMsystem.Controllers
         private readonly IAbsenceService _absenceService;
         private readonly IDayOffService _dayOffService;
         private readonly IWorkDayService _workDayService;
+        private readonly IViewListMapper _listMapper;
         private readonly IMapHelper _mapHelper;
         private readonly IFileManagmentService _fileManagmentService;
 
         public TeamleadController(UserManager<ApplicationUser> userManager,
                                   SignInManager<ApplicationUser> signInManager,
                                   IEmailSender emailSender,
+                                  IViewListMapper listMapper,
                                   IEmployeeService employeeService,
                                   IVacationService vacationService,
                                   IResidualsService residualsService,
@@ -71,6 +77,7 @@ namespace VRdkHRMsystem.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _listMapper = listMapper;
             _employeeService = employeeService;
             _vacationService = vacationService;
             _residualsService = residualsService;
@@ -85,6 +92,44 @@ namespace VRdkHRMsystem.Controllers
             _dayOffService = dayOffService;
             _mapHelper = mapHelper;
             _fileManagmentService = fileManagmentService;
+        }
+        [HttpGet]
+        public async Task<IActionResult> Calendar(int year, int month, string teamId)
+        {
+
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId);
+                if (year == 0 || month == 0)
+                {
+                    year = DateTime.UtcNow.Year;
+                    month = DateTime.UtcNow.Month;
+                }
+
+                if (teamId == null)
+                {
+                    teamId = teams.FirstOrDefault(t => t.Employees.Count() != 0)?.TeamId;
+                }
+
+                var team = await _teamService.GetForCalendaAsync(teamId);
+                var employees = await _employeeService.GetForCalendaAsync(teamId, team.TeamleadId, month, year);
+
+                var model = new CalendarViewModel
+                {
+                    Year = year,
+                    Month = month,
+                    TeamId = team?.TeamId,
+                    Team = _mapHelper.Map<TeamDTO, TeamViewModel>(team),
+                    Teams = _listMapper.CreateTeamList(teams, teamId),
+                    Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                    Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                };
+
+                return View(model);
+            }
+
+            return RedirectToAction("Profile", "Profile");
         }
 
         [HttpGet]
@@ -604,21 +649,44 @@ namespace VRdkHRMsystem.Controllers
             return View();
         }
 
-        public async Task<OkResult> CloseSickLeave(string codeE)
+        [HttpGet]
+        public async Task<IActionResult> SetAbsence(string id, string teamId, string firstName, string lastName)
         {
-            //if(Request.Headers["X-Requested-With"] == "XMLHttpRequest")
-            var abs = _absenceService.GetByEmployeeIdAsync(codeE);
+            var abs = await _absenceService.GetTodayByEmployeeIdAsync(id);
+            if (abs == null)
+            {
+                
+                var model = new AbsenceApproveViewModel
+                {
+                    TeamId = teamId,
+                    EmployeeId = id,
+                    Date = DateTime.UtcNow,
+                    FirstName = firstName,
+                    LastName = lastName
+                };
+
+                return PartialView("AbsenceApproveModal", model);
+            }
+
+            return RedirectToAction("Calendar", "Teamlead", new { teamId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetAbsence(AbsenceApproveViewModel model)
+        {
+            var abs = await _absenceService.GetTodayByEmployeeIdAsync(model.EmployeeId);
             if (abs == null)
             {
                 var absence = new AbsenceDTO
                 {
                     AbsenceId = Guid.NewGuid().ToString(),
-                    EmployeeId = codeE,
-                    AbsenceDate = DateTime.UtcNow
+                    EmployeeId = model.EmployeeId,
+                    AbsenceDate = model.Date
                 };
                 await _absenceService.CreateAsync(absence);
             }
-            return Ok();
+
+            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
         }
     }
 }

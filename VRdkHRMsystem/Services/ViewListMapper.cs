@@ -2,6 +2,7 @@
 using System.Linq;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Post;
+using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.ViewListsModels;
@@ -77,6 +78,11 @@ namespace VRdkHRMsystem.Services
                     Selected = userState == null ? true : true.ToString() == userState.ToString()
                 }
             };
+        }
+
+        public SelectListItem[] CreateTeamList(TeamDTO[] teams, string currentId)
+        {
+            return teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.TeamId, Selected = t.TeamId == currentId }).ToArray();
         }
     }
 }

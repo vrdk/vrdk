@@ -12,6 +12,7 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Assignment
         public string AssignmentId { get; set; }
         public string OrganisationId { get; set; }
         [Required(ErrorMessage = " заполните")]
+        [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string Name { get; set; }
         [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Date)]

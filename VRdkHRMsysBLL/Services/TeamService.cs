@@ -38,7 +38,13 @@ namespace VRdkHRMsysBLL.Services
                 MembersCount = t.Employees.Count()
             }).ToArray() : new TeamListUnitDTO[] { };
 
-            return teamsList;            
+            return teamsList;
+        }
+
+        public async Task<TeamDTO[]> GetAsync(Expression<Func<Team, bool>> condition = null)
+        {
+            var teams = await _teamRepository.GetAsync(condition);
+            return _mapHelper.MapCollection<Team, TeamDTO>(teams);
         }
 
         public async Task<TeamDTO> GetByIdAsync(string id)
@@ -47,10 +53,16 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<Team, TeamDTO>(team);
         }
 
+        public async Task<TeamDTO> GetForCalendaAsync(string id)
+        {
+            var team = await _teamRepository.GetForCalendarAsync(id);
+            return _mapHelper.Map<Team, TeamDTO>(team);
+        }
+
         public async Task UpdateAsync(TeamDTO newTeam)
         {
-            var currentTeam = await  _teamRepository.GetByIdAsync(newTeam.TeamId);
-            if(currentTeam != null)
+            var currentTeam = await _teamRepository.GetByIdAsync(newTeam.TeamId);
+            if (currentTeam != null)
             {
                 currentTeam.TeamleadId = newTeam.TeamleadId;
                 currentTeam.Name = newTeam.Name;

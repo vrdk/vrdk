@@ -21,10 +21,10 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
-        public async Task<AbsenceDTO> GetByEmployeeIdAsync(string id)
+        public async Task<AbsenceDTO> GetTodayByEmployeeIdAsync(string id)
         {
             var abs = await _absenceRepository.GetAsync(ab => ab.EmployeeId == id && ab.AbsenceDate.Date == DateTime.UtcNow.Date);
-            return _mapHelper.Map<Absence, AbsenceDTO>(abs.First());
+            return abs.Count() == 0 ? null : new AbsenceDTO();
         }
 
         public async Task CreateAsync(AbsenceDTO absence)

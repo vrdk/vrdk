@@ -5,7 +5,7 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface IAbsenceService
     {
-        Task<AbsenceDTO> GetByEmployeeIdAsync(string id);
+        Task<AbsenceDTO> GetTodayByEmployeeIdAsync(string id);
         Task CreateAsync(AbsenceDTO absence);
     }
 }

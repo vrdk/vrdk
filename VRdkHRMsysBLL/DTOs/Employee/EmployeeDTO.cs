@@ -4,9 +4,11 @@ using System.Text;
 using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
+using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.DTOs.SickLeave;
 using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.DTOs.Vacation;
+using VRdkHRMsysBLL.DTOs.WorkDay;
 
 namespace VRdkHRMsysBLL.DTOs.Employee
 {
@@ -27,5 +29,11 @@ namespace VRdkHRMsysBLL.DTOs.Employee
         public string WorkEmail { get; set; }
         public TeamDTO Team { get; set; }
         public BalanceResidualsDTO[] EmployeeBalanceResiduals { get; set; }
+        public VacationRequestDTO[] Vacations { get; set; }
+        public SickLeaveRequestDTO[] SickLeaves { get; set; }
+        public AbsenceDTO[] Absences { get; set; }
+        public AssignmentEmployeeDTO[] Assignments { get; set; }
+        public DayOffDTO[] DayOffs { get; set; }
+        public WorkDayDTO[] WorkDays { get; set; }
     }
 }

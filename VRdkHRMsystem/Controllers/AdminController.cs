@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +22,11 @@ using VRdkHRMsystem.Models.AdminViewModels.Assignment;
 using VRdkHRMsystem.Models.AdminViewModels.Employee;
 using VRdkHRMsystem.Models.AdminViewModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
+using VRdkHRMsystem.Models.SharedModels.Calendar;
 using VRdkHRMsystem.Models.SharedModels.Employee;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
 using VRdkHRMsystem.Models.SharedModels.Team;
 using VRdkHRMsystem.Models.SharedModels.Vacation;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -82,11 +83,57 @@ namespace VRdkHRMsystem.Controllers
             _listMapper = listMapper;
             _mapHelper = mapHelper;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Calendar(int year, int month, string teamId)
+        {
+            
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId);
+                if (year == 0 || month == 0)
+                {
+                    year = DateTime.UtcNow.Year;
+                    month = DateTime.UtcNow.Month;
+                }
+
+                if(teamId == null)
+                {
+                    teamId = teams.FirstOrDefault(t => t.Employees.Count() != 0)?.TeamId;
+                }
+
+                var team = await _teamService.GetForCalendaAsync(teamId);
+                var employees = await _employeeService.GetForCalendaAsync(teamId,team.TeamleadId, month, year);
+
+                var model = new CalendarViewModel
+                {
+                    Year = year,
+                    Month = month,
+                    TeamId = team?.TeamId,
+                    Team = _mapHelper.Map<TeamDTO,TeamViewModel>(team),
+                    Teams = _listMapper.CreateTeamList(teams, teamId),
+                    Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                    Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                };
+
+                if(team.TeamleadId == viewer.EmployeeId)
+                {
+                    return View("~/Views/Teamlead/Calendar.cshtml", model);
+                }
+
+                return View(model);
+            }
+
+            return RedirectToAction("Profile", "Profile");
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> EditTeam(string id)
         {
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if(viewer != null)
+            if (viewer != null)
             {
                 var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);
                 var team = await _teamService.GetByIdAsync(id);
@@ -96,7 +143,7 @@ namespace VRdkHRMsystem.Controllers
                     TeamId = team.TeamId,
                     Name = team.Name,
                     Employees = _listMapper.CreateSelectedEmployeesList(employees.Where(emp => emp.TeamId == null || emp.TeamId == team.TeamId).ToArray(), teamMembers),
-                    Teamleads = _listMapper.CreateSelectedEmployeesList(employees,new string[] { team.TeamleadId })
+                    Teamleads = _listMapper.CreateSelectedEmployeesList(employees, new string[] { team.TeamleadId })
                 };
 
                 return View(model);
@@ -109,24 +156,24 @@ namespace VRdkHRMsystem.Controllers
         public async Task<IActionResult> EditTeam(EditTeamViewModel model)
         {
             var team = await _teamService.GetByIdAsync(model.TeamId);
-            if(team != null)
+            if (team != null)
             {
                 var teamMembers = team.Employees.Select(e => e.EmployeeId).ToArray();
                 var removedFromTeam = teamMembers.Except(model.TeamMembers).ToArray();
                 var addedToTeam = model.TeamMembers.Except(teamMembers).ToArray();
-                if(removedFromTeam != null && removedFromTeam.Count() != 0)
+                if (removedFromTeam != null && removedFromTeam.Count() != 0)
                 {
                     await _employeeService.RemoveFromTeamAsync(removedFromTeam);
                 }
 
-                if(addedToTeam != null && addedToTeam.Count() != 0)
+                if (addedToTeam != null && addedToTeam.Count() != 0)
                 {
                     await _employeeService.AddToTeamAsync(addedToTeam, team.TeamId);
                 }
 
-                if(team.TeamleadId != model.TeamleadId)
+                if (team.TeamleadId != model.TeamleadId)
                 {
-                    team.TeamleadId = model.TeamleadId;                   
+                    team.TeamleadId = model.TeamleadId;
                 }
 
                 team.Name = model.Name;
@@ -358,7 +405,7 @@ namespace VRdkHRMsystem.Controllers
                     await _emailSender.SendPasswordResetLink(model.WorkEmail, "", "Set password", "",
                       $"Please set your password by clicking here: <a href='{callbackUrl}'>link</a>");
 
-                    if(model.Photo != null)
+                    if (model.Photo != null)
                     {
                         await _fileManagmentService.UploadUserPhoto(model.Photo, "photos", employee.EmployeeId);
                     }
@@ -720,8 +767,8 @@ namespace VRdkHRMsystem.Controllers
                     if (assignment.Duration != model.Duration)
                     {
                         var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
-                                                                                       FirstOrDefault(r => !removedFromAssignment.Any(m => m == r.EmployeeId) 
-                                                                                                           && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r=>r != null).ToArray();
+                                                                                       FirstOrDefault(r => !removedFromAssignment.Any(m => m == r.EmployeeId)
+                                                                                                           && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r => r != null).ToArray();
                         foreach (var res in residuals)
                         {
                             res.ResidualBalance += model.Duration - assignment.Duration;
@@ -733,7 +780,7 @@ namespace VRdkHRMsystem.Controllers
                     assignment.BeginDate = model.BeginDate;
                     assignment.EndDate = model.EndDate;
                     if (addedToAssignment != null && addedToAssignment.Count() != 0)
-                    {                      
+                    {
                         var employees = await _employeeService.GetWithTeam(emp => addedToAssignment.Any(m => m == emp.EmployeeId));
                         var residuals = await _residualsService.GetAsync(res => addedToAssignment.Any(m => m == res.EmployeeId) && res.Name == ResidualTypeEnum.Assignment.ToString());
                         foreach (var res in residuals)
@@ -773,7 +820,7 @@ namespace VRdkHRMsystem.Controllers
                         }
 
                         await _assignmentService.AddToAssignmentAsync(addedToAssignment, assignment.AssignmentId);
-                        await _notificationService.CreateRangeAsync(notificationList.ToArray());                       
+                        await _notificationService.CreateRangeAsync(notificationList.ToArray());
                     }
 
                     await _assignmentService.Update(assignment);
@@ -794,7 +841,7 @@ namespace VRdkHRMsystem.Controllers
                     await _assignmentService.DeleteAsync(assignment);
                 }
 
-                return RedirectToAction("Assignments","Admin");
+                return RedirectToAction("Assignments", "Admin");
             }
 
             return RedirectToAction("Assignments", "Admin");

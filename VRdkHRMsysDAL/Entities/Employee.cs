@@ -7,16 +7,16 @@ namespace VRdkHRMsysDAL.Entities
     {
         public Employee()
         {
-            Absence = new HashSet<Absence>();
+            Absences = new HashSet<Absence>();
             Assignments = new HashSet<AssignmentEmployee>();
-            DayOff = new HashSet<DayOff>();
+            DayOffs = new HashSet<DayOff>();
             EmployeeBalanceResiduals = new HashSet<EmployeeBalanceResiduals>();
-            SickLeaveRequest = new HashSet<SickLeaveRequest>();
+            SickLeaves = new HashSet<SickLeaveRequest>();
             Transaction = new HashSet<Transaction>();
             TeamNavigation = new HashSet<Team>();
-            Notification = new HashSet<Notification>();
-            VacationRequest = new HashSet<VacationRequest>();
-            WorkDay = new HashSet<WorkDay>();
+            Notifications = new HashSet<Notification>();
+            Vacations = new HashSet<VacationRequest>();
+            WorkDays = new HashSet<WorkDay>();
         }
 
         public string EmployeeId { get; set; }
@@ -36,15 +36,15 @@ namespace VRdkHRMsysDAL.Entities
         public Organisation Organisation { get; set; }
         public Post Post { get; set; }
         public Team Team { get; set; }
-        public ICollection<Absence> Absence { get; set; }
+        public ICollection<Absence> Absences { get; set; }
         public ICollection<AssignmentEmployee> Assignments { get; set; }
-        public ICollection<DayOff> DayOff { get; set; }
+        public ICollection<DayOff> DayOffs { get; set; }
         public virtual ICollection<Team> TeamNavigation { get; set; }
-        public ICollection<Notification> Notification { get; set; }
+        public ICollection<Notification> Notifications { get; set; }
         public ICollection<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
-        public ICollection<SickLeaveRequest> SickLeaveRequest { get; set; }
+        public ICollection<SickLeaveRequest> SickLeaves { get; set; }
         public ICollection<Transaction> Transaction { get; set; }
-        public ICollection<VacationRequest> VacationRequest { get; set; }
-        public ICollection<WorkDay> WorkDay { get; set; }
+        public ICollection<VacationRequest> Vacations { get; set; }
+        public ICollection<WorkDay> WorkDays { get; set; }
     }
 }

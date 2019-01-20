@@ -32,7 +32,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<Absence[]> GetAsync(Expression<Func<Absence, bool>> condition = null)
         {
-            return condition != null ? await _context.Absence.Where(condition).ToArrayAsync() : await _context.Absence.ToArrayAsync();
+            return condition != null ? await _context.Absence.Include(a=>a.Employee).Where(condition).ToArrayAsync() : await _context.Absence.Include(a => a.Employee).ToArrayAsync();
         }
 
         public async Task<Absence> GetByIdAsync(string id)

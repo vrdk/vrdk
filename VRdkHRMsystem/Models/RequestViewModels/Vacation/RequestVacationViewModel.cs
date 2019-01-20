@@ -19,7 +19,7 @@ namespace VRdkHRMsystem.Models.RequestViewModels.Vacation
         public DateTime EndDate { get; set; }
         [StringLength(128, ErrorMessage = " слишком длинное сообщение")]
         public string Comment { get; set; }
-        [Range(1, 365, ErrorMessage = "> 0 и < 365")]
+        [Range(1, 365, ErrorMessage = " от 0 до 365")]
         public int Duration { get; set; }
         public int PaidVacationResiduals { get; set; }
         public int UnpaidVaccationResiduals { get; set; }

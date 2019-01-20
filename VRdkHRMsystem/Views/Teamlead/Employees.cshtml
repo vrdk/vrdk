@@ -9,7 +9,7 @@
             <div class="table__header">
                 <p>Список сотрудников</p>
                 <div class="table__header_search">
-                    <input type="text" placeholder="Поиск" name="searchKey" value="@searchKey" autocomplete="off"/>
+                    <input type="text" placeholder="Поиск" name="searchKey" value="@searchKey" autocomplete="off" />
                     <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
@@ -31,14 +31,7 @@
                         <div class="table__body_content emplist__body_content">
                             <div class="table__body_block">
                                 <p class="emplist__name">@employee.FirstName @employee.LastName</p>
-                                @if (employee.TeamName != null)
-                                {
-                                    <p class="emplist__payvac">@employee.TeamName</p>
-                                }
-                                else
-                                {
-                                    <p class="emplist__payvac">Нет</p>
-                                }
+                                <p class="emplist__payvac">@employee.TeamName</p>
                                 <p class="emplist__payvac">@employee.PaidVacationBalance</p>
                                 <p class="emplist__vac">@employee.UnpaidVacationBalance</p>
                                 <p class="emplist__sickleavedays">@employee.SickLeaveBalance</p>
@@ -46,11 +39,7 @@
                                 <p class="emplist__passes">@employee.AbsenceBalance</p>
                                 <p class="emplist__info">
                                     <a href="@Url.Action("EmployeeProfile", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
-                                    @if (employee.TeamId != null)
-                                    {
-                                        <a><img src="~/images/users.png" alt="users" /></a>
-                                    }
-                                 
+                                    <a href="@Url.Action("TeamProfile", "Teamlead", new { id = employee.TeamId })"><img src="~/images/users.png" alt="users" /></a>
                                 </p>
                             </div>
                         </div>
@@ -58,11 +47,11 @@
                 }
                 else
                 {
-                        <div class="table__body_content emplist__body_content">
-                            <div class="table__body_block">
-                                <p class="emplist__name">Нет записей</p>
-                            </div>
+                    <div class="table__body_content emplist__body_content">
+                        <div class="table__body_block">
+                            <p class="emplist__name">Нет записей</p>
                         </div>
+                    </div>
                 }
             </div>
         </div>
@@ -71,7 +60,7 @@
             <p style="margin-bottom:12px;">
                 @if (Model.PageNumber == 0)
                 {
-                    <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled"  style="cursor:not-allowed"/></a>
+                    <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" style="cursor:not-allowed" /></a>
                 }
                 else
                 {
@@ -80,7 +69,7 @@
 
                 @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                 {
-                    <a href="#!" class="disabled"><img src="~/images/arrow-right.png" alt="arrow"  style="cursor:not-allowed"/></a>
+                    <a href="#!" class="disabled"><img src="~/images/arrow-right.png" alt="arrow" style="cursor:not-allowed" /></a>
                 }
                 else
                 {

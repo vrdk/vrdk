@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "AddTeam";
+    var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
 <form asp-action="AddTeam" method="post" class="content">
     <input asp-for="OrganisationId" hidden />
@@ -37,12 +38,5 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        $(document).ready(function () {
-            $('#teamMembers').select2({
-                placeholder: "Выберите cотрудников..."
-            });
-            $('.emplits__empselect').select2();
-        });
-    </script>
+    <script src="~/js/addteamjs.js"></script>
 }

@@ -1,0 +1,197 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Calendar.CalendarViewModel
+
+@{
+    var startDate = new DateTime(Model.Year, Model.Month, 1);
+    var now = DateTime.UtcNow;
+    var nextCalendarYear = Model.Month + 1 <= 12 ? Model.Year : Model.Year + 1;
+    var nextCalendarMonth = Model.Month + 1 <= 12 ? Model.Month + 1 : 1;
+    var prevCalendarYear = Model.Month - 1 != 0 ? Model.Year : Model.Year - 1;
+    var prevCalendarMonth = Model.Month - 1 != 0 ? Model.Month - 1 : 12;
+}
+<div class="content">
+    <div class="calendar">
+        @if (Model.TeamId != null)
+        {
+            <div class="select">
+                <select class="input calendar__select" asp-items="Model.Teams" id="team_select"></select>
+            </div>
+            <p class="calendar__teamname">@Model.Team.Name</p>
+            <div class="calendar__date">
+                <a href="@Url.Action("Calendar","Admin", new { year = prevCalendarYear, month = prevCalendarMonth, teamId = Model.TeamId })"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                <p>@startDate.ToString("MMMM", Model.Culture) @Model.Year</p>
+                <a href="@Url.Action("Calendar","Admin", new { year = nextCalendarYear, month = nextCalendarMonth, teamId = Model.TeamId })"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+            </div>
+            <div class="calendar__main">
+                <div class="calendar__passes">
+                    <div class="calendar__pass"></div>                   
+                </div>
+                <div class="calendar__mainwrapper">
+                    <div class="calendar__emps">
+                        <div class="calendar__emp"></div>
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <div class="calendar__emp">@employee.LastName @employee.FirstName.ElementAt(0).</div>
+                        }
+                    </div>
+                    <div class="calendar__body">
+                        <div class="calendar__dates">
+                            @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
+                            {
+                                <div class="calendar__dateblock">
+                                    <p class="calendar__date_number">@date.Day</p>
+                                    <p class="calendar__date_name">@date.ToString("ddd", Model.Culture)</p>
+                                </div>
+                            }
+
+                        </div>
+                        <div class="calendar__contentblocks">
+
+                            @foreach (var employee in Model.Employees)
+                            {
+                                <div class="calendar__contentblock">
+                                    @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
+                                    {
+                                        if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day >= date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day >= date.Day)))
+                                        {
+                                            <div class="calendar__block calendar__block_vacation"></div>
+                                        }
+                                        else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day)))
+                                        {
+                                            <div class="calendar__block calendar__block_health"></div>
+                                        }
+                                        else if (employee.Assignments.Any(a => a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day >= date.Day))
+                                        {
+                                            <div class="calendar__block calendar__block_assignment"></div>
+                                        }
+                                        else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
+                                        {
+                                            var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
+                                            var dayOffRequest = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day && d.DayOffState == "Requested");
+                                            if (dayOffRequest == null)
+                                            {
+                                                <text>
+                                                    <div class="calendar__block">@workDay.TimeFrom.Hours - @workDay.TimeTo.Hours</div>
+                                                </text>
+                                            }
+                                            else
+                                            {
+                                                <text>
+                                                    <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon">@workDay.TimeFrom.Hours - @workDay.TimeTo.Hours</div>
+                                                </text>
+                                            }
+
+                                        }
+                                        else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
+                                        {
+                                            var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
+                                            if (dayOff.DayOffState == "Requested")
+                                            {
+                                                <text>
+                                                    <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon">-</div>
+                                                </text>
+                                            }
+                                            else
+                                            {
+                                                <text>
+                                                    <div class="calendar__block calendar__block_dayoff"></div>
+                                                </text>
+                                            }
+
+                                        }
+                                        else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
+                                        {
+                                            <div class="calendar__block calendar__block_pass"></div>
+                                        }
+                                        else
+                                        {
+                                            <div class="calendar__block">-</div>
+                                        }
+
+                                    }
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <div class="calendar__count">
+                    <div class="calendar__workdays">
+                        <div class="calendar__workdays_title">
+                            <p>Рабочие</p>
+                            <div>
+                                <p>Дни</p>
+                                <p>Часы</p>
+                            </div>
+                        </div>
+                        @foreach (var employee in Model.Employees)
+                        {
+                            <div class="calendar__workdays_wrapper">
+                                <div class="calendar__workdays_daysblocks">
+                                    <div class="calendar__workdays_daysblock">@employee.WorkDays.Count()</div>
+                                </div>
+                                <div class="calendar__workdays_hoursblocks">
+                                    <div class="calendar__workdays_hoursblock">@employee.WorkDays.Sum(i => i.TimeTo.TotalHours - i.TimeFrom.TotalHours)</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="calendar__chilldays">
+                        <p class="calendar__chilldays_title">Вых.</p>
+                        <div class="calendar__chilldays_blocks">
+                            @foreach (var employee in Model.Employees)
+                            {
+                                <div class="calendar__chilldays_block">@employee.DayOffs.Count()</div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="calendar__info">
+                <div class="calendar__colors">
+                    <div class="calendar__color">
+                        <div class="calendar__colorline calendar__colorline_green"></div>
+                        <p>Желательно</p>
+                    </div>
+                    <div class="calendar__color">
+                        <div class="calendar__colorline calendar__colorline_yellow"></div>
+                        <p>Важно</p>
+                    </div>
+                    <div class="calendar__color">
+                        <div class="calendar__colorline calendar__colorline_red"></div>
+                        <p>Очень важно</p>
+                    </div>
+                </div>
+                <div class="calendar__icons">
+                    <div class="calendar__icon">
+                        <img src="~/images/sunflag.png" alt="icon" />
+                        <p>Отпуск</p>
+                    </div>
+                    <div class="calendar__icon">
+                        <img src="~/images/healthflag.png" alt="icon" />
+                        <p>Больничный</p>
+                    </div>
+                    <div class="calendar__icon">
+                        <img src="~/images/planeflag.png" alt="icon" />
+                        <p>Командировка</p>
+                    </div>
+                    <div class="calendar__icon">
+                        <img src="~/images/passflag.png" alt="icon" />
+                        <p>Прогулы</p>
+                    </div>
+                    <div class="calendar__icon">
+                        <img src="~/images/moonflag.png" alt="icon" />
+                        <p>Желаемые выходные</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p class="calendar__teamname">Записей нет</p>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/calendarjs.js"></script>
+}

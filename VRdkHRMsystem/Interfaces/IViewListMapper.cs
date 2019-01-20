@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Post;
+using VRdkHRMsysBLL.DTOs.Team;
 
 namespace VRdkHRMsystem.Interfaces
 {
@@ -12,5 +13,6 @@ namespace VRdkHRMsystem.Interfaces
         SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees);
         SelectListItem[] CreateStateList(string userState = null);
         SelectListItem[] CreateSelectedEmployeesList(EmployeeDTO[] employees, string[] selectedEmployees);
+        SelectListItem[] CreateTeamList(TeamDTO[] teams, string currentId);
     }
 }

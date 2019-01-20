@@ -31,13 +31,13 @@
                 <div class="vacrequest__body_left">
                     <input asp-for="EmployeeId" hidden />
                     <div class="vacrequest__block">
-                        <p>@Html.DisplayNameFor(model => model.VacationType)</p>
+                        <p>Тип отпуска</p>
                         <div class="select">
                             <select asp-for="VacationType" asp-items="Model.VacationTypes" class="input vacrequest__select"></select>
                         </div>
                     </div>
                     <div class="vacrequest__block">
-                        <p>Вид</p>
+                        <p>Комментарий</p>
                         <textarea class="input" type="text"></textarea>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
 
                     </div>
                     <div class="vacrequest__button_wrapper">
-                        <button class="empprofile__button button" type="button">
+                        <button class="empprofile__button button" type="button" onclick="window.history.back()">
                             <img src="~/images/cancel.png" alt="cancel" />
                             <p>Отменить</p>
                         </button>

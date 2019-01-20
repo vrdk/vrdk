@@ -11,8 +11,10 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         public string EmployeeId { get; set; }
         public string OrganisationId { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
+        [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string FirstName { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
+        [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string LastName { get; set; }
         [Required]
         public string PostId { get; set; }
@@ -32,31 +34,31 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         public DateTime? DismissalDate { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
         [EmailAddress]
-        [Display(Name = "Personal Email")]
+        [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string PersonalEmail { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
         [EmailAddress]
-        [Display(Name = "Work Email")]
+        [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string WorkEmail { get; set; }
         [Required]
         public string Role { get; set; }
         public IEnumerable<SelectListItem> Roles { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [Range(0, 100)]
+        [Range(0, 100, ErrorMessage = " от 0 до 100")]
         public int PaidVacationBalance { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [Range(0, 100)]
+        [Range(0, 100, ErrorMessage = " от 0 до 100")]
         public int UnpaidVacationBalance { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [Range(0, 100)]
+        [Range(0, 100, ErrorMessage = " от 0 до 100")]
         public int SickLeaveBalance { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
         [Display(Name = "Absence balance")]
-        [Range(0, 100)]
+        [Range(0, 100, ErrorMessage = " от 0 до 100")]
         public int AbsenceBalance { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
         [Display(Name = "Assignment balance")]
-        [Range(0, 100)]
+        [Range(0, 100, ErrorMessage = " от 0 до 100")]
         public int AssignmentBalance { get; set; }
     }
 }

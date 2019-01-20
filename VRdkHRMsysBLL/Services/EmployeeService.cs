@@ -32,6 +32,12 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
 
+        public async Task<EmployeeDTO[]> GetForCalendaAsync(string teamId, string teamleadId, int month, int year)
+        {
+            var employees = await _employeeRepository.GetForCalendarAsync(teamId, teamleadId, month, year);
+            return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
+        }
+
         public async Task<EmployeeDTO[]> GetWithTeam(Expression<Func<Employee, bool>> condition = null)
         {
             var employees = await _employeeRepository.GetWithTeamAsync(condition);
