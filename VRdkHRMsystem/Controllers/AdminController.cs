@@ -97,32 +97,45 @@ namespace VRdkHRMsystem.Controllers
                     year = DateTime.UtcNow.Year;
                     month = DateTime.UtcNow.Month;
                 }
+                TeamDTO team = new TeamDTO();
 
                 if(teamId == null)
                 {
-                    teamId = teams.FirstOrDefault(t => t.Employees.Count() != 0)?.TeamId;
+                    team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                }
+                else
+                {
+                    team = teams.FirstOrDefault(t => t.TeamId == teamId);
                 }
 
-                var team = await _teamService.GetForCalendaAsync(teamId);
-                var employees = await _employeeService.GetForCalendaAsync(teamId,team.TeamleadId, month, year);
-
-                var model = new CalendarViewModel
+                if(team != null)
                 {
-                    Year = year,
-                    Month = month,
-                    TeamId = team?.TeamId,
-                    Team = _mapHelper.Map<TeamDTO,TeamViewModel>(team),
-                    Teams = _listMapper.CreateTeamList(teams, teamId),
-                    Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                    Culture = CultureInfo.CreateSpecificCulture("ru-RU")
-                };
+                    var employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
 
-                if(team.TeamleadId == viewer.EmployeeId)
-                {
-                    return View("~/Views/Teamlead/Calendar.cshtml", model);
+                    var model = new CalendarViewModel
+                    {
+                        Year = year,
+                        Month = month,
+                        TeamId = team?.TeamId,
+                        Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                        Teams = _listMapper.CreateTeamList(teams, teamId),
+                        Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                        Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                    };
+
+                    if (team.TeamleadId == viewer.EmployeeId)
+                    {
+                        return View("~/Views/Teamlead/Calendar.cshtml", model);
+                    }
+
+                    return View(model);
                 }
+                else
+                {
+                    return View(new CalendarViewModel());
+                }
+               
 
-                return View(model);
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -174,6 +187,8 @@ namespace VRdkHRMsystem.Controllers
                 if (team.TeamleadId != model.TeamleadId)
                 {
                     team.TeamleadId = model.TeamleadId;
+                    var user = await _userManager.FindByIdAsync(model.TeamleadId);
+                    await _userManager.AddToRoleAsync(user, RoleEnum.Teamlead.ToString());
                 }
 
                 team.Name = model.Name;
@@ -437,7 +452,7 @@ namespace VRdkHRMsystem.Controllers
                 model.PaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance;
                 model.UnpaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance;
                 model.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
-                model.Role = role.First();
+                model.Role = role.Last();
                 model.Post = posts.FirstOrDefault(p => p.PostId == employee.PostId).Name;
             }
 
@@ -514,7 +529,7 @@ namespace VRdkHRMsystem.Controllers
                 model.VacationType = vacationRequest.VacationType;
                 model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
                 model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
-                model.RequestStatus = vacationRequest.RequestStatus;
+                model.RequestStatus = vacationRequest.RequestStatus;               
                 if (vacationRequest.Employee.Team != null)
                 {
                     var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
@@ -711,7 +726,7 @@ namespace VRdkHRMsystem.Controllers
 
             var user = await _userManager.FindByIdAsync(model.TeamleadId);
             await _userManager.AddToRoleAsync(user, RoleEnum.Teamlead.ToString());
-            return RedirectToAction("Profile", "Profile");
+            return RedirectToAction("Teams", "Admin");
         }
 
         [HttpGet]

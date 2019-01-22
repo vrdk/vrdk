@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using VRdkHRMsysBLL.DTOs.Employee;
 
 namespace VRdkHRMsysBLL.DTOs.DayOff
 {
@@ -12,5 +13,6 @@ namespace VRdkHRMsysBLL.DTOs.DayOff
         public string DayOffImportance { get; set; }
         public DateTime DayOffDate { get; set; }
         public DateTime? ProcessDate { get; set; }
+        public EmployeeDTO Employee { get; set; }
     }
 }

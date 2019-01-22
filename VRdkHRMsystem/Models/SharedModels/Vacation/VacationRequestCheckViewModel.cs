@@ -8,6 +8,7 @@ namespace VRdkHRMsystem.Models.SharedModels.Vacation
         public string VacationId { get; set; }
         public string EmployeeFullName { get; set; }
         public string TeamleadFullName { get; set; }
+        public string EmployeeId { get; set; }
         public string TeamName { get; set; }
         public string VacationType { get; set; }
         [DataType(DataType.Date)]

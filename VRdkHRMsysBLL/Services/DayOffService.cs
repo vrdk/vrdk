@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -19,6 +16,21 @@ namespace VRdkHRMsysBLL.Services
         {
             _dayOffRepository = dayOffRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task DeleteAsync(string id)
+        {
+            var dayOff = await _dayOffRepository.GetByIdAsync(id);
+            if(dayOff != null)
+            {
+                await _dayOffRepository.DeleteAsync(dayOff);
+            }     
+        }
+
+        public async Task<DayOffDTO> GetByIdAsync(string id)
+        {
+            var dayOff = await _dayOffRepository.GetByIdAsync(id);
+            return _mapHelper.Map<DayOff, DayOffDTO>(dayOff);
         }
 
         public async Task CreateAsync(DayOffDTO dayOff)

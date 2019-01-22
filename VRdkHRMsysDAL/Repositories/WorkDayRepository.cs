@@ -37,7 +37,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<WorkDay> GetByIdAsync(string id)
         {
-            return await _context.WorkDay.FirstOrDefaultAsync(ab => ab.WorkDayId.Equals(id));
+            return await _context.WorkDay.Include(w=>w.Employee).FirstOrDefaultAsync(w => w.WorkDayId.Equals(id));
         }
 
         public async Task UpdateAsync()

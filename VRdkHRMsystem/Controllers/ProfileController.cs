@@ -19,7 +19,7 @@ namespace VRdkHRMsystem.Controllers
     [Authorize]
     public class ProfileController : Controller
     {
-        private const string emptyValue = "None";
+        private const string emptyValue = "Нет";
         private readonly IEmployeeService _employeeService;
         private readonly IPostService _postService;
         private readonly ISickLeaveService _sickLeaveService;
@@ -210,7 +210,14 @@ namespace VRdkHRMsystem.Controllers
 
                 if(notificationRange == NotificationRangeEnum.User.ToString())
                 {
-                    return RedirectToAction("Profile", "Profile");
+                    if(notificationType == NotificationTypeEnum.DayOff.ToString() || notificationType == NotificationTypeEnum.WorkDay.ToString())
+                    {
+                        return RedirectToAction("Profile", "Calendar");
+                    }
+                    else
+                    {
+                       return RedirectToAction("Profile", "Profile");
+                    }                  
                 }
                 else
                 {

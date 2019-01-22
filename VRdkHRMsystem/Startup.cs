@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Services;
 using System;
+using System.Globalization;
 
 namespace VRdkHRMsystem
 {
@@ -98,6 +99,10 @@ namespace VRdkHRMsystem
             container.RegisterMvcControllers(app);
             container.RegisterMvcViewComponents(app);
             container.Verify();
+
+            var cultureInfo = new CultureInfo("ru-RU");
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
         }
     }
 }

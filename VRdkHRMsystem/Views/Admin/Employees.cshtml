@@ -48,7 +48,7 @@
                                     <a href="@Url.Action("EmployeeProfile", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
                                     @if (employee.TeamId != null)
                                     {
-                                        <a><img src="~/images/users.png" alt="users" /></a>
+                                        <a href="@Url.Action("TeamProfile", "Admin", new { id = employee.TeamId })"><img src="~/images/users.png" alt="users" /></a>
                                     }
                                     <a href="@Url.Action("EditEmployee", new { id = employee.EmployeeId })"><img src="~/images/penciltable.png" alt="pencil" /></a>
                                 </p>

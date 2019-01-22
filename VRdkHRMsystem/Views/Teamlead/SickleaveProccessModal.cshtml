@@ -1,12 +1,14 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.SickLeave.SickLeaveCheckViewModel
-
+@{
+    var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
+}
 <form asp-action="ProccessSickLeaveRequest" method="post" class="box-modal vacmodal" style="border-radius:5px;">
     <input asp-for="SickLeaveId" hidden />
     <div class="modal__header" style="border-radius:5px;">
         <p class="modal__title">Сообщение о болезни</p>
     </div>
     <div class="vacmodal__empinfo">
-        <img src="~/images/userphoto.png" alt="photo" />
+        <img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" style="object-fit: cover;border-radius:50%;" />
         <div>
             <p class="vacmodal__name">@Model.EmployeeFullName</p>
             <p class="vacmodal__post">@Model.Post</p>
@@ -33,7 +35,7 @@
         <p>Ответьте на запрос:</p>
         <div class="vacmodal__radiosection">
             <div class="vacmodal__labelwrapper">
-                <input type="radio" name="Result" id="sickmessagemodal__radio1" value="Approved" checked/>
+                <input type="radio" name="Result" id="sickmessagemodal__radio1" value="Approved" checked />
                 <label for="sickmessagemodal__radio1">
                     <p>Подтвердить</p>
                 </label>

@@ -34,6 +34,36 @@
         -webkit-transform: translate(-50%, -50%);
         transform: translate(-50%, -50%)
     }
+
+.profile__status_circle_sickleave_Denied {
+    width: 12px;
+    height: 12px;
+    background: #E16C6C;
+    border-radius: 50%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    assignmentlist__button -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: relative
+}
+
+    .profile__status_circle_sickleave_Denied div {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: #E12929;
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%)
+    }
+
 .profile__status_circle_Proccessing {
     width: 12px;
     height: 12px;
@@ -62,6 +92,36 @@
         -webkit-transform: translate(-50%, -50%);
         transform: translate(-50%, -50%)
 }
+
+.profile__status_circle_sickleave_Approved {
+    width: 12px;
+    height: 12px;
+    background: #98E3F2;
+    border-radius: 50%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: relative
+}
+
+    .profile__status_circle_sickleave_Approved div {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: #50C1F2;
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%)
+    }
+
 .profile__status_circle_Pending {
     width: 12px;
     height: 12px;
@@ -90,6 +150,36 @@
         -webkit-transform: translate(-50%, -50%);
         transform: translate(-50%, -50%)
     }
+
+.profile__status_circle_sickleave_Pending {
+    width: 12px;
+    height: 12px;
+    background: #EDEDED;
+    border-radius: 50%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: relative
+}
+
+    .profile__status_circle_sickleave_Pending div {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        background: #D1D1D1;
+        border-radius: 50%;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%)
+    }
+
 .profile__status_dismissed {
     font-size: 13px;
     display: -webkit-box;
@@ -117,10 +207,11 @@
         transform: translateY(-50%);
         left: -10px
 }
-.profile__status_circle_Closed {
+
+.profile__status_circle_sickleave_Closed {
     width: 12px;
     height: 12px;
-    background: #DFE8F2;
+    background: #d1f5e1;
     border-radius: 50%;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -134,11 +225,11 @@
     position: relative
 }
 
-    .profile__status_circle_Closed div {
+    .profile__status_circle_sickleave_Closed div {
         position: absolute;
         width: 50%;
         height: 50%;
-        background: #C9D5F2;
+        background: #73e1a3;
         border-radius: 50%;
         left: 50%;
         top: 50%;
@@ -147,8 +238,8 @@
     }
 
 .calendar__block_dayoff {
-    color: #73ddca;
-    background: #daf9f0;
+    color: #2FCCA2;
+    background: #FFF5D9;
     position: relative
 }
 
@@ -162,3 +253,7 @@
         top: 0;
         left: 0
     }
+
+.timepicker-dropdown {
+    z-index: 1036 !important;
+}

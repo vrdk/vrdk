@@ -42,7 +42,7 @@
 
                                     <p class="sicklist__duration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
                                 <div class="sicklist__info">
-                                    <div class="profile__status_circle_@item.RequestStatus">
+                                    <div class="profile__status_circle_sickleave_@item.RequestStatus">
                                         <div></div>
                                     </div>
                                     <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;" /></a>

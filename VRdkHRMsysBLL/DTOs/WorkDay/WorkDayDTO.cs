@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using VRdkHRMsysBLL.DTOs.Employee;
 
 namespace VRdkHRMsysBLL.DTOs.WorkDay
 {
@@ -12,5 +11,6 @@ namespace VRdkHRMsysBLL.DTOs.WorkDay
         public TimeSpan TimeFrom { get; set; }
         public TimeSpan TimeTo { get; set; }
         public DateTime ProcessDate { get; set; }
+        public EmployeeDTO Employee { get; set; }
     }
 }

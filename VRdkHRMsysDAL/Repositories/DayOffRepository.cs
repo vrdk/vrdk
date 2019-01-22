@@ -37,7 +37,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<DayOff> GetByIdAsync(string id)
         {
-            return await _context.DayOff.FirstOrDefaultAsync(ab => ab.DayOffId.Equals(id));
+            return await _context.DayOff.Include(w => w.Employee).FirstOrDefaultAsync(d=> d.DayOffId.Equals(id));
         }
 
         public async Task UpdateAsync()

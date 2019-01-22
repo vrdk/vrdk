@@ -8,6 +8,7 @@ namespace VRdkHRMsystem.Models.SharedModels.SickLeave
         public string SickLeaveId { get; set; }
         public string EmployeeFullName { get; set; }
         public string TeamleadFullName { get; set; }
+        public string EmployeeId { get; set; }
         public string TeamName { get; set; }
         public string Comment { get; set; }
         public string Post { get; set; }

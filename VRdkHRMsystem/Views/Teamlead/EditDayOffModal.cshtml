@@ -1,0 +1,48 @@
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.EditCalendarDayViewModel
+<form asp-action="EditDayOff" method="post" class="box-modal vacmodal" style="border-radius:5px;" id="modalForm">
+    <div class="modal__header" style="border-radius:5px;">
+        <input asp-for="CalendarDayId" hidden />
+        <input asp-for="TeamId" hidden />
+        <input name="Date" value="@Model.Date" hidden />
+        <p class="modal__title">@Model.FirstName @Model.LastName</p>
+        <p class="modal__date">@Model.Date.ToString("dd.MM.yyyy")</p>
+    </div>
+    <div class="tripmodal__date">
+        <div class="tripmodal__date_block">
+            <p>С: <span asp-validation-for="TimeFrom" style="color: #ad545f;"></span></p>
+            <input name="TimeFrom" type="text" class="input  timepicker-dropdown" value="@null" id="workDay_timepicker_from" autocomplete="off" />
+        </div>
+        <div class="tripmodal__date_block">
+            <p>По: <span asp-validation-for="TimeTo" style="color: #ad545f;"></span></p>
+            <input name="TimeTo" type="text" class="input timepicker-dropdown" value="@null" id="workDay_timepicker_to" autocomplete="off" />
+        </div>
+    </div>
+    <div class="vacmodal__answer emptimemodal__answer">
+        <div class="vacmodal__radiosection">
+            <div class="vacmodal__labelwrapper">
+                <input type="radio" name="result" id="work_day_radio" value="WorkDay" />
+                <label for="work_day_radio">
+                    <p>Рабочий</p>
+                </label>
+            </div>
+            <div class="vacmodal__labelwrapper">
+                <input type="radio" name="result" id="day_off_radio" value="DayOff" checked />
+                <label for="day_off_radio">
+                    <p>Выходной</p>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="vacmodal__buttons emptimemodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Отменить</p>
+        </button>
+        <button class="button" id="submit_button" type="submit" formnovalidate="formnovalidate">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Готовo</p>
+        </button>
+    </div>
+</form>
+<script src="~/js/calendarday.js"></script>
+

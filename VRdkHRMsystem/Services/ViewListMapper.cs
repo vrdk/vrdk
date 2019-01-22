@@ -21,10 +21,11 @@ namespace VRdkHRMsystem.Services
                 },
                 new VacationType
                 {
-                      DisplayName = "Неоплачиваемый vacation",
+                      DisplayName = "Неоплачиваемый отпуск",
                     Name = VacationTypeEnum.Unpaid_vacation.ToString()
                 }
             };
+
             return types.Select(type => new SelectListItem() { Text = type.DisplayName, Value = type.Name }).ToArray();
         }
 

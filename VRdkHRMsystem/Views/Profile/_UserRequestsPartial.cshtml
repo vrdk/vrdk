@@ -6,29 +6,29 @@
             <p class="profile__daystitle">Командировка</p>
             <div class="profile__daysblock">
                 <p class="profile__dayscount">@Model.AssignmentBalance</p>
-                <p class="profile__days_word">Дней</p>
+                <p class="profile__days_word">Дн.</p>
             </div>
         </div>
         <div class="profile__block">
             <div class="profile__daystitle">
                 Отпуск
                 <div>
-                    <p class="profile__vacdays_title">Оплаченный</p>
-                    <p class="profile__vacdays_title">Неоплаченный</p>
+                    <p class="profile__vacdays_title">Оплачиваемый</p>
+                    <p class="profile__vacdays_title">Неоплачиваемый</p>
                 </div>
             </div>
             <div class="profile__vacdays_wrapper">
                 <div>
                     <div class="profile__daysblock">
                         <p class="profile__dayscount">@Model.PaidVacationBalance</p>
-                        <p class="profile__days_word">Дней</p>
+                        <p class="profile__days_word">Дн.</p>
                         <p class="profile__days_leftword">Осталось</p>
                     </div>
                 </div>
                 <div>
                     <div class="profile__daysblock">
                         <p class="profile__dayscount">@Model.UnpaidVacationBalance</p>
-                        <p class="profile__days_word">Дней</p>
+                        <p class="profile__days_word">Дн.</p>
                         <p class="profile__days_leftword">Осталось</p>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
             <p class="profile__daystitle">Больничные</p>
             <div class="profile__daysblock">
                 <p class="profile__dayscount">@Model.SickLeaveBalance</p>
-                <p class="profile__days_word">Дней</p>
+                <p class="profile__days_word">Дн.</p>
             </div>
             <a class="profile__daysbutton" href="@Url.Action("RequestSickLeave","Request", new { id = Model.EmployeeId })" style="text-decoration: none">Сообщить о больничном</a>
         </div>
@@ -47,7 +47,7 @@
             <p class="profile__daystitle">Прогулы</p>
             <div class="profile__daysblock">
                 <p class="profile__dayscount">@Model.AbsenceBalance</p>
-                <p class="profile__days_word">Дней</p>
+                <p class="profile__days_word">Дн.</p>
             </div>
         </div>
     </div>

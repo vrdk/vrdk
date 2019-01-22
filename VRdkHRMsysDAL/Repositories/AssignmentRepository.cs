@@ -39,9 +39,9 @@ namespace VRdkHRMsysDAL.Repositories
 
             }
 
-            return condition != null ? await _context.Assignment.Where(a=>a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync() :
-                                      await _context.Assignment.Where(condition).
-                                                                Where(a => a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync();
+            return condition != null ? await _context.Assignment.Where(condition).Where(a=>a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync() :
+                                      await _context.Assignment.Where(a => a.Name.ToLower().Contains(searchKey.ToLower()) || a.AssignmentEmployee.Count.ToString() == searchKey).CountAsync();
+
         }
 
         public async Task<int> GetProfileAssignmentsCountAsync(Expression<Func<AssignmentEmployee, bool>> condition = null)
@@ -107,7 +107,8 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId)
         {
-             _context.AssignmentEmployee.RemoveRange(_context.AssignmentEmployee.Where(ae => employeeIds.Contains(ae.EmployeeId) && ae.AssignmentId == assignmentId));
+            _context.AssignmentEmployee.RemoveRange(_context.AssignmentEmployee.Where(ae => employeeIds.Contains(ae.EmployeeId) && ae.AssignmentId == assignmentId));
+            
             await _context.SaveChangesAsync();
         }
 

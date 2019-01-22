@@ -51,12 +51,12 @@
                         {
                             foreach (var item in Model.Notifications)
                             {
-                                <div class="table__body_block">
-                                    <a href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked })">
+                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked })">
+                                    <div class="table__body_block">
                                         <p class="notiflist__date">@item.NotificationDate.ToShortDateString() в @item.NotificationDate.ToShortTimeString()</p>
                                         <p class="notiflist__content">@item.Description</p>
-                                    </a>
-                                </div>
+                                    </div>
+                                </a>
                             }
                         }
                     }
@@ -76,7 +76,7 @@
                 <p style="margin-bottom:12px;">
                     @if (Model.PageNumber == 0)
                     {
-                    <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
                     }
                     else
                     {

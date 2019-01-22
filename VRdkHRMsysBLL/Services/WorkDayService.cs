@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -19,6 +16,33 @@ namespace VRdkHRMsysBLL.Services
         {
             _workDayRepository = workDayRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task DeleteAsync(string id)
+        {
+            var workDay = await _workDayRepository.GetByIdAsync(id);
+            if(workDay != null)
+            {
+                await _workDayRepository.DeleteAsync(workDay);
+            }     
+        }
+
+        public async Task UpdateAsync(WorkDayDTO workDay)
+        {
+            var currentWorkDay = await _workDayRepository.GetByIdAsync(workDay.WorkDayId);
+            if (currentWorkDay != null)
+            {
+                currentWorkDay.TimeFrom = workDay.TimeFrom;
+                currentWorkDay.TimeTo = workDay.TimeTo;
+            }
+
+            await _workDayRepository.UpdateAsync();
+        }
+
+        public async Task<WorkDayDTO> GetByIdAsync(string id)
+        {
+            var dayOff = await _workDayRepository.GetByIdAsync(id);
+            return _mapHelper.Map<WorkDay, WorkDayDTO>(dayOff);
         }
 
         public async Task CreateAsync(WorkDayDTO workDay)

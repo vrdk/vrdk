@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
 {
-    public class CalendarDayViewModel
+    public class EditCalendarDayViewModel
     {
-        public string EmployeeId { get; set; }
+        public string CalendarDayId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string TeamId { get; set; }
@@ -14,11 +14,11 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
-        public DateTime TimeFrom { get; set; }
+        public TimeSpan TimeFrom { get; set; }
         [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
-        public DateTime TimeTo { get; set; }
+        public TimeSpan TimeTo { get; set; }
         public string Result { get; set; }
         public DateTime ProcessDate { get; set; }
     }
