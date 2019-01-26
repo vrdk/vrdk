@@ -18,16 +18,24 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(WorkDay entity)
+        public async Task CreateAsync(WorkDay entity, bool writeChanges)
         {
             _context.WorkDay.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(WorkDay entity)
+        public async Task DeleteAsync(WorkDay entity, bool writeChanges)
         {
             _context.WorkDay.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task<WorkDay[]> GetAsync(Expression<Func<WorkDay, bool>> condition = null)

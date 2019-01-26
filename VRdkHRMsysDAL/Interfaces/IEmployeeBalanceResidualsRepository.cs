@@ -6,6 +6,6 @@ namespace VRdkHRMsysDAL.Interfaces
     public interface IEmployeeBalanceResidualsRepository : IRepository<EmployeeBalanceResiduals>
     {
         Task<EmployeeBalanceResiduals> GetByEmployeeIdAsync(string id, string type);
-        Task CreateRangeAsync(EmployeeBalanceResiduals[] entities);
+        Task CreateRangeAsync(EmployeeBalanceResiduals[] entities, bool writeChanges = false);
     }
 }

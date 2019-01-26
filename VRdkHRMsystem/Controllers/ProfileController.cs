@@ -1,18 +1,25 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
+using VRdkHRMsysBLL.DTOs.Team;
 using VRdkHRMsysBLL.DTOs.Vacation;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
+using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
 using VRdkHRMsystem.Models.Profile.Assignment;
 using VRdkHRMsystem.Models.Profile.Notification;
 using VRdkHRMsystem.Models.Profile.SickLeave;
 using VRdkHRMsystem.Models.Profile.Vacation;
+using VRdkHRMsystem.Models.SharedModels.Calendar;
+using VRdkHRMsystem.Models.SharedModels.Employee;
+using VRdkHRMsystem.Models.SharedModels.Team;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -26,11 +33,15 @@ namespace VRdkHRMsystem.Controllers
         private readonly IVacationService _vacationService;
         private readonly IAssignmentService _assignmentService;
         private readonly INotificationService _notificationService;
+        private readonly IViewListMapper _listMapper;
+        private readonly ITeamService _teamService;
         private readonly IMapHelper _mapHelper;
 
         public ProfileController(IEmployeeService employeeService,
                                  IPostService postService,
                                  IVacationService vacationService,
+                                 ITeamService teamService,
+                                 IViewListMapper listMapper,
                                  IAssignmentService assignmentService,
                                  INotificationService notificationService,
                                  ISickLeaveService sickLeaveService,
@@ -40,10 +51,56 @@ namespace VRdkHRMsystem.Controllers
             _sickLeaveService = sickLeaveService;
             _notificationService = notificationService;
             _assignmentService = assignmentService;
+            _teamService = teamService;
+            _listMapper = listMapper;
             _vacationService = vacationService;
             _postService = postService;
             _mapHelper = mapHelper;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Calendar(int year, int month, string teamId)
+        {
+
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                TeamDTO team = new TeamDTO();
+                CalendarViewModel model = new CalendarViewModel();
+                EmployeeDTO[] employees = new EmployeeDTO[] { };
+                var teams = await _teamService.GetAsync(t => t.TeamId == viewer.TeamId);
+
+                if (year == 0 || month == 0)
+                {
+                    year = DateTime.UtcNow.Year;
+                    month = DateTime.UtcNow.Month;
+                }
+
+                team = teams.FirstOrDefault();
+
+                if (team != null)
+                {
+                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+
+                    model = new CalendarViewModel
+                    {
+                        Year = year,
+                        Month = month,
+                        TeamId = team?.TeamId,
+                        Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                        Teams = _listMapper.CreateTeamList(teams, teamId),
+                        Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                        Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                    };
+
+                }
+
+                return View(model);
+            }
+
+            return RedirectToAction("Profile", "Profile");
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Profile(string id = null)
@@ -161,7 +218,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Notifications(bool isAdministrator, int pageNumber = 0, string searchKey = null)
+        public async Task<IActionResult> Notifications(int pageNumber = 0, string searchKey = null)
         {
             ViewData["SearchKey"] = searchKey;
             NotificationDTO[] notifications = new NotificationDTO[] { };
@@ -169,7 +226,7 @@ namespace VRdkHRMsystem.Controllers
             var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if(user != null)
             {
-                if (isAdministrator)
+                if (User.IsInRole("Administrator"))
                 {
                     notifications = await _notificationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
                                                                             note => note.EmployeeId == user.EmployeeId 
@@ -189,8 +246,7 @@ namespace VRdkHRMsystem.Controllers
                 PageNumber = pageNumber,
                 PageSize = (int)PageSizeEnum.PageSize15,
                 Count = count,
-                Notifications = _mapHelper.MapCollection<NotificationDTO, NotificationViewModel>(notifications),
-                IsAdministrator = isAdministrator
+                Notifications = _mapHelper.MapCollection<NotificationDTO, NotificationViewModel>(notifications)
             };
 
             return View(pagedNotifications);

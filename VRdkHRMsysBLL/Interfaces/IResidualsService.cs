@@ -10,8 +10,8 @@ namespace VRdkHRMsysBLL.Interfaces
     {
         Task<BalanceResidualsDTO[]> GetAsync(Expression<Func<EmployeeBalanceResiduals, bool>> condition = null);
         Task<BalanceResidualsDTO> GetByEmployeeIdAsync(string id, string type);
-        Task UpdateAsync(BalanceResidualsDTO newResidual);
-        Task UpdateRangeAsync(BalanceResidualsDTO[] newResidual);
-        Task CreateRangeAsync(BalanceResidualsDTO[] residuals);
+        Task UpdateAsync(BalanceResidualsDTO newResidual, bool writeChanges = false);
+        Task UpdateRangeAsync(BalanceResidualsDTO[] newResidual, bool writeChanges = false);
+        Task CreateRangeAsync(BalanceResidualsDTO[] residuals, bool writeChanges = false);
     }
 }

@@ -55,11 +55,11 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.MapCollection<AssignmentEmployee, AssignmentEmployeeDTO>(assignments);
         }
 
-        public async Task CreateAsync(AssignmentDTO assignment)
+        public async Task CreateAsync(AssignmentDTO assignment, bool writeChanges = false)
         {
             var assignmentToAdd = _mapHelper.Map<AssignmentDTO, Assignment>(assignment);
             assignmentToAdd.AssignmentEmployee = _mapHelper.MapCollection<AssignmentEmployeeDTO, AssignmentEmployee>(assignment.AssignmentEmployee);
-            await _assignmentRepository.CreateAsync(assignmentToAdd);
+            await _assignmentRepository.CreateAsync(assignmentToAdd, writeChanges);
         }
 
         public async Task<AssignmentDTO[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null)
@@ -74,23 +74,23 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<Assignment, AssignmentDTO>(assignment);
         }
 
-        public async Task DeleteAsync(AssignmentDTO entity)
+        public async Task DeleteAsync(AssignmentDTO entity, bool writeChanges = false)
         {
-           await _assignmentRepository.DeleteAsync(_mapHelper.Map<AssignmentDTO, Assignment>(entity));
+           await _assignmentRepository.DeleteAsync(_mapHelper.Map<AssignmentDTO, Assignment>(entity), writeChanges);
         }
 
 
-        public async Task AddToAssignmentAsync(string[] employeeIds, string assignmentId)
+        public async Task AddToAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges = false)
         {
-            await _assignmentRepository.AddToAssignmentAsync(employeeIds, assignmentId);
+            await _assignmentRepository.AddToAssignmentAsync(employeeIds, assignmentId, writeChanges);
         }
 
-        public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId)
+        public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges = false)
         {
-           await _assignmentRepository.RemoveFromAssignmentAsync(employeeIds, assignmentId);
+           await _assignmentRepository.RemoveFromAssignmentAsync(employeeIds, assignmentId, writeChanges);
         }
 
-        public async Task Update(AssignmentDTO entity)
+        public async Task Update(AssignmentDTO entity, bool writeChanges = false)
         {
             var assignment = await _assignmentRepository.GetByIdAsync(entity.AssignmentId);
             if(assignment != null)
@@ -100,7 +100,11 @@ namespace VRdkHRMsysBLL.Services
                 assignment.EndDate = entity.EndDate;
                 assignment.Duration = entity.Duration;
             }
-            await _assignmentRepository.UpdateAsync();
+
+            if (writeChanges)
+            {
+                await _assignmentRepository.UpdateAsync();
+            }        
         }
     }
 }

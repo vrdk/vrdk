@@ -1,7 +1,8 @@
 ﻿$(document).ready(function () {
     $("#team_select").on('change', function () {
         var teamId = $(this).val();
-        var url = "/teamlead/calendar?teamid=" + teamId;
+        var role = $("#redirectUrl").val();
+        var url = "/"+role+"/calendar?teamid=" + teamId;
         window.location.href = url;
     });
 });

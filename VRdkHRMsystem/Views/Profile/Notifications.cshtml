@@ -3,7 +3,6 @@
     var searchKey = ViewData["SearchKey"] as string;
 }
 <form asp-action="Notifications" method="get" class="content">
-    <input asp-for="IsAdministrator" hidden />
     <section class="listsection">
         <div class="table">
             <div class="table__header">
@@ -80,7 +79,7 @@
                     }
                     else
                     {
-                        <a asp-action="Notifications" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-isAdministrator="@Model.IsAdministrator" asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                        <a asp-action="Notifications" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
                     }
 
                     @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
@@ -89,7 +88,7 @@
                     }
                     else
                     {
-                        <a asp-action="Notifications" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-isAdministrator="@Model.IsAdministrator" asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                        <a asp-action="Notifications" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
                     }
                 </p>
             }

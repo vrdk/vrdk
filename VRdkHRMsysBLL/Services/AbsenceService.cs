@@ -27,10 +27,10 @@ namespace VRdkHRMsysBLL.Services
             return abs.Count() == 0 ? null : new AbsenceDTO();
         }
 
-        public async Task CreateAsync(AbsenceDTO absence)
+        public async Task CreateAsync(AbsenceDTO absence, bool writeChanges = false)
         {
             var absenceToAdd = _mapHelper.Map<AbsenceDTO, Absence>(absence);
-            await _absenceRepository.CreateAsync(absenceToAdd);
+            await _absenceRepository.CreateAsync(absenceToAdd, writeChanges);
         }
     }
 }

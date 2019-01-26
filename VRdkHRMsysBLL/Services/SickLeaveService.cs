@@ -78,13 +78,13 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.NestedMap<SickLeaveRequest, SickLeaveRequestDTO, Employee, EmployeeDTO, Team, TeamDTO>(request);
         }
 
-        public async Task CreateAsync(SickLeaveRequestDTO SickLeave)
+        public async Task CreateAsync(SickLeaveRequestDTO SickLeave, bool writeChanges = false)
         {
             var entity = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveRequest>(SickLeave);
-            await _sickLeaveRepository.CreateAsync(entity);
+            await _sickLeaveRepository.CreateAsync(entity,writeChanges);
         }
 
-        public async Task UpdateAsync(SickLeaveRequestDTO newRequest)
+        public async Task UpdateAsync(SickLeaveRequestDTO newRequest, bool writeChanges = false)
         {
             var currentRequest = await _sickLeaveRepository.GetByIdAsync(newRequest.SickLeaveId);
             if (currentRequest != null)
@@ -98,8 +98,11 @@ namespace VRdkHRMsysBLL.Services
                 {
                     currentRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance = newRequest.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
                 }
-                
-                await _sickLeaveRepository.UpdateAsync();
+
+                if (writeChanges)
+                {
+                    await _sickLeaveRepository.UpdateAsync();
+                }              
             }
         }
     }

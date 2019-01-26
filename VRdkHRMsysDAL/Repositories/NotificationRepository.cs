@@ -65,22 +65,35 @@ namespace VRdkHRMsysDAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateAsync(Notification entity)
+        public async Task CreateAsync(Notification entity, bool writeChanges)
         {
             _context.Notification.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
+            
         }
 
-        public async Task CreateRangeAsync(Notification[] entities)
+        public async Task CreateRangeAsync(Notification[] entities, bool writeChanges)
         {
             _context.AddRange(entities);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public async Task DeleteAsync(Notification entity)
+        public async Task DeleteAsync(Notification entity, bool writeChanges)
         {
             _context.Notification.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }       
         }
     }
 }

@@ -8,11 +8,11 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface IAssignmentService
     {
-        Task Update(AssignmentDTO entity);
-        Task DeleteAsync(AssignmentDTO entity);
-        Task CreateAsync(AssignmentDTO assignment);
-        Task AddToAssignmentAsync(string[] employeeIds, string assignmentId);
-        Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId);
+        Task Update(AssignmentDTO entity, bool writeChanges = false);
+        Task DeleteAsync(AssignmentDTO entity, bool writeChanges = false);
+        Task CreateAsync(AssignmentDTO assignment, bool writeChanges = false);
+        Task AddToAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges = false);
+        Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges = false);
         Task<AssignmentDTO> GetByIdWithEmployeesAsync(string id);
         Task<AssignmentDTO[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
         Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null);

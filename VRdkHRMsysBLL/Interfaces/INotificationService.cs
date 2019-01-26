@@ -8,8 +8,8 @@ namespace VRdkHRMsysBLL.Interfaces
 { 
     public interface INotificationService
     {
-        Task CreateAsync(NotificationDTO notification);
-        Task CreateRangeAsync(NotificationDTO[] notification);
+        Task CreateAsync(NotificationDTO notification, bool writeChanges = false);
+        Task CreateRangeAsync(NotificationDTO[] notification, bool writeChanges = false);
         Task<NotificationDTO[]> GetAsync(Expression<Func<Notification, bool>> condition = null);
         Task<NotificationDTO[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Notification, bool>> condition = null, string searchKey = null);
         Task<NotificationDTO> GetByIdAsync(string notificationId);

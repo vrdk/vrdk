@@ -8,6 +8,7 @@
     else {
         $("#submit_button").removeAttr('formnovalidate', 'formnovalidate');
         $(".timepicker-dropdown").addClass('tripmodal__checkinput');
+        $(".timepicker-dropdown").removeAttr('readonly', 'readonly');
 
     }
 });

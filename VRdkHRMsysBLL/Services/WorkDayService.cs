@@ -18,16 +18,16 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id, bool writeChanges = false)
         {
             var workDay = await _workDayRepository.GetByIdAsync(id);
             if(workDay != null)
             {
-                await _workDayRepository.DeleteAsync(workDay);
+                await _workDayRepository.DeleteAsync(workDay, writeChanges);
             }     
         }
 
-        public async Task UpdateAsync(WorkDayDTO workDay)
+        public async Task UpdateAsync(WorkDayDTO workDay, bool writeChanges = false)
         {
             var currentWorkDay = await _workDayRepository.GetByIdAsync(workDay.WorkDayId);
             if (currentWorkDay != null)
@@ -36,7 +36,10 @@ namespace VRdkHRMsysBLL.Services
                 currentWorkDay.TimeTo = workDay.TimeTo;
             }
 
-            await _workDayRepository.UpdateAsync();
+            if (writeChanges)
+            {
+                await _workDayRepository.UpdateAsync();
+            }
         }
 
         public async Task<WorkDayDTO> GetByIdAsync(string id)
@@ -45,10 +48,10 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<WorkDay, WorkDayDTO>(dayOff);
         }
 
-        public async Task CreateAsync(WorkDayDTO workDay)
+        public async Task CreateAsync(WorkDayDTO workDay, bool writeChanges = false)
         {
             var workDayToAdd = _mapHelper.Map<WorkDayDTO, WorkDay>(workDay);
-            await _workDayRepository.CreateAsync(workDayToAdd);
+            await _workDayRepository.CreateAsync(workDayToAdd, writeChanges);
         }
     }
 }

@@ -40,7 +40,7 @@
                                     <p class="sicklist__dates">@item.CreateDate.ToString("dd.MM.yyyy") - @item.CloseDate.Value.ToString("dd.MM.yyyy")</p>
                                 }
 
-                                    <p class="sicklist__duration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
+                                <p class="sicklist__duration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
                                 <div class="sicklist__info">
                                     <div class="profile__status_circle_sickleave_@item.RequestStatus">
                                         <div></div>
@@ -91,7 +91,6 @@
     </section>
 </form>
 <div class="modal fade" id="request_modal" role="dialog" style="">
-    <div class="modal-dialog modal-content">
-        <div id="modal_place"></div>
+    <div class="modal-dialog" id="modal_place">
     </div>
 </div>

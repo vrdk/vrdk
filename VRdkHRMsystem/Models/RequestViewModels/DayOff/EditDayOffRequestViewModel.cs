@@ -1,16 +1,15 @@
 ﻿using System;
 
-namespace VRdkHRMsysDAL.Entities
+namespace VRdkHRMsystem.Models.RequestViewModels.DayOff
 {
-    public partial class DayOff
+    public class EditDayOffRequestViewModel
     {
         public string DayOffId { get; set; }
         public string EmployeeId { get; set; }
         public string DayOffState { get; set; }
-        public string DayOffImportance{ get; set; }
+        public string DayOffImportance { get; set; }
         public string Comment { get; set; }
+        public string TeamId { get; set; }
         public DateTime DayOffDate { get; set; }
-        public DateTime? ProcessDate { get; set; }
-        public Employee Employee { get; set; }
     }
 }

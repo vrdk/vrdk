@@ -3,15 +3,7 @@
 <form asp-action="AddEmployee" method="post" class="content" enctype="multipart/form-data">
     <div class="profile__globalwrapper">
         <div class="profile empprofileedit">
-            <div class="empprofile__header empprofileedit__header">
-                <div class="profile__imgblock"><img src="~/images/profile/profilephoto.png" alt="photo" id="user_photo"/></div>
-                
-                <label class=" empprofile__button button empprofileedit__button" for="Photo" id="photoUploadLabel">                
-                        <img src="~/images/plus.png" alt="plus" />
-                        <p>Загрузить фото</p>
-                    <input asp-for="Photo" class="sickmessage__ulpoad_my" type="file" id="Photo" multiple="multiple" accept="image/*" onchange="changeUserPhoto(this)"/>
-                </label>
-            </div>
+           
             <div class="profile__data">
                 <div class="profile__datablock">
                     <label class="profile__blockname">

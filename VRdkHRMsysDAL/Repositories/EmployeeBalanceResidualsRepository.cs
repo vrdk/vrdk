@@ -18,16 +18,24 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(EmployeeBalanceResiduals entity)
+        public async Task CreateAsync(EmployeeBalanceResiduals entity, bool writeChanges)
         {
             _context.EmployeeBalanceResiduals.Add(entity);
-            await _context.SaveChangesAsync();
+            
+            if(writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(EmployeeBalanceResiduals entity)
+        public async Task DeleteAsync(EmployeeBalanceResiduals entity, bool writeChanges)
         {
             _context.EmployeeBalanceResiduals.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task<EmployeeBalanceResiduals[]> GetAsync(Expression<Func<EmployeeBalanceResiduals, bool>> condition = null)
@@ -45,10 +53,14 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.EmployeeBalanceResiduals.FirstOrDefaultAsync(res=>res.EmployeeId.Equals(id) && res.Name.Equals(type));
         }
 
-        public async Task CreateRangeAsync(EmployeeBalanceResiduals[] entities)
+        public async Task CreateRangeAsync(EmployeeBalanceResiduals[] entities, bool writeChanges)
         {
             _context.AddRange(entities);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
         public async Task UpdateAsync()
         {

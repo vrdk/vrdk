@@ -59,7 +59,7 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<Team, TeamDTO>(team);
         }
 
-        public async Task UpdateAsync(TeamDTO newTeam)
+        public async Task UpdateAsync(TeamDTO newTeam, bool writeChanges = false)
         {
             var currentTeam = await _teamRepository.GetByIdAsync(newTeam.TeamId);
             if (currentTeam != null)
@@ -68,13 +68,16 @@ namespace VRdkHRMsysBLL.Services
                 currentTeam.Name = newTeam.Name;
             }
 
-            await _teamRepository.UpdateAsync();
+            if (writeChanges)
+            {
+                await _teamRepository.UpdateAsync();
+            }          
         }
 
-        public async Task CreateAsync(TeamDTO team)
+        public async Task CreateAsync(TeamDTO team, bool writeChanges = false)
         {
             var teamToAdd = _mapHelper.Map<TeamDTO, Team>(team);
-            await _teamRepository.CreateAsync(teamToAdd);
+            await _teamRepository.CreateAsync(teamToAdd, writeChanges);
         }
     }
 }

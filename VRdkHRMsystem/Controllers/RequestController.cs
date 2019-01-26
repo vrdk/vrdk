@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
@@ -11,6 +12,7 @@ using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
+using VRdkHRMsystem.Models.RequestViewModels.DayOff;
 using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
 using VRdkHRMsystem.Models.RequestViewModels.Vacation;
 using VRdkHRMsystem.Models.SharedModels.SickLeave;
@@ -27,7 +29,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IPostService _postService;
         private readonly IFileManagmentService _fileManagmentService;
         private readonly INotificationService _notificationService;
-
+        private readonly IDayOffService _dayOffService;
         private readonly IMapHelper _mapHelper;
         private readonly IViewListMapper _listMapper;
 
@@ -36,6 +38,7 @@ namespace VRdkHRMsystem.Controllers
                                  ISickLeaveService sickLeaveService,
                                  IFileManagmentService fileManagmentService,
                                  IPostService postService,
+                                 IDayOffService dayOffService,
                                  INotificationService notificationService,
                                  IMapHelper mapHelper,
                                  IViewListMapper listMapper)
@@ -44,10 +47,128 @@ namespace VRdkHRMsystem.Controllers
             _vacationService = vacationRequestService;
             _sickLeaveService = sickLeaveService;
             _postService = postService;
+            _dayOffService = dayOffService;
             _notificationService = notificationService;
             _fileManagmentService = fileManagmentService;
             _mapHelper = mapHelper;
             _listMapper = listMapper;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditDayOffRequest(string id, string teamId)
+        {
+            var dayOff = await _dayOffService.GetByIdAsync(id);
+            if (dayOff != null)
+            {
+                var model = new EditDayOffRequestViewModel
+                {
+                    EmployeeId = dayOff.EmployeeId,
+                    DayOffDate = dayOff.DayOffDate,
+                    Comment = dayOff.Comment,
+                    DayOffId = dayOff.DayOffId,
+                    DayOffImportance = dayOff.DayOffImportance,
+                    TeamId = teamId
+                };
+
+                return PartialView("EditDayOffRequestModal", model);
+
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId });
+            }
+            else if (User.IsInRole("Teamlead"))
+            {
+                return RedirectToAction("Calendar", "Teamlead", new { teamId });
+            }
+            else
+            {
+                return RedirectToAction("Calendar", "Profile", new { teamId });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditDayOffRequest(EditDayOffRequestViewModel model)
+        {
+            var dayOff = await _dayOffService.GetByIdAsync(model.DayOffId);
+            if (dayOff != null)
+            {
+                dayOff.DayOffImportance = model.DayOffImportance;
+                dayOff.Comment = model.Comment;
+                await _dayOffService.UpdateAsync(dayOff, true);
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId });
+            }
+            else if (User.IsInRole("Teamlead"))
+            {
+                return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
+            }
+            else
+            {
+                return RedirectToAction("Calendar", "Profile", new { teamId = model.TeamId });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult RequestDayOff(string id, string date, string teamId)
+        {
+            var model = new RequestDayOffViewModel
+            {
+                EmployeeId = id,
+                DayOffDate = Convert.ToDateTime(date),
+                TeamId = teamId
+            };
+
+            return PartialView("RequestDayOffModal", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RequestDayOff(RequestDayOffViewModel model)
+        {
+            var employee = await _employeeService.GetByIdWithTeamAsync(model.EmployeeId);
+            if (employee != null)
+            {
+                var dayOff = new DayOffDTO
+                {
+                    DayOffId = Guid.NewGuid().ToString(),
+                    EmployeeId = employee.EmployeeId,
+                    DayOffDate = model.DayOffDate,
+                    DayOffImportance = model.DayOffImportance,
+                    DayOffState = DayOffStateEnum.Requested.ToString(),
+                    Comment = model.Comment,
+                    ProcessDate = DateTime.UtcNow
+                };
+                var notification = new NotificationDTO
+                {
+                    NotificationId = Guid.NewGuid().ToString(),
+                    EmployeeId = employee.Team?.TeamleadId,
+                    OrganisationId = employee.OrganisationId,
+                    NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                    NotificationDate = DateTime.UtcNow,
+                    Description = $"{employee.FirstName} {employee.LastName} выбрал желаемый выходной.",
+                    NotificationRange = NotificationRangeEnum.User.ToString(),
+                    IsChecked = false
+                };
+                await _dayOffService.CreateAsync(dayOff);
+                await _notificationService.CreateAsync(notification, true);
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
+            }
+            else if (User.IsInRole("Teamlead"))
+            {
+                return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
+            }
+            else
+            {
+                return RedirectToAction("Calendar", "Profile", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
+            }
         }
 
         [HttpGet]
@@ -68,7 +189,7 @@ namespace VRdkHRMsystem.Controllers
                 employee = await _employeeService.GetByEmailWithTeamWithResidualsAsync(User.Identity.Name);
             }
             if (employee != null)
-            {              
+            {
                 model.ProfileModel.EmployeeId = employee.EmployeeId;
                 model.RequestVacationModel.EmployeeId = employee.EmployeeId;
                 model.RequestVacationModel.PaidVacationResiduals = employee.EmployeeBalanceResiduals.FirstOrDefault(res => res.Name == "Paid_vacation").ResidualBalance;
@@ -115,15 +236,15 @@ namespace VRdkHRMsystem.Controllers
                 await _notificationService.CreateAsync(notification);
                 if (employee.TeamId != null)
                 {
-                    vacationRequest.RequestStatus = RequestStatusEnum.Pending.ToString();            
+                    vacationRequest.RequestStatus = RequestStatusEnum.Pending.ToString();
                 }
                 else
                 {
                     vacationRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
-                }      
+                }
                 vacationRequest.VacationId = Guid.NewGuid().ToString();
                 vacationRequest.CreateDate = DateTime.UtcNow.Date;
-                await _vacationService.CreateAsync(vacationRequest);                
+                await _vacationService.CreateAsync(vacationRequest, true);
             }
 
             return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });
@@ -192,11 +313,13 @@ namespace VRdkHRMsystem.Controllers
                     NotificationRange = NotificationRangeEnum.Organisation.ToString(),
                     Description = $"{employee.FirstName} {employee.LastName} запросил больничный"
                 };
-                await _notificationService.CreateAsync(notification);
+
+                await _notificationService.CreateAsync(notification, true);
+
                 if (model.File != null)
                 {
                     await _fileManagmentService.UploadSickLeaveFileAsync(model.File, sickLeaveRequest.SickLeaveId);
-                }               
+                }
             }
 
             return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });
@@ -224,7 +347,7 @@ namespace VRdkHRMsystem.Controllers
             if (request != null)
             {
                 request.Comment = model.Comment;
-                await _sickLeaveService.UpdateAsync(request);
+                await _sickLeaveService.UpdateAsync(request, true);
                 if (model.File != null)
                 {
                     await _fileManagmentService.UploadSickLeaveFileAsync(model.File, request.SickLeaveId);
@@ -241,7 +364,7 @@ namespace VRdkHRMsystem.Controllers
             if (sickLiveRequest != null)
             {
                 var model = _mapHelper.Map<SickLeaveRequestDTO, CloseSickLeaveViewModel>(sickLiveRequest);
-                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLiveRequest.SickLeaveId);     
+                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLiveRequest.SickLeaveId);
 
                 return PartialView("CloseSickleaveModal", model);
             }
@@ -253,16 +376,14 @@ namespace VRdkHRMsystem.Controllers
         public async Task<ActionResult> CloseSickLeave(CloseSickLeaveViewModel model)
         {
             var request = await _sickLeaveService.GetByIdWithEmployeeWithResidualsAsync(model.SickLeaveId);
-            if(request != null && request.RequestStatus == RequestStatusEnum.Approved.ToString())
+            if (request != null && request.RequestStatus == RequestStatusEnum.Approved.ToString())
             {
                 request.CloseDate = DateTime.UtcNow.Date;
                 var c = (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays;
                 request.Duration = (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays != 0 ? (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays : 1;
                 request.RequestStatus = RequestStatusEnum.Closed.ToString();
                 request.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance += request.Duration.Value;
-                await _sickLeaveService.UpdateAsync(request);
-
-                return RedirectToAction("Profile", "Profile");
+                await _sickLeaveService.UpdateAsync(request, true);
             }
 
             return RedirectToAction("Profile", "Profile");

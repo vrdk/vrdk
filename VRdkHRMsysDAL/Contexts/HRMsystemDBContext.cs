@@ -137,6 +137,10 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("day_off_importance")
                     .HasMaxLength(512);
 
+                entity.Property(e => e.Comment)
+                    .HasColumnName("comment")
+                    .HasMaxLength(100);
+
                 entity.Property(e => e.DayOffState)
                     .IsRequired()
                     .HasColumnName("day_off_state")

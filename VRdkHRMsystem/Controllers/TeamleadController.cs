@@ -99,34 +99,61 @@ namespace VRdkHRMsystem.Controllers
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
+                TeamDTO team = new TeamDTO();
+                CalendarViewModel model = new CalendarViewModel();
+                EmployeeDTO[] employees = new EmployeeDTO[] { };
                 var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId || t.TeamId == viewer.TeamId);
                 if (year == 0 || month == 0)
                 {
                     year = DateTime.UtcNow.Year;
                     month = DateTime.UtcNow.Month;
                 }
-                TeamDTO team = new TeamDTO();
 
                 if (teamId == null)
                 {
-                    team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                    if (viewer.TeamId != null)
+                    {
+                        team = teams.FirstOrDefault(t => t.TeamId == viewer.TeamId);
+                    }
+                    else
+                    {
+                        team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                    }
                 }
                 else
                 {
                     team = teams.FirstOrDefault(t => t.TeamId == teamId);
                 }
 
+
                 if (team != null)
                 {
-                    var employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+                    if(team.TeamId == viewer.TeamId)
+                    {
+                        employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+                        model = new CalendarViewModel
+                        {
+                            Year = year,
+                            Month = month,
+                            TeamId = team?.TeamId,
+                            Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                            Teams = _listMapper.CreateTeamList(teams, team.TeamId),
+                            Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                            Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                        };
 
-                    var model = new CalendarViewModel
+                        return View("~/Views/Profile/Calendar.cshtml", model);
+                    }
+
+                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+
+                    model = new CalendarViewModel
                     {
                         Year = year,
                         Month = month,
                         TeamId = team?.TeamId,
                         Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
-                        Teams = _listMapper.CreateTeamList(teams, teamId),
+                        Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                         Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
                         Culture = CultureInfo.CreateSpecificCulture("ru-RU")
                     };
@@ -350,7 +377,7 @@ namespace VRdkHRMsystem.Controllers
                     await _notificationService.CreateAsync(notification);
                 }
 
-                await _vacationService.UpdateAsync(vacationRequest);
+                await _vacationService.UpdateAsync(vacationRequest, true);
             }
 
             return RedirectToAction("Vacations", "Teamlead");
@@ -568,7 +595,7 @@ namespace VRdkHRMsystem.Controllers
                     await _notificationService.CreateAsync(notification);
                 }
 
-                await _sickLeaveService.UpdateAsync(sickLeaveRequest);
+                await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
             }
 
             return RedirectToAction("Sickleaves", "Teamlead");
@@ -622,8 +649,8 @@ namespace VRdkHRMsystem.Controllers
                         WorkDayId = Guid.NewGuid().ToString(),
                         EmployeeId = dayOff.Employee.EmployeeId,
                         WorkDayDate = model.Date,
-                        TimeFrom = model.TimeFrom,
-                        TimeTo = model.TimeTo,
+                        TimeFrom = model.TimeFrom.TimeOfDay,
+                        TimeTo = model.TimeTo.TimeOfDay,
                         ProcessDate = DateTime.UtcNow
                     };
                     var notification = new NotificationDTO
@@ -637,13 +664,34 @@ namespace VRdkHRMsystem.Controllers
                         NotificationRange = NotificationRangeEnum.User.ToString(),
                         IsChecked = false
                     };
-                    await _dayOffService.DeleteAsync(dayOff.DayOffId);
+                    if(dayOff.DayOffImportance != null)
+                    {
+                        dayOff.DayOffState = DayOffStateEnum.Requested.ToString();
+                        dayOff.ProcessDate = DateTime.UtcNow;
+                        await _dayOffService.UpdateAsync(dayOff);
+                    }
+                    else
+                    {
+                        await _dayOffService.DeleteAsync(dayOff.DayOffId);
+                    }
+                    
                     await _workDayService.CreateAsync(workDay);
-                    await _notificationService.CreateAsync(notification);
+                    await _notificationService.CreateAsync(notification, true);
+                }
+                else if(dayOff.DayOffState == DayOffStateEnum.Requested.ToString())
+                {
+                    dayOff.DayOffState = DayOffStateEnum.Approved.ToString();
+                    dayOff.ProcessDate = DateTime.UtcNow;
+                    await _dayOffService.UpdateAsync(dayOff, true);                   
                 }
             }
 
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            }
+
+            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
         [HttpGet]
@@ -652,18 +700,24 @@ namespace VRdkHRMsystem.Controllers
             var workDay = await _workDayService.GetByIdAsync(id);
             if (workDay != null)
             {
+                var parsedDate = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture);
                 var model = new EditCalendarDayViewModel
                 {
                     CalendarDayId = workDay.WorkDayId,
-                    Date = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture),
-                    TimeFrom = workDay.TimeFrom,
-                    TimeTo = workDay.TimeTo,
+                    Date = parsedDate,
+                    TimeFrom = new DateTime(parsedDate.Year,parsedDate.Month,parsedDate.Day, workDay.TimeFrom.Hours,workDay.TimeFrom.Minutes, 0),
+                    TimeTo = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, workDay.TimeTo.Hours, workDay.TimeFrom.Minutes, 0),
                     FirstName = workDay.Employee.FirstName,
                     LastName = workDay.Employee.LastName,
                     TeamId = teamId
                 };
 
                 return PartialView("EditWorkDayModal", model);
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId });
             }
 
             return RedirectToAction("Calendar", "Teamlead", new { teamId });
@@ -677,35 +731,59 @@ namespace VRdkHRMsystem.Controllers
             {
                 if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
                 {
-                    var dayOff = new DayOffDTO
+                    var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
+                    if(dayOffEx != null && dayOffEx.DayOffImportance != null)
                     {
-                        DayOffId = Guid.NewGuid().ToString(),
-                        EmployeeId = workDay.Employee.EmployeeId,
-                        DayOffDate = model.Date,
-                        DayOffState = DayOffStateEnum.Approved.ToString(),
-                        ProcessDate = DateTime.UtcNow
-                    };
-                    var notification = new NotificationDTO
+                        dayOffEx.DayOffState = DayOffStateEnum.Approved.ToString();
+                        dayOffEx.ProcessDate = DateTime.UtcNow;
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            OrganisationId = workDay.Employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")} был заменён выходным.",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            IsChecked = false
+                        };
+                        await _dayOffService.UpdateAsync(dayOffEx);
+                        await _notificationService.CreateAsync(notification);
+                        await _workDayService.DeleteAsync(workDay.WorkDayId, true);
+                    }
+                    else
                     {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = workDay.Employee.EmployeeId,
-                        OrganisationId = workDay.Employee.OrganisationId,
-                        NotificationType = NotificationTypeEnum.DayOff.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")} был заменён выходным.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-                    await _dayOffService.CreateAsync(dayOff);
-                    await _workDayService.DeleteAsync(workDay.WorkDayId);
-                    await _notificationService.CreateAsync(notification);
+                        var dayOff = new DayOffDTO
+                        {
+                            DayOffId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            DayOffDate = model.Date,
+                            DayOffState = DayOffStateEnum.Approved.ToString(),
+                            ProcessDate = DateTime.UtcNow
+                        };
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            OrganisationId = workDay.Employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")} был заменён выходным.",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            IsChecked = false
+                        };
+
+                        await _workDayService.DeleteAsync(workDay.WorkDayId);
+                        await _dayOffService.CreateAsync(dayOff);                  
+                        await _notificationService.CreateAsync(notification, true);
+                    }                                 
                 }
                 else
                 {
-                    if (workDay.TimeFrom != model.TimeFrom || workDay.TimeTo != model.TimeTo)
+                    if (workDay.TimeFrom != model.TimeFrom.TimeOfDay || workDay.TimeTo != model.TimeTo.TimeOfDay)
                     {
-                        workDay.TimeFrom = model.TimeFrom;
-                        workDay.TimeTo = model.TimeTo;
+                        workDay.TimeFrom = model.TimeFrom.TimeOfDay;
+                        workDay.TimeTo = model.TimeTo.TimeOfDay;
                         workDay.ProcessDate = DateTime.UtcNow;
                         var notification = new NotificationDTO
                         {
@@ -719,12 +797,17 @@ namespace VRdkHRMsystem.Controllers
                             IsChecked = false
                         };
                         await _workDayService.UpdateAsync(workDay);
-                        await _notificationService.CreateAsync(notification);
+                        await _notificationService.CreateAsync(notification, true);
                     }                   
                 }
             }
 
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            }
+
+            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
 
@@ -771,7 +854,7 @@ namespace VRdkHRMsystem.Controllers
                         IsChecked = false
                     };
                     await _dayOffService.CreateAsync(dayOff);
-                    await _notificationService.CreateAsync(notification);
+                    await _notificationService.CreateAsync(notification, true);
                 }
                 else
                 {
@@ -796,11 +879,16 @@ namespace VRdkHRMsystem.Controllers
                         IsChecked = false
                     };
                     await _workDayService.CreateAsync(workDay);
-                    await _notificationService.CreateAsync(notification);
+                    await _notificationService.CreateAsync(notification, true);
                 }
             }
 
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            }
+
+            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
         [HttpGet]
@@ -822,6 +910,11 @@ namespace VRdkHRMsystem.Controllers
                 return PartialView("AbsenceApproveModal", model);
             }
 
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId });
+            }
+
             return RedirectToAction("Calendar", "Teamlead", new { teamId });
         }
 
@@ -837,7 +930,12 @@ namespace VRdkHRMsystem.Controllers
                     EmployeeId = model.EmployeeId,
                     AbsenceDate = model.Date
                 };
-                await _absenceService.CreateAsync(absence);
+                await _absenceService.CreateAsync(absence, true);
+            }
+
+            if (User.IsInRole("Administrator"))
+            {
+                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId });
             }
 
             return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });

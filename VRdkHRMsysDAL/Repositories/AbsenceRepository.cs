@@ -18,16 +18,24 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(Absence entity)
+        public async Task CreateAsync(Absence entity, bool writeChanges)
         {
             _context.Absence.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(Absence entity)
+        public async Task DeleteAsync(Absence entity, bool writeChanges)
         {
             _context.Absence.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task<Absence[]> GetAsync(Expression<Func<Absence, bool>> condition = null)

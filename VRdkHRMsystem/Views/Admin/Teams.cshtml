@@ -5,26 +5,26 @@
 }
 <form asp-action="Teams" method="get" class="content">
     <section class="listsection">
-        <div class="table">
-            <div class="table__header">
-                <p>Список команд</p>
-                <div class="table__header_search">
-                    <input type="text" placeholder="Найти команду..." name="searchKey" value="@searchKey" />
-                    <button type="submit"><img src="~/images/search.png" alt="search" /></button>
-                </div>
-            </div>
-            <div class="table__body">
-                @if (Model != null && Model.Teams.Count() != 0)
-                {
-                    <div class="table__body_title teamlist__body_title">
-                        <p class="teamlist__name">Название команды</p>
-                        <p class="teamlist__leader">Team Leader</p>
-                        <p class="teamlist__count">Кол-во сотрудников</p>
-                        <p class="teamlist__info">Инфо</p>
+            <div class="table">
+                <div class="table__header">
+                    <p>Список команд</p>
+                    <div class="table__header_search">
+                        <input type="text" placeholder="Найти команду..." name="searchKey" value="@searchKey" />
+                        <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                     </div>
-                    foreach (var team in Model.Teams)
+                </div>
+                <div class="table__body">
+                    @if (Model != null && Model.Teams.Count() != 0)
                     {
+                        <div class="table__body_title teamlist__body_title">
+                            <p class="teamlist__name">Название команды</p>
+                            <p class="teamlist__leader">Team Leader</p>
+                            <p class="teamlist__count">Кол-во сотрудников</p>
+                            <p class="teamlist__info">Инфо</p>
+                        </div>
                         <div class="table__body_content teamlist__body_content">
+                            @foreach (var team in Model.Teams)
+                            {
                             <div class="table__body_block">
                                 <p class="teamlist__name">@team.Name</p>
                                 <p class="teamlist__leader">@team.TeamleadName</p>
@@ -34,43 +34,42 @@
                                     <a href="@Url.Action("EditTeam","Admin", new { id = team.TeamId })"><img src="~/images/penciltable.png" alt="pencil" /></a>
                                 </p>
                             </div>
-
+                            }
                         </div>
                     }
-                }
-                else
-                {
+                    else
+                    {
                     <div class="table__body_content teamlist__body_content">
                         <div class="table__body_block">
                             <p class="teamlist__name">Нет записей</p>
                         </div>
                     </div>
+                    }
+                </div>
+            </div>
+            <div class="center" style="margin-left:45%">
+                @if (Model.Count > Model.PageSize)
+                {
+                    <p style="margin-bottom:12px;">
+                        @if (Model.PageNumber == 0)
+                        {
+                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                        }
+                        else
+                        {
+                            <a asp-action="Teams" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                        }
+
+                        @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+                        {
+                            <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                        }
+                        else
+                        {
+                            <a asp-action="Teams" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                        }
+                    </p>
                 }
             </div>
-        </div>
-        <div class="center" style="margin-left:45%">
-            @if (Model.Count > Model.PageSize)
-            {
-                <p style="margin-bottom:12px;">
-                    @if (Model.PageNumber == 0)
-                    {
-                    <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
-                    }
-                    else
-                    {
-                        <a asp-action="Teams" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
-                    }
-
-                    @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
-                    {
-                        <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
-                    }
-                    else
-                    {
-                        <a asp-action="Teams" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
-                    }
-                </p>
-            }
-        </div>
-    </section>
+        </section>
 </form>

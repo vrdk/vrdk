@@ -46,16 +46,16 @@ namespace VRdkHRMsysBLL.Services
             return await _notificationRepository.GetNotificationsCountAsync(condition, searchKey);
         }
 
-        public async Task CreateAsync(NotificationDTO notification)
+        public async Task CreateAsync(NotificationDTO notification, bool writeChanges = false)
         {
             var notificationToAdd = _mapHelper.Map<NotificationDTO, Notification>(notification);
-            await _notificationRepository.CreateAsync(notificationToAdd);
+            await _notificationRepository.CreateAsync(notificationToAdd, writeChanges);
         }
 
-        public async Task CreateRangeAsync(NotificationDTO[] notification)
+        public async Task CreateRangeAsync(NotificationDTO[] notification, bool writeChanges = false)
         {
             var notificationsToAdd = _mapHelper.MapCollection<NotificationDTO, Notification>(notification);
-            await _notificationRepository.CreateRangeAsync(notificationsToAdd);
+            await _notificationRepository.CreateRangeAsync(notificationsToAdd, writeChanges);
         }
     }
 }

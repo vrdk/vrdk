@@ -91,17 +91,27 @@ namespace VRdkHRMsystem.Controllers
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
+                TeamDTO team = new TeamDTO();
+                CalendarViewModel model = new CalendarViewModel();
+                EmployeeDTO[] employees = new EmployeeDTO[] { };
                 var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId);
+
                 if (year == 0 || month == 0)
                 {
                     year = DateTime.UtcNow.Year;
                     month = DateTime.UtcNow.Month;
                 }
-                TeamDTO team = new TeamDTO();
-
+                
                 if(teamId == null)
                 {
-                    team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                    if(viewer.TeamId != null)
+                    {
+                        team = teams.FirstOrDefault(t => t.TeamId == viewer.TeamId);
+                    }
+                    else
+                    {
+                        team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                    }                 
                 }
                 else
                 {
@@ -110,15 +120,33 @@ namespace VRdkHRMsystem.Controllers
 
                 if(team != null)
                 {
-                    var employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+                    if(team.TeamId == viewer.TeamId)
+                    {
+                        employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+                        model = new CalendarViewModel
+                        {
+                            Year = year,
+                            Month = month,
+                            TeamId = team?.TeamId,
+                            Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                            Teams = _listMapper.CreateTeamList(teams, team.TeamId),
+                            Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
+                            Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                        };
 
-                    var model = new CalendarViewModel
+                        return View("~/Views/Profile/Calendar.cshtml", model);
+
+                    }
+
+                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+
+                    model = new CalendarViewModel
                     {
                         Year = year,
                         Month = month,
                         TeamId = team?.TeamId,
                         Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
-                        Teams = _listMapper.CreateTeamList(teams, teamId),
+                        Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                         Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
                         Culture = CultureInfo.CreateSpecificCulture("ru-RU")
                     };
@@ -126,16 +154,10 @@ namespace VRdkHRMsystem.Controllers
                     if (team.TeamleadId == viewer.EmployeeId)
                     {
                         return View("~/Views/Teamlead/Calendar.cshtml", model);
-                    }
-
-                    return View(model);
+                    } 
                 }
-                else
-                {
-                    return View(new CalendarViewModel());
-                }
-               
 
+                return View(model);
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -193,7 +215,7 @@ namespace VRdkHRMsystem.Controllers
 
                 team.Name = model.Name;
 
-                await _teamService.UpdateAsync(team);
+                await _teamService.UpdateAsync(team, true);
 
                 return RedirectToAction("Teams", "Admin");
             }
@@ -339,7 +361,7 @@ namespace VRdkHRMsystem.Controllers
                 var newEmployee = _mapHelper.Map<EditEmployeeViewModel, EmployeeDTO>(model);
                 newEmployee.TeamId = employee.Team?.TeamId;
                 newEmployee.EmployeeBalanceResiduals = employee.EmployeeBalanceResiduals;
-                await _employeeService.UpdateAsync(newEmployee);
+                await _employeeService.UpdateAsync(newEmployee, true);
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -413,7 +435,7 @@ namespace VRdkHRMsystem.Controllers
                       }
                      };
                     await _employeeService.CreateAsync(employee);
-                    await _residualsService.CreateRangeAsync(residuals);
+                    await _residualsService.CreateRangeAsync(residuals, true);
                     var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
                     var emailConfirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     string callbackUrl = Url.Action("SetPasswordAndConfrimEmail", "Account", new { id = user.Id, resetCode = passwordResetCode, confirmCode = emailConfirmationCode }, Request.Scheme);
@@ -655,7 +677,7 @@ namespace VRdkHRMsystem.Controllers
                         IsChecked = false
                     };
 
-                    await _notificationService.CreateAsync(notification);
+                    await _notificationService.CreateAsync(notification, true);
                 }
                 else
                 {
@@ -673,7 +695,7 @@ namespace VRdkHRMsystem.Controllers
                         IsChecked = false
                     };
 
-                    await _notificationService.CreateAsync(notification);
+                    await _notificationService.CreateAsync(notification, true);
                 }
             }
 
@@ -716,13 +738,15 @@ namespace VRdkHRMsystem.Controllers
                 TeamleadId = model.TeamleadId,
                 Name = model.Name
             };
+
             await _teamService.CreateAsync(team);
+
             foreach (var employee in employees)
             {
                 employee.TeamId = team.TeamId;
             }
 
-            await _employeeService.UpdateRangeAsync(employees);
+            await _employeeService.UpdateRangeAsync(employees, true);
 
             var user = await _userManager.FindByIdAsync(model.TeamleadId);
             await _userManager.AddToRoleAsync(user, RoleEnum.Teamlead.ToString());
@@ -791,6 +815,7 @@ namespace VRdkHRMsystem.Controllers
 
                         await _residualsService.UpdateRangeAsync(residuals);
                     }
+                    assignment.Name = model.Name;
                     assignment.Duration = model.Duration;
                     assignment.BeginDate = model.BeginDate;
                     assignment.EndDate = model.EndDate;
@@ -838,25 +863,8 @@ namespace VRdkHRMsystem.Controllers
                         await _notificationService.CreateRangeAsync(notificationList.ToArray());
                     }
 
-                    await _assignmentService.Update(assignment);
+                    await _assignmentService.Update(assignment, true);
                 }
-                else
-                {
-                    var assignmentEmployees = assignment.AssignmentEmployee.Select(a => a.Employee.EmployeeId).ToArray();
-                    var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
-                                                                                        FirstOrDefault(r => assignmentEmployees.Any(m => m == r.EmployeeId)
-                                                                                           && r.Name == ResidualTypeEnum.Assignment.ToString())).ToArray();
-                    foreach (var res in residuals)
-                    {
-                        res.ResidualBalance += assignment.Duration;
-                    }
-
-                    await _residualsService.UpdateRangeAsync(residuals);
-                    await _assignmentService.RemoveFromAssignmentAsync(assignmentEmployees, assignment.AssignmentId);
-                    await _assignmentService.DeleteAsync(assignment);
-                }
-
-                return RedirectToAction("Assignments", "Admin");
             }
 
             return RedirectToAction("Assignments", "Admin");
@@ -952,9 +960,9 @@ namespace VRdkHRMsystem.Controllers
                     }
                 }
 
-                await _notificationService.CreateRangeAsync(notificationList.ToArray());
+                await _notificationService.CreateRangeAsync(notificationList.ToArray(), true);
             }
-
+            
             return RedirectToAction("Assignments", "Admin");
         }
     }

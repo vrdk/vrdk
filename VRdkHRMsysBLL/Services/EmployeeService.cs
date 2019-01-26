@@ -32,9 +32,9 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
 
-        public async Task<EmployeeDTO[]> GetForCalendaAsync(string teamId, string teamleadId, int month, int year)
+        public async Task<EmployeeDTO[]> GetForCalendaAsync(string teamId, string teamleadId, int month, int year, string personalId = null)
         {
-            var employees = await _employeeRepository.GetForCalendarAsync(teamId, teamleadId, month, year);
+            var employees = await _employeeRepository.GetForCalendarAsync(teamId, teamleadId, month, year, personalId);
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
 
@@ -112,7 +112,7 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.NestedMap<Employee, EmployeeDTO, Team, TeamDTO>(employee);
         }
 
-        public async Task RemoveFromTeamAsync(string[] membersIds)
+        public async Task RemoveFromTeamAsync(string[] membersIds, bool writeChanges = false)
         {
             var employees = await _employeeRepository.GetAsync(e => membersIds.Any(m => m == e.EmployeeId));
 
@@ -121,10 +121,13 @@ namespace VRdkHRMsysBLL.Services
                 employee.TeamId = null;
             }
 
-            await _employeeRepository.UpdateAsync();
+            if (writeChanges)
+            {
+                await _employeeRepository.UpdateAsync();
+            }           
         }
 
-        public async Task AddToTeamAsync(string[] membersIds, string teamId)
+        public async Task AddToTeamAsync(string[] membersIds, string teamId, bool writeChanges = false)
         {
             var employees = await _employeeRepository.GetAsync(e => membersIds.Any(m => m == e.EmployeeId));
 
@@ -133,10 +136,13 @@ namespace VRdkHRMsysBLL.Services
                 employee.TeamId = teamId;
             }
 
-            await _employeeRepository.UpdateAsync();
+            if (writeChanges)
+            {
+                await _employeeRepository.UpdateAsync();
+            }        
         }
 
-        public async Task UpdateRangeAsync(EmployeeDTO[] newEmployees)
+        public async Task UpdateRangeAsync(EmployeeDTO[] newEmployees, bool writeChanges = false)
         {
             var currentEmployees = await _employeeRepository.GetAsync(emp => newEmployees.Any(e=>emp.EmployeeId==e.EmployeeId));
             if (currentEmployees != null)
@@ -148,11 +154,14 @@ namespace VRdkHRMsysBLL.Services
                     _mapHelper.MapChanges(newEmployees[i],currentEmployees[i]);
                 }
 
-                await _employeeRepository.UpdateAsync();
+                if (writeChanges)
+                {
+                    await _employeeRepository.UpdateAsync();
+                }                
             }
         }
 
-        public async Task UpdateAsync(EmployeeDTO newEmployee)
+        public async Task UpdateAsync(EmployeeDTO newEmployee, bool writeChanges = false)
         {
             var currentEmployee = await _employeeRepository.GetByIdAsync(newEmployee.EmployeeId);
             if(currentEmployee != null)
@@ -177,14 +186,19 @@ namespace VRdkHRMsysBLL.Services
                         }                    
                     }
                 }
-                await _employeeRepository.UpdateAsync(currentEmployee);
+
+                if (writeChanges)
+                {
+                    await _employeeRepository.UpdateEmployeeAsync(currentEmployee);
+                }              
             }         
         }
 
-        public async Task CreateAsync(EmployeeDTO employee)
+        public async Task CreateAsync(EmployeeDTO employee, bool writeChanges = false)
         {
             var employeeToAdd = _mapHelper.Map<EmployeeDTO, Employee>(employee);
-            await _employeeRepository.CreateAsync(employeeToAdd);
+
+            await _employeeRepository.CreateAsync(employeeToAdd, writeChanges);
         }
     }
 }

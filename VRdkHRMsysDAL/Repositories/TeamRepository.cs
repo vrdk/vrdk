@@ -73,16 +73,24 @@ namespace VRdkHRMsysDAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task CreateAsync(Team entity)
+        public async Task CreateAsync(Team entity, bool writeChanges)
         {
             _context.Team.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(Team entity)
+        public async Task DeleteAsync(Team entity, bool writeChanges)
         {
             _context.Team.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
     }
 }

@@ -7,9 +7,9 @@ namespace VRdkHRMsysDAL.Interfaces
 {
     public interface IAssignmentRepository : IRepository<Assignment>
     {
-        Task AddToAssignmentAsync(string[] employeeIds, string assignmentId);
+        Task AddToAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges);
         Task<Assignment[]> GetWithEmployeeAsync(Expression<Func<Assignment, bool>> condition = null);
-        Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId);
+        Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges);
         Task<Assignment> GetByIdWithEmployeesAsync(string id);
         Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null);
         Task<AssignmentEmployee[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);

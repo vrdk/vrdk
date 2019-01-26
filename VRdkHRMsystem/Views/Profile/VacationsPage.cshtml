@@ -9,17 +9,17 @@
                 <p class="profile__tabs_vacdate">Даты</p>
                 <p class="profile__tabs_vactype">Тип</p>
                 <p class="profile__tabs_vacstatus">Статуc</p>
-                <p class="profile__tabs_vacduration">Длительность</p>
+                <p class="profile__tabs_vacduration">Длит.</p>
             </div>
             <div class="profile__tabs_vaccontent profile__tabs_content">
                 <p class="profile__tabs_vacdate">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
                 @if (item.VacationType == "Paid_vacation")
                 {
-                    <p class="profile__tabs_vactype">Оплачиваемый</p>
+                    <p class="profile__tabs_vactype">Оплач.</p>
                 }
                 else
                 {
-                    <p class="profile__tabs_vactype">Неоплачиваемый</p>
+                    <p class="profile__tabs_vactype">Неоплач.</p>
                 }
                 <div class="profile__tabs_vacstatus profile__tabs_vacstatus-item">
                     <div class="profile__status_circle_@item.RequestStatus">

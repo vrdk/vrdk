@@ -18,10 +18,10 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
-        public async Task CreateAsync(TransactionDTO transaction)
+        public async Task CreateAsync(TransactionDTO transaction, bool writeChanges = false)
         {
             var entity = _mapHelper.Map<TransactionDTO, Transaction>(transaction);
-            await _transactionRepository.CreateAsync(entity);
+            await _transactionRepository.CreateAsync(entity, writeChanges);
         }
     }
 }

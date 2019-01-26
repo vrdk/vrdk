@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.DayOff;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -18,13 +19,36 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
-        public async Task DeleteAsync(string id)
+        public async Task DeleteAsync(string id, bool writeChanges = false)
         {
             var dayOff = await _dayOffRepository.GetByIdAsync(id);
             if(dayOff != null)
             {
-                await _dayOffRepository.DeleteAsync(dayOff);
+                await _dayOffRepository.DeleteAsync(dayOff, writeChanges);
             }     
+        }
+
+        public async Task UpdateAsync(DayOffDTO dayOff, bool writeChanges = false)
+        {
+            var currentdayOff = await _dayOffRepository.GetByIdAsync(dayOff.DayOffId);
+            if (currentdayOff != null)
+            {
+                currentdayOff.Comment = dayOff.Comment;
+                currentdayOff.DayOffImportance = dayOff.DayOffImportance;
+                currentdayOff.DayOffState = dayOff.DayOffState;
+                currentdayOff.ProcessDate = dayOff.ProcessDate;
+            }
+
+            if (writeChanges)
+            {
+                await _dayOffRepository.UpdateAsync();
+            }         
+        }
+
+        public async Task<DayOffDTO> GetByDateAsync(DateTime date, string employeeId)
+        {
+            var dayOff = await _dayOffRepository.GetByDateAsync(date, employeeId);
+            return _mapHelper.Map<DayOff, DayOffDTO>(dayOff);
         }
 
         public async Task<DayOffDTO> GetByIdAsync(string id)
@@ -33,10 +57,10 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.Map<DayOff, DayOffDTO>(dayOff);
         }
 
-        public async Task CreateAsync(DayOffDTO dayOff)
+        public async Task CreateAsync(DayOffDTO dayOff, bool writeChanges = false)
         {
             var dayOffToAdd = _mapHelper.Map<DayOffDTO, DayOff>(dayOff);
-            await _dayOffRepository.CreateAsync(dayOffToAdd);
+            await _dayOffRepository.CreateAsync(dayOffToAdd, writeChanges);
         }
     }
 }

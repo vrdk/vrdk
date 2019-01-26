@@ -14,11 +14,11 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
-        public TimeSpan TimeFrom { get; set; }
+        public DateTime TimeFrom { get; set; }
         [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Time)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
-        public TimeSpan TimeTo { get; set; }
+        public DateTime TimeTo { get; set; }
         public string Result { get; set; }
         public DateTime ProcessDate { get; set; }
     }

@@ -18,16 +18,24 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(Post entity)
+        public async Task CreateAsync(Post entity, bool writeChanges)
         {
             _context.Post.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(Post entity)
+        public async Task DeleteAsync(Post entity, bool writeChanges)
         {
             _context.Post.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task<Post[]> GetAsync(Expression<Func<Post, bool>> condition = null)

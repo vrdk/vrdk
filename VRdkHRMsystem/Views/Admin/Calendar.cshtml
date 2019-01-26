@@ -23,7 +23,7 @@
             </div>
             <div class="calendar__main">
                 <div class="calendar__passes">
-                    <div class="calendar__pass"></div>                   
+                    <div class="calendar__pass"></div>
                 </div>
                 <div class="calendar__mainwrapper">
                     <div class="calendar__emps">
@@ -63,10 +63,14 @@
                                         {
                                             <div class="calendar__block calendar__block_assignment"></div>
                                         }
+                                        else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
+                                        {
+                                            <div class="calendar__block calendar__block_pass"></div>
+                                        }
                                         else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
                                         {
                                             var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
-                                        var dayOffRequest = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day && d.DayOffState == "Requested");
+                                            var dayOffRequest = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day && d.DayOffState == "Requested");
                                             if (dayOffRequest == null)
                                             {
                                                 <text>
@@ -97,10 +101,6 @@
                                                 </text>
                                             }
 
-                                        }
-                                        else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
-                                        {
-                                            <div class="calendar__block calendar__block_pass"></div>
                                         }
                                         else
                                         {

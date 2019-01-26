@@ -18,21 +18,34 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync(DayOff entity)
+        public async Task CreateAsync(DayOff entity, bool writeChanges)
         {
             _context.DayOff.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(DayOff entity)
+        public async Task DeleteAsync(DayOff entity, bool writeChanges)
         {
             _context.DayOff.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task<DayOff[]> GetAsync(Expression<Func<DayOff, bool>> condition = null)
         {
             return condition != null ? await _context.DayOff.Where(condition).ToArrayAsync() : await _context.DayOff.ToArrayAsync(); 
+        }
+
+        public async Task<DayOff> GetByDateAsync(DateTime date, string employeeId)
+        {
+            return await _context.DayOff.FirstOrDefaultAsync(d => d.DayOffDate == date && d.EmployeeId == employeeId);
         }
 
         public async Task<DayOff> GetByIdAsync(string id)

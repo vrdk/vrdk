@@ -9,7 +9,5 @@
         public int PageSize { get; set; }
 
         public NotificationViewModel[] Notifications { get; set; }
-
-        public bool IsAdministrator { get; set; }
     }
 }

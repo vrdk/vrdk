@@ -12,9 +12,13 @@
     {
         redirectUrl = "Admin";
     }
-    else
+    else if (User.IsInRole("Teamlead"))
     {
         redirectUrl = "Teamlead";
+    }
+    else
+    {
+        redirectUrl = "profile";
     }
 }
 <div class="content">
@@ -22,9 +26,12 @@
     <div class="calendar">
         @if (Model.TeamId != null)
         {
-            <div class="select">
-                <select class="input calendar__select" asp-items="Model.Teams" id="team_select"></select>
-            </div>
+            @if (Model.Teams.Count() > 1)
+            {
+                <div class="select">
+                    <select class="input calendar__select" asp-items="Model.Teams" id="team_select"></select>
+                </div>
+            }
             <p class="calendar__teamname">@Model.Team.Name</p>
             <div class="calendar__date">
                 <a href="@Url.Action("Calendar",redirectUrl, new { year = prevCalendarYear, month = prevCalendarMonth, teamId = Model.TeamId })"><img src="~/images/arrow-left.png" alt="arrow" /></a>
@@ -34,20 +41,6 @@
             <div class="calendar__main">
                 <div class="calendar__passes">
                     <div class="calendar__pass"></div>
-                    @if (now.Month == Model.Month && now.Year == Model.Year)
-                    {
-                        @foreach (var employee in Model.Employees)
-                        {
-                            if (!employee.Absences.Any(a => a.AbsenceDate.Day == now.Day) && !employee.DayOffs.Any(d => d.DayOffDate.Day == now.Day))
-                            {
-                                <div class="calendar__pass" onclick="setAbsence('@employee.EmployeeId','@Model.TeamId','@employee.FirstName','@employee.LastName','@Model.TeamId')">Прогул</div>
-                            }
-                            else
-                            {
-                                <div class="calendar__pass" disabled="disabled" style="cursor:not-allowed">Прогул</div>
-                            }
-                        }
-                    }
                 </div>
                 <div class="calendar__mainwrapper">
                     <div class="calendar__emps">
@@ -99,36 +92,37 @@
                                                 if (dayOffRequest == null)
                                                 {
                                                     <text>
-                                                        <div class="calendar__block" onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
+
                                             }
                                             else if (Model.Employees[i].DayOffs.Any(d => d.DayOffDate.Day == date.Day))
                                             {
                                                 var dayOff = Model.Employees[i].DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
-                                                if (dayOff.DayOffState == "Approved")
+                                                if (dayOff.DayOffState == "Requested")
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff" onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')"></div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon">-</div>
                                                     </text>
-
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')">-</div>
+                                                        <div class="calendar__block calendar__block_dayoff"></div>
                                                     </text>
                                                 }
+
                                             }
                                             else
                                             {
-                                                <div class="calendar__block" onclick="proccessCalendarDay('@Model.Employees[i].EmployeeId','@date.ToString("dd.MM.yyyy")','@Model.Employees[i].FirstName','@Model.Employees[i].LastName','@Model.TeamId')">-</div>
+                                                <div class="calendar__block">-</div>
                                             }
 
                                         }
@@ -162,40 +156,40 @@
                                                 if (dayOffRequest == null)
                                                 {
                                                     <text>
-                                                        <div class="calendar__block" @if(Model.Employees[i].TeamId == null) { <text> onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                                        </text>
-                                                    }
-                                                    else
-                                                    {
-                                                        <text>
-                                                            <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" @if(Model.Employees[i].TeamId == null) { <text> onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                                            </text>
-                                                        }
-                                                    }
-                                                    else if (Model.Employees[i].DayOffs.Any(d => d.DayOffDate.Day == date.Day))
-                                                    {
-                                                        var dayOff = Model.Employees[i].DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
-                                                        if (dayOff.DayOffState == "Requested")
-                                                        {
-                                                            <text>
-                                                                <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" @if(Model.Employees[i].TeamId == null) { <text> onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')" </text> }>-</div>
-                                                                </text>
+                                                        <div class="calendar__block" onclick="requestDayOff('@Model.Employees[i].EmployeeId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    <text>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" onclick="editDayOffRequest('@dayOffRequest.DayOffId','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                    </text>
+                                                }
 
-                                                            }
-                                                            else
-                                                            {
-                                                                <text>
-                                                                    <div class="calendar__block calendar__block_dayoff calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" @if(Model.Employees[i].TeamId == null) { <text> onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')" </text> }></div>
-                                                                    </text>
+                                            }
+                                            else if (Model.Employees[i].DayOffs.Any(d => d.DayOffDate.Day == date.Day))
+                                            {
+                                                var dayOff = Model.Employees[i].DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
+                                                if (dayOff.DayOffState == "Requested")
+                                                {
+                                                    <text>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" onclick="editDayOffRequest('@dayOff.DayOffId','@Model.TeamId')">-</div>
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    <text>
+                                                        <div class="calendar__block calendar__block_dayoff"></div>
+                                                    </text>
+                                                }
 
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                <div class="calendar__block" @if (Model.Employees[i].TeamId == null) { <text> onclick="proccessCalendarDay('@Model.Employees[i].EmployeeId','@date.ToString("dd.MM.yyyy")','@Model.Employees[i].FirstName','@Model.Employees[i].LastName','@Model.TeamId')" </text> }>-</div>
-                                                            }
+                                            }
+                                            else
+                                            {
+                                                <div class="calendar__block" onclick="requestDayOff('@Model.Employees[i].EmployeeId','@date.ToString("dd.MM.yyyy")','@Model.TeamId')">-</div>
+                                            }
 
-                                                        }
+                                        }
                                     </div>
                                 }
                             }
@@ -214,9 +208,9 @@
                         @foreach (var employee in Model.Employees)
                         {
                             var completeWorkDays = employee.WorkDays.Where(w => !employee.Vacations.Any(v => (v.BeginDate.Day <= w.WorkDayDate.Day && v.EndDate.Day >= w.WorkDayDate.Day) || (v.BeginDate.Month != w.WorkDayDate.Month && v.BeginDate.Day >= w.WorkDayDate.Day && v.EndDate.Day >= w.WorkDayDate.Day))
-                                                                             && !employee.SickLeaves.Any(s => s.CreateDate.Day <= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day >= w.WorkDayDate.Day) || (s.CreateDate.Month != w.WorkDayDate.Month && s.CreateDate.Day >= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day >= w.WorkDayDate.Day)))
-                                                                             && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= w.WorkDayDate.Day && a.Assignment.EndDate.Day >= w.WorkDayDate.Day) || (a.Assignment.BeginDate.Month != w.WorkDayDate.Month && a.Assignment.BeginDate.Day >= w.WorkDayDate.Day && a.Assignment.EndDate.Day >= w.WorkDayDate.Day))
-                                                                             && !employee.Absences.Any(a => a.AbsenceDate.Day == w.WorkDayDate.Day));
+                                                                            && !employee.SickLeaves.Any(s => s.CreateDate.Day <= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day >= w.WorkDayDate.Day) || (s.CreateDate.Month != w.WorkDayDate.Month && s.CreateDate.Day >= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day >= w.WorkDayDate.Day)))
+                                                                            && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= w.WorkDayDate.Day && a.Assignment.EndDate.Day >= w.WorkDayDate.Day) || (a.Assignment.BeginDate.Month != w.WorkDayDate.Month && a.Assignment.BeginDate.Day >= w.WorkDayDate.Day && a.Assignment.EndDate.Day >= w.WorkDayDate.Day))
+                                                                            && !employee.Absences.Any(a => a.AbsenceDate.Day == w.WorkDayDate.Day));
                             <div class="calendar__workdays_wrapper">
                                 <div class="calendar__workdays_daysblocks">
                                     <div class="calendar__workdays_daysblock">@(completeWorkDays.Count())</div>
@@ -233,9 +227,9 @@
                             @foreach (var employee in Model.Employees)
                             {
                                 var completeDayOffs = employee.DayOffs.Where(d => d.DayOffState == "Approved" && !employee.Vacations.Any(v => (v.BeginDate.Day <= d.DayOffDate.Day && v.EndDate.Day >= d.DayOffDate.Day) || (v.BeginDate.Month != d.DayOffDate.Month && v.BeginDate.Day >= d.DayOffDate.Day && v.EndDate.Day >= d.DayOffDate.Day))
-                                                                             && !employee.SickLeaves.Any(s => s.CreateDate.Day <= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day >= d.DayOffDate.Day) || (s.CreateDate.Month != d.DayOffDate.Month && s.CreateDate.Day >= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day >= d.DayOffDate.Day)))
-                                                                             && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= d.DayOffDate.Day && a.Assignment.EndDate.Day >= d.DayOffDate.Day) || (a.Assignment.BeginDate.Month != d.DayOffDate.Month && a.Assignment.BeginDate.Day >= d.DayOffDate.Day && a.Assignment.EndDate.Day >= d.DayOffDate.Day))
-                                                                             && !employee.Absences.Any(a => a.AbsenceDate.Day == d.DayOffDate.Day));
+                                                                           && !employee.SickLeaves.Any(s => s.CreateDate.Day <= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day >= d.DayOffDate.Day) || (s.CreateDate.Month != d.DayOffDate.Month && s.CreateDate.Day >= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day >= d.DayOffDate.Day)))
+                                                                           && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= d.DayOffDate.Day && a.Assignment.EndDate.Day >= d.DayOffDate.Day) || (a.Assignment.BeginDate.Month != d.DayOffDate.Month && a.Assignment.BeginDate.Day >= d.DayOffDate.Day && a.Assignment.EndDate.Day >= d.DayOffDate.Day))
+                                                                           && !employee.Absences.Any(a => a.AbsenceDate.Day == d.DayOffDate.Day));
                                 <div class="calendar__chilldays_block">@(completeDayOffs.Count())</div>
                             }
                         </div>
@@ -293,6 +287,5 @@
     </div>
 </div>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script async src="~/js/teamleadcalendar.js"></script>
+    <script src="~/js/profilecalendar.js"></script>
 }

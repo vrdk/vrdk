@@ -18,16 +18,24 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;
         }
 
-        public async Task CreateAsync (Assignment entity)
+        public async Task CreateAsync(Assignment entity, bool writeChanges)
         {
             _context. Assignment.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }       
         }
 
-        public async Task DeleteAsync (Assignment entity)
+        public async Task DeleteAsync (Assignment entity, bool writeChanges)
         {
             _context.Assignment.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }           
         }
 
         public async Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null)
@@ -93,7 +101,7 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context. Assignment.FirstOrDefaultAsync(a => a. AssignmentId == id);
         }
 
-        public async Task AddToAssignmentAsync(string[] employeeIds, string assignmentId)
+        public async Task AddToAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges)
         {
             _context.AssignmentEmployee.AddRange(employeeIds.Select(id => new AssignmentEmployee
             {
@@ -102,14 +110,20 @@ namespace VRdkHRMsysDAL.Repositories
                 RowId = Guid.NewGuid().ToString()
             }));
 
-            await _context.SaveChangesAsync();
+            if (writeChanges)
+            {
+                await _context.SaveChangesAsync();
+            }            
         }
 
-        public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId)
+        public async Task RemoveFromAssignmentAsync(string[] employeeIds, string assignmentId, bool writeChanges)
         {
             _context.AssignmentEmployee.RemoveRange(_context.AssignmentEmployee.Where(ae => employeeIds.Contains(ae.EmployeeId) && ae.AssignmentId == assignmentId));
-            
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }           
         }
 
         public async Task UpdateAsync()

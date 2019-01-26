@@ -35,7 +35,7 @@ namespace VRdkHRMsysBLL.Services
           return _mapHelper.Map<EmployeeBalanceResiduals, BalanceResidualsDTO>(residual);
         }
 
-        public async Task UpdateRangeAsync(BalanceResidualsDTO[] newResiduals)
+        public async Task UpdateRangeAsync(BalanceResidualsDTO[] newResiduals, bool writeChanges = false)
         {
             var currentResiduals = await _residualsRepository.GetAsync(res => newResiduals.Any(r => res.ResidualId == r.ResidualId));            
             if (currentResiduals != null)
@@ -47,22 +47,29 @@ namespace VRdkHRMsysBLL.Services
                     currentResiduals[i].ResidualBalance = newResiduals[i].ResidualBalance;
                 }
 
-                await _residualsRepository.UpdateAsync();
+                if (writeChanges)
+                {
+                    await _residualsRepository.UpdateAsync();
+                }              
             }
         }
 
-        public async Task CreateRangeAsync(BalanceResidualsDTO[] residuals)
+        public async Task CreateRangeAsync(BalanceResidualsDTO[] residuals, bool writeChanges = false)
         {
             var residualsToAdd = _mapHelper.MapCollection<BalanceResidualsDTO, EmployeeBalanceResiduals>(residuals);
-            await _residualsRepository.CreateRangeAsync(residualsToAdd);
+            await _residualsRepository.CreateRangeAsync(residualsToAdd, writeChanges);
         }
-        public async Task UpdateAsync(BalanceResidualsDTO newResidual)
+        public async Task UpdateAsync(BalanceResidualsDTO newResidual, bool writeChanges = false)
         {
             var currentResidual = await _residualsRepository.GetByIdAsync(newResidual.ResidualId);
             if (currentResidual != null)
             {
                 currentResidual.ResidualBalance = newResidual.ResidualBalance;
-                await _residualsRepository.UpdateAsync();
+
+                if (writeChanges)
+                {
+                    await _residualsRepository.UpdateAsync();
+                }                
             }
         }
     }

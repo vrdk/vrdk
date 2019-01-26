@@ -87,16 +87,24 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.VacationRequest.Include(req=>req.Employee).ThenInclude(emp=>emp.Team).FirstOrDefaultAsync(req => req.VacationId.Equals(id));
         }
 
-        public async Task CreateAsync(VacationRequest entity)
+        public async Task CreateAsync(VacationRequest entity, bool writeChanges)
         {
             _context.VacationRequest.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(VacationRequest entity)
+        public async Task DeleteAsync(VacationRequest entity, bool writeChanges)
         {
             _context.VacationRequest.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }      
 
         public async Task UpdateAsync()

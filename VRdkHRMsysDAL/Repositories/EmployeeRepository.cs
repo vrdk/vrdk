@@ -18,13 +18,14 @@ namespace VRdkHRMsysDAL.Repositories
             _context = context;  
         }
 
-        public async Task<Employee[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year)
+        public async Task<Employee[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year, string personalId = null)
         {
-            return await _context.Employee.Where(e => e.TeamId == teamId || e.EmployeeId == teamleadId).OrderBy(e=>e.EmployeeId == teamleadId? 0 : 1).Select(e => new Employee
+            return await _context.Employee.Where(e => e.TeamId == teamId || e.EmployeeId == teamleadId).OrderBy(e=> personalId == null ? e.EmployeeId == teamleadId? 0 : 1 : e.EmployeeId == personalId ? 0 : 1).Select(e => new Employee
             {
                 EmployeeId = e.EmployeeId,
                 FirstName = e.FirstName,
                 LastName = e.LastName,
+                TeamId = e.TeamId,
                 Vacations = e.Vacations.Where(v=>((v.BeginDate.Month == month && v.BeginDate.Year == year) || (v.EndDate.Month == month && v.EndDate.Year == year))  && v.RequestStatus == "Approved").ToList(),
                 SickLeaves = e.SickLeaves.Where(s=>((s.CreateDate.Month == month && s.CreateDate.Year == year && s.CloseDate == null) || (s.CloseDate != null && s.CloseDate.Value.Month == month && s.CloseDate.Value.Year == year) || (s.CloseDate == null && s.CloseDate.Value.Month != month && s.CloseDate.Value.Year != year)) && (s.RequestStatus == "Approved" || s.RequestStatus == "Closed")).ToList(),
                 Assignments = e.Assignments.Where(a=>(a.Assignment.BeginDate.Month == month && a.Assignment.BeginDate.Year == year) || (a.Assignment.EndDate.Month == month && a.Assignment.EndDate.Year == year) ).Select(a=>new AssignmentEmployee
@@ -110,16 +111,24 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.Employee.Include(x => x.Team).FirstOrDefaultAsync(em => em.EmployeeId == id);
         }
 
-        public async Task CreateAsync(Employee entity)
+        public async Task CreateAsync(Employee entity, bool writeChanges)
         {
             _context.Employee.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if(writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(Employee entity)
+        public async Task DeleteAsync(Employee entity, bool writeChanges)
         {
             _context.Employee.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task UpdateAsync()
@@ -127,10 +136,14 @@ namespace VRdkHRMsysDAL.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Employee entity)
+        public async Task UpdateEmployeeAsync(Employee entity, bool writeChanges)
         {
             _context.Employee.Update(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
     }
 }

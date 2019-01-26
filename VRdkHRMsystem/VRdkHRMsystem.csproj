@@ -30,6 +30,9 @@
     <Content Update="Views\Admin\SickleaveProccessModal.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Profile\Calendar.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Request\CloseSickleaveModal.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

@@ -1,28 +1,29 @@
 ﻿@model VRdkHRMsystem.Models.Profile.Assignment.ProfileAssignmentListViewModel
 
+
 @if (Model != null && Model.Assignments.Count() != 0)
 {
     foreach (var item in Model.Assignments)
     {
-<div class="profile__tabs_body_block">
-    <div class="profile__tabs_assignmentstitle profile__tabs_title">
-        <p class="profile__tabs_assignmentdate">Даты</p>
-        <p class="profile__tabs_assignmentname">Название</p>
-        <p class="profile__tabs_assignmentduration">Длительность</p>
-    </div>
-    <div class="profile__tabs_assignmentcontent profile__tabs_content">
-        <p class="profile__tabs_assignmentdate">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
-        <p class="profile__tabs_assignmentname">@item.Name</p>
-        <p class="profile__tabs_assignmentduration">@item.Duration</p>
-    </div>
-</div>
+        <div class="profile__tabs_body_block">
+            <div class="profile__tabs_assignmentstitle profile__tabs_title">
+                <p class="profile__tabs_assignmentdate">Даты</p>
+                <p class="profile__tabs_assignmentname">Название</p>
+                <p class="profile__tabs_assignmentduration">Длит.</p>
+            </div>
+            <div class="profile__tabs_assignmentcontent profile__tabs_content">
+                <p class="profile__tabs_assignmentdate" style="font-size:14px;">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
+                <p class="profile__tabs_assignmentname">@item.Name</p>
+                <p class="profile__tabs_assignmentduration">@item.Duration</p>
+            </div>
+        </div>
     }
     @if (Model.Count > Model.PageSize)
     {
         <p style="margin-left:48%; margin-top:10px;">
             @if (Model.PageNumber == 0)
             {
-            <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
             }
             else
             {
@@ -41,7 +42,7 @@
 }
 else
 {
-        <div class="profile__tabs_assignmentcontent profile__tabs_content">
-            <p class="profile__tabs_assignmentdate">Нет записей</p>
-        </div>
+    <div class="profile__tabs_assignmentcontent profile__tabs_content">
+        <p class="profile__tabs_assignmentdate">Нет записей</p>
+    </div>
 }

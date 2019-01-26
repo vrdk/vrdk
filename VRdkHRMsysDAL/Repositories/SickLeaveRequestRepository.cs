@@ -92,16 +92,24 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.SickLeaveRequest.FirstOrDefaultAsync(req => req.SickLeaveId.Equals(id));
         }
 
-        public async Task CreateAsync(SickLeaveRequest entity)
+        public async Task CreateAsync(SickLeaveRequest entity, bool writeChanges)
         {
             _context.SickLeaveRequest.Add(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
-        public async Task DeleteAsync(SickLeaveRequest entity)
+        public async Task DeleteAsync(SickLeaveRequest entity, bool writeChanges)
         {
             _context.SickLeaveRequest.Remove(entity);
-            await _context.SaveChangesAsync();
+
+            if (writeChanges)
+            {
+                await UpdateAsync();
+            }
         }
 
         public async Task UpdateAsync()

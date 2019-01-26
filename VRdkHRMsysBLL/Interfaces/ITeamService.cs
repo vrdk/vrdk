@@ -8,9 +8,9 @@ namespace VRdkHRMsysBLL.Interfaces
 {
     public interface ITeamService
     {
-        Task CreateAsync(TeamDTO team);
+        Task CreateAsync(TeamDTO team, bool writeChanges = false);
         Task<TeamDTO> GetByIdAsync(string id);
-        Task UpdateAsync(TeamDTO newTeam);
+        Task UpdateAsync(TeamDTO newTeam, bool writeChanges = false);
         Task<TeamDTO[]> GetAsync(Expression<Func<Team, bool>> condition = null);
         Task<TeamListUnitDTO[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<Team, bool>> condition = null);
         Task<TeamDTO> GetForCalendaAsync(string id);

@@ -14,7 +14,7 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<VacationRequestViewDTO[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<VacationRequest, bool>> condition = null);
         Task<VacationRequestDTO[]> GetAsync(Expression<Func<VacationRequest, bool>> condition = null);
         Task<VacationRequestDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
-        Task UpdateAsync(VacationRequestDTO newRequest);
-        Task CreateAsync(VacationRequestDTO request);
+        Task UpdateAsync(VacationRequestDTO newRequest, bool writeChanges = false);
+        Task CreateAsync(VacationRequestDTO request, bool writeChanges = false);
     }
 }
