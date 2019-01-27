@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
 using VRdkHRMsysBLL.DTOs.Employee;
@@ -21,6 +22,7 @@ using VRdkHRMsystem.Models;
 using VRdkHRMsystem.Models.AdminViewModels.Assignment;
 using VRdkHRMsystem.Models.AdminViewModels.Employee;
 using VRdkHRMsystem.Models.AdminViewModels.Team;
+using VRdkHRMsystem.Models.SharedModels.Absence;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Calendar;
 using VRdkHRMsystem.Models.SharedModels.Employee;
@@ -40,6 +42,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IEmployeeService _employeeService;
         private readonly IVacationService _vacationService;
         private readonly IResidualsService _residualsService;
+        private readonly IAbsenceService _absenceService;
         private readonly ITransactionService _transactionService;
         private readonly IPostService _postService;
         private readonly ISickLeaveService _sickLeaveService;
@@ -58,6 +61,7 @@ namespace VRdkHRMsystem.Controllers
             IVacationService vacationService,
             IResidualsService residualsService,
             ISickLeaveService sickLeaveService,
+            IAbsenceService absenceService,
             ITransactionService transactionService,
             IFileManagmentService fileManagmentService,
             INotificationService notificationService,
@@ -72,6 +76,7 @@ namespace VRdkHRMsystem.Controllers
             _employeeService = employeeService;
             _residualsService = residualsService;
             _vacationService = vacationService;
+            _absenceService = absenceService;
             _transactionService = transactionService;
             _fileManagmentService = fileManagmentService;
             _notificationService = notificationService;
@@ -127,15 +132,16 @@ namespace VRdkHRMsystem.Controllers
                         {
                             Year = year,
                             Month = month,
-                            TeamId = team?.TeamId,
-                            Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                            TeamId = team.TeamId,
+                            TeamName = team.Name,
+                            MainMemberId = viewer.EmployeeId,
                             Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                             Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                            Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                            Culture = CultureInfo.CreateSpecificCulture("ru-RU"),
+                            Role = "Admin"
                         };
 
                         return View("~/Views/Profile/Calendar.cshtml", model);
-
                     }
 
                     employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
@@ -144,11 +150,13 @@ namespace VRdkHRMsystem.Controllers
                     {
                         Year = year,
                         Month = month,
-                        TeamId = team?.TeamId,
-                        Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                        TeamId = team.TeamId,
+                        TeamName = team.Name,
+                        MainMemberId = team.TeamleadId,
                         Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                         Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                        Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                        Culture = CultureInfo.CreateSpecificCulture("ru-RU"),
+                        Role = "Admin"
                     };
 
                     if (team.TeamleadId == viewer.EmployeeId)
@@ -231,6 +239,30 @@ namespace VRdkHRMsystem.Controllers
             var model = _mapHelper.Map<TeamDTO, TeamProfileViewModel>(team);
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences= new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+            }
+
+            var pagedAbsences= new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return View(pagedAbsences);
         }
 
         [HttpGet]

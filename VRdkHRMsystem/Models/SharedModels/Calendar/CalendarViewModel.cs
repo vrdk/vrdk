@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using VRdkHRMsystem.Models.SharedModels.Employee;
-using VRdkHRMsystem.Models.SharedModels.Team;
 
 namespace VRdkHRMsystem.Models.SharedModels.Calendar
 {
@@ -14,6 +13,8 @@ namespace VRdkHRMsystem.Models.SharedModels.Calendar
         public int Year { get; set; }
         public CultureInfo Culture { get; set; }
         public CalendarEmployeeViewModel[] Employees { get; set; }
-        public TeamViewModel Team { get; set; }
+        public string TeamName { get; set; }
+        public string MainMemberId { get; set; }
+        public string Role { get; set; }
     }
 }

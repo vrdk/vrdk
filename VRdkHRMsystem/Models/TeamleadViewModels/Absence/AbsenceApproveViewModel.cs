@@ -12,5 +12,6 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Absence
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime Date { get; set; }
+        public string Role { get; set; }
     }
 }

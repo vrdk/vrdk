@@ -4,4 +4,8 @@
         var url = "/admin/calendar?teamid=" + teamId;
         window.location.href = url;
     });
+    $(".calendar__block_moon").tooltipster({
+        position: 'right',
+        theme: 'tooltipster-light'
+    });
 });

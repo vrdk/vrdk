@@ -86,11 +86,13 @@ namespace VRdkHRMsystem.Controllers
                     {
                         Year = year,
                         Month = month,
-                        TeamId = team?.TeamId,
-                        Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                        TeamId = team.TeamId,
+                        TeamName = team.Name,
+                        MainMemberId = viewer.EmployeeId,
                         Teams = _listMapper.CreateTeamList(teams, teamId),
                         Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                        Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                        Culture = CultureInfo.CreateSpecificCulture("ru-RU"),
+                        Role = "Profile"
                     };
 
                 }

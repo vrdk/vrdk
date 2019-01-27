@@ -2,6 +2,7 @@
 
 <form asp-action="ProccessCalendarDay" method="post" class="box-modal vacmodal"  style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto" id="modalForm">
     <div class="modal__header" style="border-radius:5px;">
+        <input asp-for="Role" hidden />
         <input asp-for="EmployeeId" hidden />
         <input asp-for="TeamId" hidden />
         <input name="Date" value="@Model.Date" hidden />

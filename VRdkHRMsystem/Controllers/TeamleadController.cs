@@ -19,6 +19,7 @@ using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
+using VRdkHRMsystem.Models.SharedModels.Absence;
 using VRdkHRMsystem.Models.SharedModels.Assignment;
 using VRdkHRMsystem.Models.SharedModels.Calendar;
 using VRdkHRMsystem.Models.SharedModels.Employee;
@@ -135,11 +136,13 @@ namespace VRdkHRMsystem.Controllers
                         {
                             Year = year,
                             Month = month,
-                            TeamId = team?.TeamId,
-                            Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                            TeamId = team.TeamId,
+                            TeamName = team.Name,
+                            MainMemberId = viewer.EmployeeId,
                             Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                             Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                            Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                            Culture = CultureInfo.CreateSpecificCulture("ru-RU"),
+                            Role = "Teamlead"
                         };
 
                         return View("~/Views/Profile/Calendar.cshtml", model);
@@ -151,11 +154,13 @@ namespace VRdkHRMsystem.Controllers
                     {
                         Year = year,
                         Month = month,
-                        TeamId = team?.TeamId,
-                        Team = team != null ? _mapHelper.Map<TeamDTO, TeamViewModel>(team) : null,
+                        TeamId = team.TeamId,
+                        TeamName = team.Name,
+                        MainMemberId = team.TeamleadId,
                         Teams = _listMapper.CreateTeamList(teams, team.TeamId),
                         Employees = _mapHelper.MapCollection<EmployeeDTO, CalendarEmployeeViewModel>(employees),
-                        Culture = CultureInfo.CreateSpecificCulture("ru-RU")
+                        Culture = CultureInfo.CreateSpecificCulture("ru-RU"),
+                        Role = "Teamlead"
                     };
 
                     return View(model);
@@ -257,6 +262,30 @@ namespace VRdkHRMsystem.Controllers
             };
 
             return View(pagedVacations);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return View(pagedAbsences);
         }
 
         [HttpGet]
@@ -616,7 +645,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditDayOff(string id, string date, string teamId)
+        public async Task<IActionResult> EditDayOff(string id, string date, string teamId, string role)
         {
             var dayOff = await _dayOffService.GetByIdAsync(id);
             if (dayOff != null)
@@ -627,13 +656,14 @@ namespace VRdkHRMsystem.Controllers
                     Date = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture),
                     FirstName = dayOff.Employee.FirstName,
                     LastName = dayOff.Employee.LastName,
-                    TeamId = teamId
+                    TeamId = teamId,
+                    Role = role
                 };
 
                 return PartialView("EditDayOffModal", model);
             }
 
-            return RedirectToAction("Calendar", "Teamlead", new { teamId });
+            return RedirectToAction("Calendar", role, new { teamId });
         }
 
         [HttpPost]
@@ -686,16 +716,11 @@ namespace VRdkHRMsystem.Controllers
                 }
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditWorkDay(string id, string date, string teamId)
+        public async Task<IActionResult> EditWorkDay(string id, string date, string teamId, string role)
         {
             var workDay = await _workDayService.GetByIdAsync(id);
             if (workDay != null)
@@ -709,18 +734,14 @@ namespace VRdkHRMsystem.Controllers
                     TimeTo = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, workDay.TimeTo.Hours, workDay.TimeFrom.Minutes, 0),
                     FirstName = workDay.Employee.FirstName,
                     LastName = workDay.Employee.LastName,
-                    TeamId = teamId
+                    TeamId = teamId,
+                    Role = role
                 };
 
                 return PartialView("EditWorkDayModal", model);
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId });
+            return RedirectToAction("Calendar", role , new { teamId });
         }
 
         [HttpPost]
@@ -802,17 +823,12 @@ namespace VRdkHRMsystem.Controllers
                 }
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
 
         [HttpGet]
-        public IActionResult ProccessCalendarDay(string id, string date, string name, string surname, string teamId)
+        public IActionResult ProccessCalendarDay(string id, string date, string name, string surname, string teamId, string role)
         {
             var model = new CalendarDayViewModel
             {
@@ -820,7 +836,8 @@ namespace VRdkHRMsystem.Controllers
                 Date = DateTime.ParseExact(date, "dd.MM.yyyy", CultureInfo.InvariantCulture),
                 FirstName = name,
                 LastName = surname,
-                TeamId = teamId
+                TeamId = teamId,
+                Role = role
             };
 
             return PartialView("ProccessCalendarDayModal", model);
@@ -883,16 +900,11 @@ namespace VRdkHRMsystem.Controllers
                 }
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
         }
 
         [HttpGet]
-        public async Task<IActionResult> SetAbsence(string id, string teamId, string firstName, string lastName)
+        public async Task<IActionResult> SetAbsence(string id, string teamId, string firstName, string lastName, string role)
         {
             var abs = await _absenceService.GetTodayByEmployeeIdAsync(id);
             if (abs == null)
@@ -904,18 +916,14 @@ namespace VRdkHRMsystem.Controllers
                     EmployeeId = id,
                     Date = DateTime.UtcNow,
                     FirstName = firstName,
-                    LastName = lastName
+                    LastName = lastName,
+                    Role = role
                 };
 
                 return PartialView("AbsenceApproveModal", model);
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId });
+            return RedirectToAction("Calendar", role, new { teamId });
         }
 
         [HttpPost]
@@ -933,12 +941,7 @@ namespace VRdkHRMsystem.Controllers
                 await _absenceService.CreateAsync(absence, true);
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId });
-            }
-
-            return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId });
+            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId });
         }
     }
 }

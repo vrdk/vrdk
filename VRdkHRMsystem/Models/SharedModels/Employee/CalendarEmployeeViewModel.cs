@@ -52,6 +52,7 @@ namespace VRdkHRMsystem.Models.SharedModels.Employee
         public DateTime DayOffDate { get; set; }
         public string DayOffState { get; set; }
         public string DayOffImportance { get; set; }
+        public string Comment { get; set; }
     }
 
     public class CalendarWorkDayViewModel

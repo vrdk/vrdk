@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.Absence;
@@ -19,6 +20,25 @@ namespace VRdkHRMsysBLL.Services
         {
             _absenceRepository = absenceRepository;
             _mapHelper = mapHelper;
+        }
+
+        public async Task<int> GetAbsencesCountAsync(string searchKey = null, Expression<Func<Absence, bool>> condition = null)
+        {
+            return await _absenceRepository.GetAbsencesCountAsync(searchKey, condition);
+        }
+
+        public async Task<AbsenceListUnitDTO[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<Absence, bool>> condition = null)
+        {
+            var assigns = await _absenceRepository.GetPageAsync(pageNumber, pageSize, condition, searchKey);
+            var assignments = assigns != null ? assigns.Select(a => new AbsenceListUnitDTO
+            {
+                EmployeeId = a.EmployeeId,
+                FullEmployeeName = $"{a.Employee.FirstName} {a.Employee.LastName}",
+                TeamName = a.Employee.Team?.Name,
+                Date = a.AbsenceDate
+            }).ToArray() : new AbsenceListUnitDTO[] { };
+
+            return assignments;
         }
 
         public async Task<AbsenceDTO> GetTodayByEmployeeIdAsync(string id)

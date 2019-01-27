@@ -5,6 +5,10 @@
         var url = "/" + role + "/calendar?teamid=" + teamId;
         window.location.href = url;
     });
+    $(".calendar__block_moon").tooltipster({
+        position: 'right',
+        theme: 'tooltipster-light'
+    });
 });
 
 function requestDayOff(id, dt, tId) {

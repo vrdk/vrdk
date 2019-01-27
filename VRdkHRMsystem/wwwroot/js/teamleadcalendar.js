@@ -5,12 +5,23 @@
         var url = "/"+role+"/calendar?teamid=" + teamId;
         window.location.href = url;
     });
+    $(".calendar__block_moon").tooltipster({
+        position: 'right',
+        theme: 'tooltipster-light'
+    });
 });
 
-function setAbsence(id, tId, fn, ln) {
-    var url = "/teamlead/setAbsence?id=" + id + "&teamId=" + tId + "&firstName=" + fn + "&lastName=" + ln;
+function setAbsence(id, tId, fn, ln, rl) {
+    var url = "/teamlead/setAbsence";
     $.ajax({
         url: url,
+        data: {
+            id: id,
+            teamId: tId,
+            firstName: fn,
+            lastName: ln,
+            role: rl
+        },
         method: 'get',
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -20,7 +31,7 @@ function setAbsence(id, tId, fn, ln) {
     });
 }
 
-function proccessCalendarDay(id, dt, fn, ln, tId) {
+function proccessCalendarDay(id, dt, fn, ln, tId, rl) {
     var url = "/teamlead/proccesscalendarday";
     $.ajax({
         url: url,
@@ -30,7 +41,8 @@ function proccessCalendarDay(id, dt, fn, ln, tId) {
             date: dt,
             name: fn,
             surname: ln,
-            teamId: tId
+            teamId: tId,
+            role : rl
         },
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -52,7 +64,7 @@ function proccessCalendarDay(id, dt, fn, ln, tId) {
     });
 }
 
-function editWorkDay(id, dt, tId) {
+function editWorkDay(id, dt, tId, rl) {
     var url = "/teamlead/editworkday";
     $.ajax({
         url: url,
@@ -60,7 +72,8 @@ function editWorkDay(id, dt, tId) {
         data: {
             id: id,
             date: dt,
-            teamId: tId
+            teamId: tId,
+            role: rl
         },
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -82,7 +95,7 @@ function editWorkDay(id, dt, tId) {
     });
 }
 
-function editDayOff(id, dt, tId) {
+function editDayOff(id, dt, tId, rl) {
     var url = "/teamlead/editdayoff";
     $.ajax({
         url: url,
@@ -90,7 +103,8 @@ function editDayOff(id, dt, tId) {
         data: {
             id: id,
             date: dt,
-            teamId: tId
+            teamId: tId,
+            role: rl
         },
         success: function (modal_html) {
             $('#modal_place').empty();
