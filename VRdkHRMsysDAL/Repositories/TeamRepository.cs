@@ -85,7 +85,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task DeleteAsync(Team entity, bool writeChanges)
         {
-            _context.Team.Remove(entity);
+            _context.Remove(_context.Team.FirstOrDefault(t=>t.TeamId==entity.TeamId));
 
             if (writeChanges)
             {

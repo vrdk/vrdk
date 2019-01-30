@@ -94,9 +94,16 @@ namespace VRdkHRMsystem.Controllers
             var dayOff = await _dayOffService.GetByIdAsync(model.DayOffId);
             if (dayOff != null)
             {
-                dayOff.DayOffImportance = model.DayOffImportance;
-                dayOff.Comment = model.Comment;
-                await _dayOffService.UpdateAsync(dayOff, true);
+                if (model.DayOffImportance == "delete")
+                {
+                   await _dayOffService.DeleteAsync(dayOff.DayOffId, true);
+                }
+                else
+                {
+                    dayOff.DayOffImportance = model.DayOffImportance;
+                    dayOff.Comment = model.Comment;
+                    await _dayOffService.UpdateAsync(dayOff, true);
+                }              
             }
 
             if (User.IsInRole("Administrator"))

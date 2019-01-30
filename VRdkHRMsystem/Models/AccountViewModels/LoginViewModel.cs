@@ -8,11 +8,11 @@ namespace VRdkHRMsystem.Models.AccountViewModels
 {
     public class LoginViewModel
     {
-        [Required]
+        [Required(ErrorMessage = " заполните")]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = " заполните")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 

@@ -30,12 +30,12 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task DeleteAsync (Assignment entity, bool writeChanges)
         {
-            _context.Assignment.Remove(entity);
+            _context.Remove(_context.Assignment.FirstOrDefault(t => t.AssignmentId == entity.AssignmentId));
 
             if (writeChanges)
             {
                 await UpdateAsync();
-            }           
+            }
         }
 
         public async Task<int> GetAssignmentsCountAsync(string searchKey = null, Expression<Func<Assignment, bool>> condition = null)
@@ -112,7 +112,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await _context.SaveChangesAsync();
+                await UpdateAsync();
             }            
         }
 

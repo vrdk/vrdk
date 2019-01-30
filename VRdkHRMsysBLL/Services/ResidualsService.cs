@@ -40,8 +40,8 @@ namespace VRdkHRMsysBLL.Services
             var currentResiduals = await _residualsRepository.GetAsync(res => newResiduals.Any(r => res.ResidualId == r.ResidualId));            
             if (currentResiduals != null)
             {
-                newResiduals.OrderBy(r => r.ResidualId);
-                currentResiduals.OrderBy(r => r.ResidualId);
+                newResiduals = newResiduals.OrderBy(r => r.ResidualId).ToArray();
+                currentResiduals = currentResiduals.OrderBy(r => r.ResidualId).ToArray();
                 for (int i = 0; i < currentResiduals.Length; i++)
                 {
                     currentResiduals[i].ResidualBalance = newResiduals[i].ResidualBalance;

@@ -167,7 +167,11 @@ namespace VRdkHRMsystem.Controllers
                 }
                 else
                 {
-                    return View(new CalendarViewModel());
+                    return View(new CalendarViewModel()
+                    {
+                        Year = year,
+                        Month = month
+                    });
                 }
             }
 
@@ -936,8 +940,11 @@ namespace VRdkHRMsystem.Controllers
                 {
                     AbsenceId = Guid.NewGuid().ToString(),
                     EmployeeId = model.EmployeeId,
-                    AbsenceDate = model.Date
+                    AbsenceDate = model.Date    
                 };
+                var residual = await  _residualsService.GetByEmployeeIdAsync(model.EmployeeId, ResidualTypeEnum.Absence.ToString());
+                residual.ResidualBalance += 1;
+                await _residualsService.UpdateAsync(residual);
                 await _absenceService.CreateAsync(absence, true);
             }
 

@@ -17,6 +17,6 @@ namespace VRdkHRMsysDAL.Interfaces
         Task<Employee[]> GetPageAsync(int pageSize, int pageNumber, string searchKey, Expression<Func<Employee, bool>> condition = null);
         Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition = null, string searchKey = null);
         Task<Employee[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year, string personalId = null);
-        Task UpdateEmployeeAsync(Employee entity, bool writeChanges = false);
+        Task UpdateEmployeeAsync(Employee entity, bool writeChange);
     }
 }

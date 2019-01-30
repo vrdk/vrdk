@@ -189,7 +189,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _employeeRepository.UpdateEmployeeAsync(currentEmployee);
+                    await _employeeRepository.UpdateEmployeeAsync(currentEmployee, writeChanges);
                 }              
             }         
         }

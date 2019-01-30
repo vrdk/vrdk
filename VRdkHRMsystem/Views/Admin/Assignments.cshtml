@@ -36,8 +36,11 @@
                                 <p class="assignmentlist__name">@item.Name</p>
                                 <p class="assignmentlist__countmembers">@item.EmployeesCount</p>
                                 <p class="assignmentlist__dates">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
-                                <p class="assignmentlist__duration">@item.Duration</p>
-                                <p class="assignmentlist__info"><img src="~/images/penciltable.png" alt="pencil" onclick="editAssignment('@item.AssignmentId')" /></p>
+                                <p class="assignmentlist__duration">@item.Duration</p>                            
+                                <p class="assignmentlist__info">
+                                    <img src="~/images/cross2.png" alt="exit" style="cursor:pointer" onclick="deleteAssignment('@item.AssignmentId')"/>
+                                    <img src="~/images/penciltable.png" alt="pencil" onclick="editAssignment('@item.AssignmentId')" style="cursor:pointer" />
+                                </p>
                             </div>
                         </div>
                     }

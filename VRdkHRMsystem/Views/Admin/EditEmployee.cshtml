@@ -147,13 +147,14 @@
         </div>
     </div>
 </form>
+
 <div class="modal fade" id="user_photo_modal">
-    <div class="modal-dialog modal-content" style="width:700px;">
+    <div class="modal-dialog modal-content" style="width:700px;margin-left:auto;margin-right:auto;margin-top:5%">
         <div id="questionmodal1" style="width:auto">
             <div class="modal__header" style="border-radius: 6px;">
                 <p class="modal__title">Изменить фото</p>
             </div>
-            <div class=" questionmodal__question" style="max-height:300px;overflow:hidden;">
+            <div class="questionmodal__question" style="max-height:300px;overflow:hidden;">
                 <img style="max-width:100%;height:auto" id="image" src="" alt="">
             </div>
             <div class="vacmodal__buttons">
@@ -172,6 +173,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/cropper.min.js"></script>
-    <script src="~/js/photoCropping.js"></script>
+    <script src="~/js/profilePhotoCropper.js"></script>
     <link rel="stylesheet" href="~/css/cropper.min.css" />
 }

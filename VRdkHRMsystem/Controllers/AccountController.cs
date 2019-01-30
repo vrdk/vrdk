@@ -58,9 +58,8 @@ namespace VRdkHRMsystem.Controllers
             if (ModelState.IsValid)
                 {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, true);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
@@ -82,12 +81,12 @@ namespace VRdkHRMsystem.Controllers
                 }
                 else
                 {
+                    ViewData["Denied"] = "access_denied";
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 

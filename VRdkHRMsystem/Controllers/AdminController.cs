@@ -92,7 +92,7 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Calendar(int year, int month, string teamId)
         {
-            
+
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
@@ -106,26 +106,26 @@ namespace VRdkHRMsystem.Controllers
                     year = DateTime.UtcNow.Year;
                     month = DateTime.UtcNow.Month;
                 }
-                
-                if(teamId == null)
+
+                if (teamId == null)
                 {
-                    if(viewer.TeamId != null)
+                    if (viewer.TeamId != null)
                     {
                         team = teams.FirstOrDefault(t => t.TeamId == viewer.TeamId);
                     }
                     else
                     {
                         team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
-                    }                 
+                    }
                 }
                 else
                 {
                     team = teams.FirstOrDefault(t => t.TeamId == teamId);
                 }
 
-                if(team != null)
+                if (team != null)
                 {
-                    if(team.TeamId == viewer.TeamId)
+                    if (team.TeamId == viewer.TeamId)
                     {
                         employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
                         model = new CalendarViewModel
@@ -162,10 +162,18 @@ namespace VRdkHRMsystem.Controllers
                     if (team.TeamleadId == viewer.EmployeeId)
                     {
                         return View("~/Views/Teamlead/Calendar.cshtml", model);
-                    } 
-                }
+                    }
 
-                return View(model);
+                    return View(model);
+                }
+                else
+                {
+                    return View(new CalendarViewModel()
+                    {
+                        Year = year,
+                        Month = month
+                    });
+                }
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -246,7 +254,7 @@ namespace VRdkHRMsystem.Controllers
         {
             ViewData["SearchKey"] = searchKey;
             int count = 0;
-            var absences= new AbsenceListUnitDTO[] { };
+            var absences = new AbsenceListUnitDTO[] { };
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
@@ -254,7 +262,7 @@ namespace VRdkHRMsystem.Controllers
                 count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
             }
 
-            var pagedAbsences= new AbsenceListViewModel()
+            var pagedAbsences = new AbsenceListViewModel()
             {
                 PageNumber = pageNumber,
                 Count = count,
@@ -474,14 +482,7 @@ namespace VRdkHRMsystem.Controllers
                     await _emailSender.SendPasswordResetLink(model.WorkEmail, "", "Set password", "",
                       $"Please set your password by clicking here: <a href='{callbackUrl}'>link</a>");
 
-                    if (model.Photo != null)
-                    {
-                        await _fileManagmentService.UploadUserPhoto(model.Photo, "photos", employee.EmployeeId);
-                    }
-                    else
-                    {
-                        await _fileManagmentService.UploadDefaultUserPhoto(employee.EmployeeId);
-                    }
+                    await _fileManagmentService.UploadDefaultUserPhoto(employee.EmployeeId);
                 }
 
                 return RedirectToAction("Profile", "Profile");
@@ -583,7 +584,7 @@ namespace VRdkHRMsystem.Controllers
                 model.VacationType = vacationRequest.VacationType;
                 model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
                 model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
-                model.RequestStatus = vacationRequest.RequestStatus;               
+                model.RequestStatus = vacationRequest.RequestStatus;
                 if (vacationRequest.Employee.Team != null)
                 {
                     var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
@@ -732,6 +733,73 @@ namespace VRdkHRMsystem.Controllers
             }
 
             return RedirectToAction("Vacations", "Admin");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteAssignment(string id)
+        {
+            var assignment = await _assignmentService.GetByIdWithEmployeesAsync(id);
+            if (assignment != null)
+            {
+                var model = _mapHelper.Map<AssignmentDTO, AssignmentViewModel>(assignment);
+
+                return PartialView("AssignmentDeleteApproveModal", model);
+            }
+
+            return RedirectToAction("Assignments", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAssignment(AssignmentViewModel model)
+        {
+            var assignment = await _assignmentService.GetByIdWithEmployeesAsync(model.AssignmentId);
+            if (assignment != null)
+            {
+                var employeeIds = assignment.AssignmentEmployee.Select(ae => ae.EmployeeId).ToArray();
+                var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
+                                                                                       FirstOrDefault(r => employeeIds.Any(m => m == r.EmployeeId)
+                                                                                       && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r => r != null).ToArray();
+                foreach (var res in residuals)
+                {
+                    res.ResidualBalance -= assignment.Duration;
+                }
+
+                await _residualsService.UpdateRangeAsync(residuals);
+
+                await _assignmentService.RemoveFromAssignmentAsync(employeeIds, assignment.AssignmentId);
+
+                await _assignmentService.DeleteAsync(assignment, true);
+            }
+
+            return RedirectToAction("Assignments", "Admin");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteTeam(string id)
+        {
+            var team = await _teamService.GetByIdAsync(id);
+            if (team != null)
+            {
+                var model = _mapHelper.Map<TeamDTO, TeamViewModel>(team);
+
+                return PartialView("TeamDeleteApproveModal", model);
+            }
+
+            return RedirectToAction("Teams", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteTeam(TeamViewModel model)
+        {
+            var team = await _teamService.GetByIdAsync(model.TeamId);
+            if (team != null)
+            {
+                await _employeeService.RemoveFromTeamAsync(team.Employees.Select(emp => emp.EmployeeId).ToArray());
+
+                await _teamService.DeleteAsync(team, true);
+            }
+
+            return RedirectToAction("Teams", "Admin");
         }
 
         [HttpGet]
@@ -994,7 +1062,7 @@ namespace VRdkHRMsystem.Controllers
 
                 await _notificationService.CreateRangeAsync(notificationList.ToArray(), true);
             }
-            
+
             return RedirectToAction("Assignments", "Admin");
         }
     }

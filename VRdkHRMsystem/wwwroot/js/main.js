@@ -10,7 +10,24 @@ $(document).ready(function () {
     $("#File").on('change', function () {
         $("#fileUploadText").html("Фото загружено");
     });
+    ligthMenuItem();
 });
+function ligthMenuItem() {
+    var menu = $('.navigation__link');
+    var url = location.href;
+    url = url.split('/');
+    if (url.length > 4) {
+        for (var i = 0; i <= menu.length - 1; i++) {
+            if (url[url.length - 1].toLowerCase().indexOf(menu[i].id) >= 0) {
+                menu[i].classList.add('navigation__link_active');
+            }
+            else {
+                menu[i].classList.remove('navigation__link_active');
+            }
+        }
+    }     
+}
+
 function GetDiff(fromId, toId) {
     var d1 = document.getElementById(toId).value;
     var endDate = new Date(d1.split('.')[2], d1.split('.')[1] - 1, d1.split('.')[0]);
@@ -80,6 +97,38 @@ function proccessSickleave(method, id) {
     $.ajax({
         type: "Get",
         url: url,
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#request_modal').modal();
+            $('#modal_place').html(modal_html);
+        }
+    });
+}
+
+function deleteTeam(id) {
+    var url = "/admin/deleteteam";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            id: id
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#request_modal').modal();
+            $('#modal_place').html(modal_html);
+        }
+    });
+}
+
+function deleteAssignment(id) {
+    var url = "/admin/deleteassignment";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            id: id
+        },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();

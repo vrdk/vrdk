@@ -95,9 +95,17 @@ namespace VRdkHRMsystem.Controllers
                         Role = "Profile"
                     };
 
-                }
+                    return View(model);
 
-                return View(model);
+                }
+                else
+                {
+                    return View(new CalendarViewModel()
+                    {
+                        Year = year,
+                        Month = month
+                    });
+                }              
             }
 
             return RedirectToAction("Profile", "Profile");

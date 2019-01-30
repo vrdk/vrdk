@@ -17,21 +17,27 @@
             <p>Важность</p>
             <div class="dayoffmodal__radiosection">
                 <div class="dayoffmodal__labelwrapper">
-                    <input type="radio" name="DayOffImportance" value="green" id="dayoffmodal__radio1" @if (Model.DayOffImportance == "green") { <text> checked </text> }/>
+                    <input type="radio" name="DayOffImportance" value="green" id="dayoffmodal__radio1" @if (Model.DayOffImportance == "green") { <text> checked </text> } />
                     <label for="dayoffmodal__radio1">
                         <p>Желательно</p>
                     </label>
                 </div>
                 <div class="dayoffmodal__labelwrapper">
-                    <input type="radio" name="DayOffImportance" value="yellow" id="dayoffmodal__radio2" @if (Model.DayOffImportance == "yellow") { <text> checked </text> }/>
+                    <input type="radio" name="DayOffImportance" value="yellow" id="dayoffmodal__radio2" @if (Model.DayOffImportance == "yellow") { <text> checked </text> } />
                     <label for="dayoffmodal__radio2">
                         <p>Важно</p>
                     </label>
                 </div>
                 <div class="dayoffmodal__labelwrapper">
-                    <input type="radio" name="DayOffImportance" value="red" id="dayoffmodal__radio3" @if (Model.DayOffImportance == "red") { <text> checked </text> }/>
+                    <input type="radio" name="DayOffImportance" value="red" id="dayoffmodal__radio3" @if (Model.DayOffImportance == "red") { <text> checked </text> } />
                     <label for="dayoffmodal__radio3">
                         <p>Очень важно</p>
+                    </label>
+                </div>
+                <div class="dayoffmodal__labelwrapper">
+                    <input type="radio" name="DayOffImportance" value="delete" id="dayoffmodal__radio4" />
+                    <label for="dayoffmodal__radio4">
+                        <p>Удалить</p>
                     </label>
                 </div>
             </div>

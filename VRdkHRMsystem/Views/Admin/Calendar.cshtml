@@ -21,7 +21,7 @@
                 <p>@startDate.ToString("MMMM", Model.Culture) @Model.Year</p>
                 <a href="@Url.Action("Calendar",Model.Role, new { year = nextCalendarYear, month = nextCalendarMonth, teamId = Model.TeamId })"><img src="~/images/arrow-right.png" alt="arrow" /></a>
             </div>
-            <div class="calendar__main">
+            <div class="calendar__main">    
                 <div class="calendar__passes">
                     <div class="calendar__pass"></div>
                 </div>
@@ -70,9 +70,9 @@
                                     else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
                                     {
                                         var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
-                                            <text>
-                                                <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                            </text>
+                                        <text>
+                                            <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                        </text>
                                     }
                                     else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
                                     {
@@ -82,6 +82,10 @@
                                             <text>
                                                 <div class="calendar__block calendar__block_dayoff"></div>
                                             </text>
+                                        }
+                                        else
+                                        {
+                                            <div class="calendar__block">-</div>
                                         }
                                     }
                                     else

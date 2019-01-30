@@ -15,5 +15,6 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<TeamListUnitDTO[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<Team, bool>> condition = null);
         Task<TeamDTO> GetForCalendaAsync(string id);
         Task<int> GetTeamsCountAsync(string searchKey = null, Expression<Func<Team, bool>> condition = null);
+        Task DeleteAsync(TeamDTO team, bool writeChanges = false);
     }
 }

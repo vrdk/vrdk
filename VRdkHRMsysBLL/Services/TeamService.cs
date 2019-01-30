@@ -79,5 +79,11 @@ namespace VRdkHRMsysBLL.Services
             var teamToAdd = _mapHelper.Map<TeamDTO, Team>(team);
             await _teamRepository.CreateAsync(teamToAdd, writeChanges);
         }
+
+        public async Task DeleteAsync(TeamDTO team, bool writeChanges = false)
+        {
+            var teamToRemove = _mapHelper.Map<TeamDTO, Team>(team);
+            await _teamRepository.DeleteAsync(teamToRemove, writeChanges);
+        }
     }
 }

@@ -1,12 +1,12 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.Calendar.CalendarViewModel
 
 @{
-    var startDate = new DateTime(Model.Year, Model.Month, 1);
-    var now = DateTime.UtcNow;
-    var nextCalendarYear = Model.Month + 1 <= 12 ? Model.Year : Model.Year + 1;
-    var nextCalendarMonth = Model.Month + 1 <= 12 ? Model.Month + 1 : 1;
-    var prevCalendarYear = Model.Month - 1 != 0 ? Model.Year : Model.Year - 1;
-    var prevCalendarMonth = Model.Month - 1 != 0 ? Model.Month - 1 : 12;
+        var startDate = new DateTime(Model.Year, Model.Month, 1);
+        var now = DateTime.UtcNow;
+        var nextCalendarYear = Model.Month + 1 <= 12 ? Model.Year : Model.Year + 1;
+        var nextCalendarMonth = Model.Month + 1 <= 12 ? Model.Month + 1 : 1;
+        var prevCalendarYear = Model.Month - 1 != 0 ? Model.Year : Model.Year - 1;
+        var prevCalendarMonth = Model.Month - 1 != 0 ? Model.Month - 1 : 12;
 }
 <div class="content">
     <input id="redirectUrl" value="@Model.Role" hidden />

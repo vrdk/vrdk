@@ -1,0 +1,21 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Assignment.AssignmentViewModel
+
+<form asp-action="DeleteAssignment" method="post" class="box-modal vacmodal" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
+    <input asp-for="AssignmentId" hidden />
+    <div class="modal__header" style="border-radius:5px;">
+        <p class="modal__title">Удаление командировки</p>
+    </div>
+    <div class="questionmodal__question">
+        <p>Вы уверены, что хотите удалить командировку "@Model.Name"?</p>
+    </div>
+    <div class="vacmodal__buttons">
+        <button class="button" data-dismiss="modal" type="button">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Отменить</p>
+        </button>
+        <button class="button" type="submit">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Подтвердить</p>
+        </button>
+    </div>
+</form>
