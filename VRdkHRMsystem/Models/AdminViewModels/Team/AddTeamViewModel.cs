@@ -9,11 +9,12 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Team
     {
         public string OrganisationId { get; set; }
         public string TeamId { get; set; }
-        public string Name { get; set; }
-        [Required(ErrorMessage = " необходино заполнить")]
+        [Required(ErrorMessage = " заполните")]
         [MaxLength(50, ErrorMessage = " до 50 символов")]
+        public string Name { get; set; }
         public string TeamleadId { get; set; }
         public IEnumerable<SelectListItem> Teamleads { get; set; }
+        [Required(ErrorMessage = " выберите сотрудников")]
         public string[] TeamMembers { get; set; }
         public IEnumerable<SelectListItem> Employees { get; set; }
     }

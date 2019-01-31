@@ -5,7 +5,7 @@
     var urlForCheck = "/Teamlead/CheckSickleaveRequest?id=";
 }
 
-<form asp-action="Sickleaves" method="get" class="content">
+<form asp-action="Sickleaves" method="get" class="content" id="submit_form">
     <section class="listsection">
         <div class="table">
             <div class="table__header">
@@ -64,33 +64,32 @@
 
             </div>
         </div>
-        <div class="center" style="margin-left:45%">
-            @if (Model.Count > Model.PageSize)
-            {
-                <p style="margin-bottom:12px;">
-                    @if (Model.PageNumber == 0)
-                    {
-                        <a href="#!"><img src="~/images/arrow-left.png" alt="arrow" class="disabled" /></a>
-                    }
-                    else
-                    {
-                        <a asp-action="Sickleaves" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
-                    }
-
-                    @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
-                    {
-                        <a href="#!" class="disabled" style="cursor:default"><img src="~/images/arrow-right.png" alt="arrow" /></a>
-                    }
-                    else
-                    {
-                        <a asp-action="Sickleaves" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
-                    }
-                </p>
-            }
-        </div>
+        @if (Model.Count > Model.PageSize)
+        {
+            <div class="table__pageblock">
+                @if (Model.PageNumber == 0)
+                {
+                    <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" /></a>
+                }
+                else
+                {
+                    <a asp-action="Sickleaves" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                }
+                <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count / @Model.PageSize + 1)</p>
+                @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+                {
+                    <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" /></a>
+                }
+                else
+                {
+                    <a asp-action="Sickleaves" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                }
+            </div>
+        }
     </section>
 </form>
 <div class="modal fade" id="request_modal" role="dialog" style="">
     <div class="modal-dialog" id="modal_place">
     </div>
 </div>
+<script src="~/js/searchSubmit.js"></script>

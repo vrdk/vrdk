@@ -39,18 +39,21 @@ namespace VRdkHRMsystem.Services
             var roles = new Role[] {
                 new Role
                 {
-                    Name=RoleEnum.Administrator.ToString()
+                    Name="Администратор",
+                    Value = RoleEnum.Administrator.ToString()
                 },
                 new Role
                 {
-                    Name=RoleEnum.Teamlead.ToString()
+                    Name="Руководитель",
+                    Value = RoleEnum.Teamlead.ToString()
                 },
                 new Role
                 {
-                    Name=RoleEnum.Employee.ToString()
+                    Name="Работник",
+                    Value = RoleEnum.Employee.ToString()
                 }
             };
-            return roles.Select(role => new SelectListItem() { Text = role.Name, Value = role.Name, Selected = role.Name == editUserRole }).ToArray();
+            return roles.Select(role => new SelectListItem() { Text = role.Name, Value = role.Value, Selected = role.Value == editUserRole }).ToArray();
         }
 
         public SelectListItem[] CreateEmployeesList(EmployeeDTO[] employees)

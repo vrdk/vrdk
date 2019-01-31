@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.AdminViewModels.Assignment.EditAssignmentViewModel
 
-<form asp-action="EditAssignment" asp-controller="Admin" method="post" class="box-modal vacmodal"  style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto" id="modalForm">
+<form asp-action="EditAssignment" asp-controller="Admin" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-radius:5px;">
         <p class="modal__title">Добавить командировку</p>
         <input asp-for="AssignmentId" hidden />
@@ -8,7 +8,7 @@
     </div>
     <div class="tripmodal__name">
         <p>Название <span asp-validation-for="Name" style="color: #ad545f;"></span></p>
-        <input asp-for="Name" class="input" type="text" autocomplete="off" style="padding-left:10px;"/>
+        <input asp-for="Name" class="input" type="text" autocomplete="off" style="padding-left:10px;" />
     </div>
     <div class="tripmodal__members" style="padding:20px;">
         <p>Учасники <span asp-validation-for="AssignmentMembers" style="color: #ad545f;"></span></p>
@@ -37,10 +37,5 @@
         </button>
     </div>
 </form>
-<script>
-    $.validator.setDefaults({
-        ignore: []
-    });
-    $.validator.unobtrusive.parse("#modalForm");   
-</script>
+<script src="~/js/submit.js"></script>
 

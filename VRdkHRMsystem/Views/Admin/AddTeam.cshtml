@@ -4,21 +4,21 @@
     ViewData["Title"] = "AddTeam";
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
-<form asp-action="AddTeam" method="post" class="content">
+<form asp-action="AddTeam" method="post" class="content" id="submit_form">
     <input asp-for="OrganisationId" hidden />
     <div class="teamprofile">
         <div class="teamprofile__leader">
             <div class="teamprofile__info">
-                <p>Название команды</p>
+                <p>Название команды <span asp-validation-for="Name" style="color: #ad545f;"></span></p>
                 <input asp-for="Name" class="input" type="text" />
             </div>
             <div class="teamprofile__teamlead" style="padding:20px;">
-                <p>Team Lead:</p>
+                <p style="margin-left:0;">Руководитель:</p>
                 <select class="emplits__empselect teamprofile__select" asp-for="TeamleadId" asp-items="Model.Teamleads" style="width:100%;" hidden></select>
             </div>
         </div>
         <div class="teamprofile__members">
-            <p>Учасники</p>
+            <p>Учасники <span asp-validation-for="TeamMembers" style="color: #ad545f;"></span></p>
             <div class="teamprofile__members_wrapper" style="padding:20px;">
                 <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
             </div>
@@ -38,5 +38,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+         $.validator.setDefaults({
+        ignore: []
+    });
+    $.validator.unobtrusive.parse("#submit_form");
+    </script>
+    <script src="~/js/submit.js"></script>
     <script src="~/js/team.js"></script>
 }

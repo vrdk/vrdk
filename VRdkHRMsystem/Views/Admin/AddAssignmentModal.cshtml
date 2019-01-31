@@ -1,9 +1,9 @@
 ﻿@model VRdkHRMsystem.Models.AdminViewModels.Assignment.AddAssignmentViewModel
 
-<form asp-action="AddAssignment" asp-controller="Admin" method="post" class="box-modal vacmodal" style="border-radius:5px; margin-left:auto;margin-right:auto;margin-top:auto" id="modalForm">
+<form asp-action="AddAssignment" asp-controller="Admin" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:5px; margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-radius:5px;">
         <p class="modal__title">Добавить командировку</p>
-        <input asp-for="OrganisationId" hidden/>
+        <input asp-for="OrganisationId" hidden />
     </div>
     <div class="tripmodal__name">
         <p>Название <span asp-validation-for="Name" style="color: #ad545f;"></span></p>
@@ -24,22 +24,19 @@
         </div>
 
     </div>
-        <input asp-for="Duration" readonly id="Duration" class="input" hidden/>
-        <div class="vacmodal__buttons">
-            <button class="button" type="button" data-dismiss="modal">
-                <img src="~/images/cancel.png" alt="cancel" />
-                <p>Отменить</p>
-            </button>
-            <button class="button" type="submit">
-                <img src="~/images/submit.png" alt="submit" />
-                <p>Создать</p>
-            </button>
-        </div>
-</form>
-<script>
-    $.validator.setDefaults({
-        ignore: []
-    });
-    $.validator.unobtrusive.parse("#modalForm");
-</script>
+    <input asp-for="Duration" readonly id="Duration" class="input" hidden />
+    <div class="vacmodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Отменить</p>
+        </button>
+        <button class="button" type="submit">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Создать</p>
+        </button>
+    </div>
+</form> 
+<script src="~/js/submit.js"></script>
+
+
 

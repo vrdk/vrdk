@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarDayViewModel
 
-<form asp-action="ProccessCalendarDay" method="post" class="box-modal vacmodal"  style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto" id="modalForm">
+<form asp-action="ProccessCalendarDay" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-radius:5px;">
         <input asp-for="Role" hidden />
         <input asp-for="EmployeeId" hidden />
@@ -47,4 +47,4 @@
     </div>
 </form>
 <script src="~/js/calendarday.js"></script>
-  
+

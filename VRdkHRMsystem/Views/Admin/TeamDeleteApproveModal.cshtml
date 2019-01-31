@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.Team.TeamViewModel
 
-<form asp-action="DeleteTeam" method="post" class="box-modal vacmodal" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="DeleteTeam" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <input asp-for="TeamId" hidden />
     <div class="modal__header" style="border-radius:5px;">
         <p class="modal__title">Удаление команды</p>
@@ -19,3 +19,4 @@
         </button>
     </div>
 </form>
+<script src="~/js/submit.js"></script>

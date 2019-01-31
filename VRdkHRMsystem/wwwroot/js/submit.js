@@ -1,10 +1,13 @@
 ﻿$(document).ready(function () {
+    $.validator.setDefaults({
+        ignore: []
+    });
+    $.validator.unobtrusive.parse("#submit_form");
     $("#submit_form").on('submit', function () {
-        $('#preloader').css('display', 'flex');
+        if ($("#submit_form").valid()) {
+            var modal = $("#request_modal");
+            modal.modal('hide');
+            $('#preloader').css('display', 'flex');
+        }      
     });
 });
-function closePreloader(preloader) {
-    setTimeout(function () {
-        $(preloader).hide();
-    }, 1000);
-}

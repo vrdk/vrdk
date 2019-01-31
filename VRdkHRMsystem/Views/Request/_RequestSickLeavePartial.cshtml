@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.RequestSickLeaveViewModel
 
-<form asp-action="RequestSickLeave" method="post" enctype="multipart/form-data">
+<form asp-action="RequestSickLeave" method="post" enctype="multipart/form-data" id="submit_form">
     <div class="profile__right">
         <div class="profile__days sickmessage__days">
             <div class="profile__block">
@@ -22,13 +22,13 @@
                     </div>
                     <p></p>
                 </div>
-                
+
                 <div class="sickmessage__upload">
                     <label class="sickmessage__ulpoad_label" for="File" id="fileUploadLabel">
                         <img src="~/images/camera.png" alt="cross" />
                         <p id="fileUploadText">Добавить фото</p>
                     </label>
-                    <input asp-for="File" class="sickmessage__ulpoad_my" type="file" id="File" multiple="multiple" accept="image/*"/>
+                    <input asp-for="File" class="sickmessage__ulpoad_my" type="file" id="File" multiple="multiple" accept="image/*" />
                 </div>
                 <div class="vacrequest__body_right sickmessage__body_right">
                     <div class="vacrequest__button_wrapper sickmessage__button_wrapper">
@@ -46,3 +46,4 @@
         </div>
     </div>
 </form>
+<script src="~/js/submit.js"></script>

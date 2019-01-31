@@ -136,3 +136,15 @@ function deleteAssignment(id) {
         }
     });
 }
+
+function showPreloader() {
+    var pl = $('#preloader');
+    pl.css('display', 'flex');
+}
+
+function closePreloader(preloader) {
+    setTimeout(function () {
+        $(preloader).hide();
+    }, 1000);
+}
+

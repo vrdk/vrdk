@@ -4,13 +4,13 @@
     ViewData["Title"] = "EditEmployee";
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
-<form asp-action="EditEmployee" method="post" class="content">
+<form asp-action="EditEmployee" method="post" class="content" id="submit_form">
     <div class="profile__globalwrapper">
         <input asp-for="OrganisationId" hidden />
         <input asp-for="EmployeeId" hidden />
         <div class="profile empprofileedit">
             <div class="empprofile__header empprofileedit__header">
-                <div class="profile__imgblock"><img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" id="user_photo" style="object-fit: cover;"/></div>
+                <div class="profile__imgblock"><img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" id="user_photo" style="object-fit: cover;" /></div>
                 <label class=" empprofile__button button empprofileedit__button" for="Photo" id="photoUploadLabel">
                     <img src="~/images/plus.png" alt="plus" />
                     <p>Изменить фото</p>
@@ -174,5 +174,6 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/cropper.min.js"></script>
     <script src="~/js/profilePhotoCropper.js"></script>
+    <script src="~/js/submit.js"></script>
     <link rel="stylesheet" href="~/css/cropper.min.css" />
 }

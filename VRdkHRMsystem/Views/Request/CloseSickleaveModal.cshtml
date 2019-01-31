@@ -1,35 +1,35 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.CloseSickLeaveViewModel
 
 <form asp-action="CloseSickleave" asp-controller="Request" method="post" class="box-modal vacmodal" style="border-radius:5px;margin-left:auto;margin-right:auto;margin-top:auto">
-        <input asp-for="SickLeaveId" hidden />
-        <div class="modal__header" style="border-radius:5px;">
-            <p class="modal__title">Сообщение о болезни</p>
+    <input asp-for="SickLeaveId" hidden />
+    <div class="modal__header" style="border-radius:5px;">
+        <p class="modal__title">Сообщение о болезни</p>
+    </div>
+    <div class="sickmessagemodal__body">
+        <p>Комментарий</p>
+        <textarea class="input vacrequest__block" type="text" readonly>@Model.Comment</textarea>
+        <div style="margin:15px 0px 15px 0px;">
+            <p>Дата: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
         </div>
-        <div class="sickmessagemodal__body">
-            <p>Комментарий</p>
-            <textarea class="input vacrequest__block" type="text" readonly>@Model.Comment</textarea>
-            <div style="margin:15px 0px 15px 0px;">
-                <p>Дата: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
-            </div>
-            <div>
-                @foreach (var file in Model.Files)
-                {
-                    <p>
-                        Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
-                            <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
-                        </a>
-                    </p>
-                }
-            </div>
+        <div>
+            @foreach (var file in Model.Files)
+            {
+                <p>
+                    Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                    </a>
+                </p>
+            }
         </div>
-        <div class="vacmodal__buttons">
-            <button class="button" type="button" data-dismiss="modal">
-                <img src="~/images/cancel.png" alt="cancel" />
-                <p>Назад</p>
-            </button>
-            <button class="button" type="submit">
-                <img src="~/images/submit.png" alt="submit" />
-                <p>Закрыть</p>
-            </button>
-        </div>
+    </div>
+    <div class="vacmodal__buttons">
+        <button class="button" type="button" data-dismiss="modal">
+            <img src="~/images/cancel.png" alt="cancel" />
+            <p>Назад</p>
+        </button>
+        <button class="button" type="submit">
+            <img src="~/images/submit.png" alt="submit" />
+            <p>Закрыть</p>
+        </button>
+    </div>
 </form>

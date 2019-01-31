@@ -20,10 +20,7 @@ function addAssignment() {
             $("#tripMembers").select2({
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
-            });
-            $("#tripMembers").rules("add", {
-                required: true
-            });
+            }); 
             $("#assignmentaddmodal_datepicker_from").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
@@ -54,9 +51,6 @@ function editAssignment(id) {
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
             });
-            $("#tripMembers").rules("add", {
-                required: true
-            });
             $("#assignmentaddmodal_datepicker_from").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
@@ -85,3 +79,8 @@ function checkAssignment(id) {
         }
     });
 }
+$(document).ready(function () {
+    $("#assignments_form").on('submit', function () {
+        showPreloader();
+    });
+});

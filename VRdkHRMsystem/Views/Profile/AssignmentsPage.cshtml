@@ -20,24 +20,25 @@
     }
     @if (Model.Count > Model.PageSize)
     {
-        <p style="margin-left:48%; margin-top:10px;">
+        <div class="table__pageblock" style=" margin-top:10px;">
             @if (Model.PageNumber == 0)
             {
-                <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" /></a>
             }
             else
             {
-                <a onclick="getprofilerequests('@(Model.PageNumber-1)','assignment')" style="cursor:pointer"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                <a onclick="getprofilerequests('@(Model.PageNumber-1)','assignment')" style="cursor:pointer"><img src="~/images/angle-left.png" alt="arrow" /></a>
             }
+            <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count / @Model.PageSize + 1)</p>
             @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
             {
-                <a href="#!" class="disabled" style="cursor:not-allowed;"><img src="~/images/cross.png" alt="arrow" style="margin-bottom:2px;" /></a>
+                <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" /></a>
             }
             else
             {
-                <a onclick="getprofilerequests('@(Model.PageNumber+1)','assignment')" style="cursor:pointer"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                <a onclick="getprofilerequests('@(Model.PageNumber+1)','assignment')" style="cursor:pointer"><img src="~/images/angle-right.png" alt="arrow" /></a>
             }
-        </p>
+        </div>
     }
 }
 else

@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
     $("#team_select").on('change', function () {
+        showPreloader();
         var teamId = $(this).val();
         var role = $("#redirectUrl").val();
         var url = "/" + role + "/calendar?teamid=" + teamId;
@@ -45,10 +46,3 @@ function editDayOffRequest(id, tId) {
         }
     });
 }
-
-//$(document).ready(function () {
-//    $('#reqDayOffFrom').submit(function () {
-//        alert('1');
-//        $('#request_modal').modal('hide');
-//    });
-//});

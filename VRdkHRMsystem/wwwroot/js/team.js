@@ -1,4 +1,6 @@
-﻿function formatState(state) {
+﻿
+
+function formatState(state) {
     if (!state.id) {
         return state.text;
     }
@@ -7,7 +9,7 @@
         '<span><img src="' + baseUrl + state.element.value + '.png" style="border-radius:50%; height:30px; width:30px;vertical-align:middle;"/> ' + state.text + '</span>'
     );
     return $state;
-};
+}
 
 $(document).ready(function () {
     $('#teamMembers').select2({

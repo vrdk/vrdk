@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.Vacation.RequestVacationViewModel
 
-<form asp-action="RequestVacation" method="post">
+<form asp-action="RequestVacation" method="post" id="submit_form">
     <div class="profile__right">
         <div class="profile__days vacrequest__days">
             <div class="profile__block">
@@ -48,7 +48,7 @@
                     </div>
                     <div class="vacrequest__block">
                         <p>До<span asp-validation-for="EndDate" style="color: #ad545f; padding:0"></span></p>
-                        <input asp-for="EndDate" class="input" type="text" id="vacrequest__to_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off"/>
+                        <input asp-for="EndDate" class="input" type="text" id="vacrequest__to_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
                     </div>
                     <div class="vacrequest__block">
                         <p>Длительность</p>
@@ -71,3 +71,4 @@
         </div>
     </div>
 </form>
+<script src="~/js/submit.js"></script>

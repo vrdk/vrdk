@@ -74,7 +74,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<SickLeaveRequest> GetByIdWithEmployeeWithTeamAsync(string id)
         {
-            return await _context.SickLeaveRequest.Include(req => req.Employee).ThenInclude(emp => emp.Team).FirstOrDefaultAsync(req => req.SickLeaveId.Equals(id));
+            return await _context.SickLeaveRequest.Include(req => req.Employee).ThenInclude(emp => emp.Team).ThenInclude(t=>t.Teamlead).FirstOrDefaultAsync(req => req.SickLeaveId.Equals(id));
         }
 
         public async Task<SickLeaveRequest[]> GetAsync(Expression<Func<SickLeaveRequest, bool>> condition = null)

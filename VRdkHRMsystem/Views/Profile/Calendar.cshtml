@@ -53,54 +53,54 @@
                             {
                                 if (employee.EmployeeId != Model.MainMemberId)
                                 {
-                            <div class="calendar__contentblock">
-                                @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
-                                {
-                                    if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day >= date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day >= date.Day)))
-                                    {
-                                        <div class="calendar__block calendar__block_vacation"></div>
-                                    }
-                                    else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day) || (s.CreateDate.Month != date.Month && s.CreateDate.Day >= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day))))
-                                    {
-                                        <div class="calendar__block calendar__block_health"></div>
-                                    }
-                                    else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
-                                    {
-                                        <div class="calendar__block calendar__block_pass"></div>
-                                    }
-                                    else if (employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day >= date.Day) || (a.Assignment.BeginDate.Month != date.Month && a.Assignment.BeginDate.Day >= date.Day && a.Assignment.EndDate.Day >= date.Day)))
-                                    {
-                                        <div class="calendar__block calendar__block_assignment"></div>
-                                    }
-                                    else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
-                                    {
-                                        var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
-                                        <text>
-                                            <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                        </text>
-
-                                    }
-                                    else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
-                                    {
-                                        var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
-                                        if (dayOff.DayOffState == "Approved")
+                                    <div class="calendar__contentblock">
+                                        @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
                                         {
-                                            <text>
-                                                <div class="calendar__block calendar__block_dayoff"></div>
-                                            </text>
-                                        }
-                                        else
-                                        {
-                                            <div class="calendar__block">-</div>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <div class="calendar__block">-</div>
-                                    }
+                                            if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day >= date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day >= date.Day)))
+                                            {
+                                                <div class="calendar__block calendar__block_vacation"></div>
+                                            }
+                                            else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day) || (s.CreateDate.Month != date.Month && s.CreateDate.Day >= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day))))
+                                            {
+                                                <div class="calendar__block calendar__block_health"></div>
+                                            }
+                                            else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
+                                            {
+                                                <div class="calendar__block calendar__block_pass"></div>
+                                            }
+                                            else if (employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day >= date.Day) || (a.Assignment.BeginDate.Month != date.Month && a.Assignment.BeginDate.Day >= date.Day && a.Assignment.EndDate.Day >= date.Day)))
+                                            {
+                                                <div class="calendar__block calendar__block_assignment"></div>
+                                            }
+                                            else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
+                                            {
+                                                var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
+                                                <text>
+                                                    <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                </text>
 
-                                }
-                            </div>
+                                            }
+                                            else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
+                                            {
+                                                var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
+                                                if (dayOff.DayOffState == "Approved")
+                                                {
+                                                    <text>
+                                                        <div class="calendar__block calendar__block_dayoff"></div>
+                                                    </text>
+                                                }
+                                                else
+                                                {
+                                                    <div class="calendar__block">-</div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="calendar__block">-</div>
+                                            }
+
+                                        }
+                                    </div>
                                 }
                                 else
                                 {
@@ -261,6 +261,7 @@
     </div>
 </div>
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <link rel="stylesheet" type="text/css" href="~/css/tooltipster-sideTip-light.min.css" />
     <link rel="stylesheet" type="text/css" href="~/css/tooltipster.bundle.min.css" />
     <script type="text/javascript" src="~/js/tooltipster.bundle.min.js"></script>

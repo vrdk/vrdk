@@ -143,7 +143,7 @@ namespace VRdkHRMsystem.Controllers
 
                         return View("~/Views/Profile/Calendar.cshtml", model);
                     }
-
+                        
                     employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
 
                     model = new CalendarViewModel
@@ -606,20 +606,24 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<IActionResult> CheckSickleaveRequest(string id)
         {
-            var sickLiveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (sickLiveRequest != null)
+            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (sickLeaveRequest != null)
             {
-                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLiveRequest);
-                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLiveRequest.SickLeaveId);
-                var posts = await _postService.GetPostsByOrganisationIdAsync(sickLiveRequest.Employee.OrganisationId);
-                model.EmployeeFullName = $"{sickLiveRequest.Employee.FirstName} {sickLiveRequest.Employee.LastName}";
-                model.Post = posts.FirstOrDefault(p => p.PostId == sickLiveRequest.Employee.PostId).Name;
-                if (sickLiveRequest.Employee.Team != null)
+                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLeaveRequest);
+                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(sickLeaveRequest.SickLeaveId);
+                var posts = await _postService.GetPostsByOrganisationIdAsync(sickLeaveRequest.Employee.OrganisationId);
+                model.EmployeeFullName = $"{sickLeaveRequest.Employee.FirstName} {sickLeaveRequest.Employee.LastName}";
+                model.Post = posts.FirstOrDefault(p => p.PostId == sickLeaveRequest.Employee.PostId).Name;
+                if (sickLeaveRequest.ProccessedbyId != null)
                 {
-                    var teamlead = await _employeeService.GetByIdAsync(sickLiveRequest.Employee.Team.TeamleadId);
-                    model.TeamName = sickLiveRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                    if (teamlead.WorkEmail == User.Identity.Name && sickLiveRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
+                    var proccessor = await _employeeService.GetByIdAsync(sickLeaveRequest.ProccessedbyId);
+                    model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                }
+                if (sickLeaveRequest.Employee.Team != null)
+                {
+                    model.TeamName = sickLeaveRequest.Employee.Team.Name;
+                    model.TeamleadFullName = $"{sickLeaveRequest.Employee.Team.Teamlead.FirstName} {sickLeaveRequest.Employee.Team.Teamlead.LastName}";
+                    if (sickLeaveRequest.Employee.Team.Teamlead.WorkEmail == User.Identity.Name && sickLeaveRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
                     {
                         return PartialView("SickleaveProccessModal", model);
                     }
@@ -627,19 +631,67 @@ namespace VRdkHRMsystem.Controllers
                 else
                 {
                     model.TeamName = emptyValue;
-                    model.TeamleadFullName = emptyValue;
+                    model.TeamleadFullName = emptyValue;                 
                 }
 
-                if (sickLiveRequest.ProccessedbyId != null)
+                if (sickLeaveRequest.Employee.Team == null && sickLeaveRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
                 {
-                    var proccessor = await _employeeService.GetByIdAsync(sickLiveRequest.ProccessedbyId);
-                    model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                    return PartialView("SickleaveProccessModal", model);
                 }
 
                 return PartialView("SickleaveViewModal", model);
             }
 
             return PartialView("SickleaveViewModal");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveCheckViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            var sickLeaveRequest = await _sickLeaveService.GetByIdAsync(model.SickLeaveId);
+            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+            {
+                sickLeaveRequest.ProccessedbyId = user.Id;
+                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
+                {
+                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был подтвердён.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                    };
+
+                    await _notificationService.CreateAsync(notification);
+                }
+                else
+                {
+                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был отклонён.",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        IsChecked = false
+                    };
+
+                    await _notificationService.CreateAsync(notification);
+                }
+
+                await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
+            }
+
+            return RedirectToAction("Sickleaves", "Admin");
         }
 
         [HttpGet]

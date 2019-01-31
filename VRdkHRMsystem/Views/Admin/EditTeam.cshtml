@@ -3,12 +3,12 @@
 @{
     ViewData["Title"] = "AddTeam";
 }
-<form asp-action="EditTeam" method="post" class="content">
+<form asp-action="EditTeam" method="post" class="content" id="submit_form">
     <input asp-for="TeamId" hidden />
     <div class="teamprofile">
         <div class="teamprofile__leader">
             <div class="teamprofile__info">
-                <p>Название команды</p>
+                <p>Название команды <span asp-validation-for="Name" style="color: #ad545f;"></span></p>
                 <input asp-for="Name" class="input" type="text" />
             </div>
             <div class="teamprofile__teamlead" style="padding:20px;">
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="teamprofile__members">
-            <p>Учасники</p>
+            <p>Учасники <span asp-validation-for="TeamMembers" style="color: #ad545f;"></span></p>
             <div class="teamprofile__members_wrapper" style="padding:20px;">
                 <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
             </div>
@@ -37,5 +37,13 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $.validator.setDefaults({
+            ignore: []
+        });
+        $.validator.unobtrusive.parse("#submit_form");
+    </script>
+    <script src="~/js/submit.js"></script>
     <script src="~/js/team.js"></script>
 }
+

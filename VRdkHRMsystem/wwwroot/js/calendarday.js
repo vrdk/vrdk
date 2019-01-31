@@ -12,7 +12,23 @@
 
     }
 });
-$.validator.setDefaults({
-    ignore: []
+$(document).ready(function () {
+    $.validator.setDefaults({
+        ignore: []
+    });
+    $.validator.unobtrusive.parse("#submit_form");
+    $("#submit_form").on('submit', function () {
+        if ($('#submit_button').attr('formnovalidate') !== 'formnovalidate') {
+            if ($("#submit_form").valid()) {
+                var modal = $("#request_modal");
+                modal.modal('hide');
+                $('#preloader').css('display', 'flex');
+            }
+        }
+        else {
+            modal = $("#request_modal");
+            modal.modal('hide');
+            $('#preloader').css('display', 'flex');
+        }
+    });
 });
-$.validator.unobtrusive.parse("#modalForm");

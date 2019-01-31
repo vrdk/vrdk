@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.AdminViewModels.Employee.AddEmployeeViewModel
 
-<form asp-action="AddEmployee" method="post" class="content" enctype="multipart/form-data">
+<form asp-action="AddEmployee" method="post" class="content" enctype="multipart/form-data" id="submit_form">
     <div class="profile__globalwrapper">
         <div class="profile empprofileedit">
            
@@ -129,4 +129,5 @@
 </form>
     @section Scripts {
         @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script src="~/js/submit.js"></script>
     }

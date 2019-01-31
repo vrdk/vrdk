@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Absence.AbsenceApproveViewModel
 
-<form asp-action="SetAbsence" method="post" class="box-modal vacmodal" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="SetAbsence" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <input asp-for="EmployeeId" hidden />
     <input asp-for="Role" hidden />
     <input asp-for="Date" hidden />
@@ -22,3 +22,4 @@
         </button>
     </div>
 </form>
+<script src="~/js/submit.js"></script>
