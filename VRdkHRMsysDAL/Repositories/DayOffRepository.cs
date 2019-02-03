@@ -24,7 +24,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -34,7 +34,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -45,7 +45,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<DayOff> GetByDateAsync(DateTime date, string employeeId)
         {
-            return await _context.DayOff.FirstOrDefaultAsync(d => d.DayOffDate == date && d.EmployeeId == employeeId);
+            return await _context.DayOff.FirstOrDefaultAsync(d => d.DayOffDate.Date == date.Date && d.EmployeeId == employeeId);
         }
 
         public async Task<DayOff> GetByIdAsync(string id)
@@ -53,7 +53,7 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.DayOff.Include(w => w.Employee).FirstOrDefaultAsync(d=> d.DayOffId.Equals(id));
         }
 
-        public async Task UpdateAsync()
+        public async Task WriteChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

@@ -1,0 +1,43 @@
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.TimeManagement.TimeManagementListViewModel
+<div class="box-modal vacmodal planningmodal" id="planningmodalcheck" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+    <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
+        <p class="modal__title">@Model.EmployeeFullName</p>
+        <p class="modal__date">@Model.Date.ToString("dd.MM.yyyy")</p>
+    </div>
+    <div class="planningmodal__table">
+        @if (Model.Records != null && Model.Records.Count() != 0)
+        {
+            <div class="planningmodal__tableheader">
+                <div class="planningmodal__date">Интервал времени</div>
+                <div class="planningmodal__type">Деятельность</div>
+            </div>
+            <div class="planningmodal__tablebody">
+                @foreach (var record in Model.Records)
+                {
+                    <div class="planningmodal__block">
+                        <div class="planningmodal__date">@record.TimeFrom.ToString(@"hh\:mm") - @record.TimeTo.ToString(@"hh\:mm")</div>
+                        <div class="planningmodal__type">@record.Description</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="planningmodal__tableheader">
+                <div class="planningmodal__date">Интервал времени</div>
+                <div class="planningmodal__type" style="min-width:100px;">Деятельность</div>
+            </div>
+            <div class="planningmodal__tablebody">
+                <div class="planningmodal__block">
+                    <div class="planningmodal__type">Записей нет</div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="vacmodal__buttons planningmodal__button">
+        <button class="empprofile__button button back_button" data-dismiss="modal" style="width:100px;margin-left:auto; margin-top:0" type="button">
+            <p>Закрыть</p>
+        </button>
+    </div>
+
+</div>

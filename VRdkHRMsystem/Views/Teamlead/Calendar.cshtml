@@ -90,13 +90,13 @@
                                                 if (dayOffRequest == null)
                                                 {
                                                     <text>
-                                                        <div class="calendar__block" onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
                                             }
@@ -106,20 +106,20 @@
                                                 if (dayOff.DayOffState == "Approved")
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff" onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')"></div>
+                                                        <div class="calendar__block calendar__block_dayoff" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')"></div>
                                                     </text>
 
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')">-</div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">-</div>
                                                     </text>
                                                 }
                                             }
                                             else
                                             {
-                                                <div class="calendar__block" onclick="proccessCalendarDay('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">-</div>
+                                                <div class="calendar__block" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">-</div>
                                             }
 
                                         }
@@ -153,13 +153,13 @@
                                                 if (dayOffRequest == null)
                                                 {
                                                     <text>
-                                                        <div class="calendar__block" @if(employee.TeamId == null) { <text> onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block" @if(employee.TeamId == null) { <text>  onclick="callSelfDayProccessMenu('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                         </text>
                                                     }
                                                     else
                                                     {
                                                         <text>
-                                                            <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon"  title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" @if(employee.TeamId == null) { <text> onclick="editWorkDay('@workDay.WorkDayId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                            <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon"  title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" @if(employee.TeamId == null) { <text> onclick="callSelfDayProccessMenu('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }>@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                             </text>
                                                         }
                                                     }
@@ -169,21 +169,21 @@
                                                         if (dayOff.DayOffState == "Requested")
                                                         {
                                                             <text>
-                                                                <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" @if(employee.TeamId == null) { <text> onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')" </text> }>-</div>
+                                                                <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" @if(employee.TeamId == null) { <text> onclick="callSelfDayProccessMenu('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }>-</div>
                                                                 </text>
 
                                                             }
                                                             else
                                                             {
                                                                 <text>
-                                                                    <div class="calendar__block calendar__block_dayoff" @if(employee.TeamId == null) { <text> onclick="editDayOff('@dayOff.DayOffId','@date.ToString("dd.MM.yyyy")','@Model.TeamId','@Model.Role')" </text> }></div>
+                                                                    <div class="calendar__block calendar__block_dayoff" @if(employee.TeamId == null) { <text> onclick="callSelfDayProccessMenu('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }></div>
                                                                     </text>
 
                                                                 }
                                                             }
                                                             else
                                                             {
-                                                                <div class="calendar__block" @if (employee.TeamId == null) { <text> onclick="proccessCalendarDay('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }>-</div>
+                                                                <div class="calendar__block" @if (employee.TeamId == null) { <text> onclick="callSelfDayProccessMenu('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')" </text> }>-</div>
                                                             }
 
                                                         }
@@ -279,8 +279,8 @@
         }
     </div>
 </div>
-<div class="modal fade" id="request_modal" role="dialog" style="">
-    <div class="modal-dialog" id="modal_place">
+<div class="modal fade" id="request_modal" role="dialog">
+    <div class="modal-dialog" id="modal_place" style="margin-left:auto;margin-right:auto;">
     </div>
 </div>
 @section Scripts {
@@ -289,4 +289,5 @@
     <link rel="stylesheet" type="text/css" href="~/css/tooltipster.bundle.min.css" />
     <script type="text/javascript" src="~/js/tooltipster.bundle.min.js"></script>
     <script async src="~/js/teamleadcalendar.js"></script>
+    <script async src="~/js/timemanagment.js"></script>
 }

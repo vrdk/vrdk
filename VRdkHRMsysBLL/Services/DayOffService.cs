@@ -41,7 +41,7 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _dayOffRepository.UpdateAsync();
+                await _dayOffRepository.WriteChangesAsync();
             }         
         }
 

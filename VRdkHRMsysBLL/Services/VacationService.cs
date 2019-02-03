@@ -89,7 +89,7 @@ namespace VRdkHRMsysBLL.Services
                 _mapHelper.MapChanges(newRequest, currentRequest);
                 if (writeChanges)
                 {
-                    await _vacationRepository.UpdateAsync();
+                    await _vacationRepository.WriteChangesAsync();
                 }
             }
         }

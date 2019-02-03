@@ -12,6 +12,7 @@ using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
+using VRdkHRMsystem.Models.RequestViewModels;
 using VRdkHRMsystem.Models.RequestViewModels.DayOff;
 using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
 using VRdkHRMsystem.Models.RequestViewModels.Vacation;
@@ -54,40 +55,6 @@ namespace VRdkHRMsystem.Controllers
             _listMapper = listMapper;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> EditDayOffRequest(string id, string teamId)
-        {
-            var dayOff = await _dayOffService.GetByIdAsync(id);
-            if (dayOff != null)
-            {
-                var model = new EditDayOffRequestViewModel
-                {
-                    EmployeeId = dayOff.EmployeeId,
-                    DayOffDate = dayOff.DayOffDate,
-                    Comment = dayOff.Comment,
-                    DayOffId = dayOff.DayOffId,
-                    DayOffImportance = dayOff.DayOffImportance,
-                    TeamId = teamId
-                };
-
-                return PartialView("EditDayOffRequestModal", model);
-
-            }
-
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId });
-            }
-            else if (User.IsInRole("Teamlead"))
-            {
-                return RedirectToAction("Calendar", "Teamlead", new { teamId });
-            }
-            else
-            {
-                return RedirectToAction("Calendar", "Profile", new { teamId });
-            }
-        }
-
         [HttpPost]
         public async Task<IActionResult> EditDayOffRequest(EditDayOffRequestViewModel model)
         {
@@ -121,16 +88,35 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult RequestDayOff(string id, string date, string teamId)
+        public async Task<IActionResult> ProccessCalendarDay(string id, string date, string teamId)
         {
-            var model = new RequestDayOffViewModel
+            var dayOffDate = Convert.ToDateTime(date);
+            var dayOff = await _dayOffService.GetByDateAsync(dayOffDate, id);
+            if(dayOff == null)
             {
-                EmployeeId = id,
-                DayOffDate = Convert.ToDateTime(date),
-                TeamId = teamId
-            };
+                var model = new RequestDayOffViewModel
+                {
+                    EmployeeId = id,
+                    DayOffDate = Convert.ToDateTime(date),
+                    TeamId = teamId
+                };
 
-            return PartialView("RequestDayOffModal", model);
+                return PartialView("RequestDayOffModal", model);
+            }
+            else
+            {
+                var model = new EditDayOffRequestViewModel
+                {
+                    EmployeeId = dayOff.EmployeeId,
+                    DayOffDate = dayOff.DayOffDate,
+                    Comment = dayOff.Comment,
+                    DayOffId = dayOff.DayOffId,
+                    DayOffImportance = dayOff.DayOffImportance,
+                    TeamId = teamId
+                };
+
+                return PartialView("EditDayOffRequestModal", model);
+            }                   
         }
 
         [HttpPost]
@@ -234,7 +220,7 @@ namespace VRdkHRMsystem.Controllers
                     NotificationId = Guid.NewGuid().ToString(),
                     OrganisationId = employee.OrganisationId,
                     NotificationDate = DateTime.UtcNow,
-                    EmployeeId = employee.Team != null ? employee.Team.TeamleadId : null,
+                    EmployeeId = employee.Team?.TeamleadId,
                     NotificationType = NotificationTypeEnum.Vacation.ToString(),
                     IsChecked = false,
                     NotificationRange = NotificationRangeEnum.Organisation.ToString(),
@@ -313,7 +299,7 @@ namespace VRdkHRMsystem.Controllers
                 {
                     NotificationId = Guid.NewGuid().ToString(),
                     OrganisationId = employee.OrganisationId,
-                    EmployeeId = employee.Team != null ? employee.Team.TeamleadId : null,
+                    EmployeeId = employee.Team?.TeamleadId,
                     NotificationDate = DateTime.UtcNow,
                     NotificationType = NotificationTypeEnum.Vacation.ToString(),
                     IsChecked = false,

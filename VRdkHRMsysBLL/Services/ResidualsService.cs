@@ -49,7 +49,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _residualsRepository.UpdateAsync();
+                    await _residualsRepository.WriteChangesAsync();
                 }              
             }
         }
@@ -68,7 +68,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _residualsRepository.UpdateAsync();
+                    await _residualsRepository.WriteChangesAsync();
                 }                
             }
         }

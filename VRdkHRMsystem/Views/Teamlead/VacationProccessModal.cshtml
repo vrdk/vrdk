@@ -2,11 +2,11 @@
 @{
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
-<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal" id="submit_form"  style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal" id="submit_form"  style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div id="vacrequest">
         <input asp-for="VacationId" hidden />
         <input asp-for="VacationType" hidden />
-        <div class="modal__header" style="border-radius:5px;">
+        <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
             <p class="modal__title">Запрос на отпуск</p>
         </div>
         <div class="vacmodal__empinfo">

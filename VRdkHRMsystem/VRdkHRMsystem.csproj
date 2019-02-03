@@ -45,6 +45,12 @@
     <Content Update="Views\Teamlead\Calendar.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Teamlead\SelfDayProccessMenuModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\DayProccessMenuModal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Teamlead\EmployeeProfile.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -55,6 +61,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Teamlead\Teams.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Teamlead\TimeManagementModal.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Teamlead\VacationProccessModal.cshtml">

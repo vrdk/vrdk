@@ -24,7 +24,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -34,7 +34,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -48,7 +48,12 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.WorkDay.Include(w=>w.Employee).FirstOrDefaultAsync(w => w.WorkDayId.Equals(id));
         }
 
-        public async Task UpdateAsync()
+        public async Task<WorkDay> GetByDateAsync(DateTime date, string employeeId)
+        {
+            return await _context.WorkDay.FirstOrDefaultAsync(w => w.WorkDayDate.Date == date.Date && w.EmployeeId == employeeId);
+        }
+
+        public async Task WriteChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

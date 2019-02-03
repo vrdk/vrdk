@@ -68,7 +68,7 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.Team.Include(t=>t.Employees).Include(t=>t.Teamlead).FirstOrDefaultAsync(team => team.TeamId.Equals(id));
         }
 
-        public async Task UpdateAsync()
+        public async Task WriteChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
@@ -79,7 +79,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -89,7 +89,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
     }

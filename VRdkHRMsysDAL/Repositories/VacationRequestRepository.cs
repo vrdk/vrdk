@@ -93,7 +93,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -103,11 +103,11 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }      
 
-        public async Task UpdateAsync()
+        public async Task WriteChangesAsync()
         {
             await _context.SaveChangesAsync();
         }

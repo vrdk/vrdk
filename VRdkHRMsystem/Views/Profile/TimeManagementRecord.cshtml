@@ -1,0 +1,23 @@
+﻿@model  VRdkHRMsystem.Models.Profile.TimeManagement.TimeManagementRecordViewModel
+<form asp-action="createtimemanagementrecord" method="get" class="planningmodal__block timeManagementForm">
+    <input asp-for="EmployeeId" hidden />
+    <input asp-for="TimeManagementRecordId" hidden />
+    <input asp-for="RecordDate" hidden />
+    <div class="planningmodal__date">
+        <div class="tripmodal__date" style="padding:0">
+            <div class="tripmodal__date_block">
+                <input placeholder="C" asp-for="TimeFrom" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker"  value="@(Model.TimeManagementRecordId != null? Model.TimeFrom.ToString(@"hh\:mm"): null)"  autocomplete="off" />
+            </div>
+            <div class="tripmodal__date_block">
+                <input placeholder="По" asp-for="TimeTo" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker"  value="@(Model.TimeManagementRecordId != null? Model.TimeTo.ToString(@"hh\:mm"): null)"  autocomplete="off" />
+            </div>
+        </div>
+    </div>
+    <input asp-for="Description" type="text" class="planningmodal__type input" style="overflow-x: auto;" autocomplete="off" />
+    <div class="planningmodal__action">
+    <img src="~/images/cross2.png" alt="cross" class="submit_img" onclick="deleteTimeManagementRecord(this,'@Model.TimeManagementRecordId')"/>
+    <img onclick="submitClosestForm(this)" src="~/images/pencil.png" alt="pencil" /></div>
+</form>
+
+
+   

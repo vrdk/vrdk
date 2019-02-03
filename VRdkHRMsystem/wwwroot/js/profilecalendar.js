@@ -12,8 +12,8 @@
     });
 });
 
-function requestDayOff(id, dt, tId) {
-    var url = "/request/requestdayoff";
+function proccessProfileCalendarDay(id, dt, tId) {
+    var url = "/request/proccesscalendarday";
     $.ajax({
         url: url,
         method: 'get',
@@ -24,20 +24,41 @@ function requestDayOff(id, dt, tId) {
         },
         success: function (modal_html) {
             $('#modal_place').empty();
-            $('#request_modal').modal();
             $('#modal_place').html(modal_html);
         }
     });
 }
 
-function editDayOffRequest(id, tId) {
-    var url = "/request/editdayoffrequest";
+function timeManagmentModal(date) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var url = "/profile/timemanagment";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            date: date
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#modal_place').html(modal_html);
+        }
+    });
+
+    preloader.css('display', 'none');
+}
+
+function callDayProccessMenu(id, date, teamId) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var url = '/profile/dayproccessmenu';
     $.ajax({
         url: url,
         method: 'get',
         data: {
             id: id,
-            teamId: tId
+            date: date,
+            teamId: teamId
         },
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -45,4 +66,6 @@ function editDayOffRequest(id, tId) {
             $('#modal_place').html(modal_html);
         }
     });
+
+    preloader.css('display', 'none');
 }

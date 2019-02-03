@@ -10,6 +10,16 @@ $(document).ready(function () {
     $("#File").on('change', function () {
         $("#fileUploadText").html("Фото загружено");
     });
+    $("a").on('click', function () {
+        showPreloader();
+    });
+    $(".submit_button").on('click', function () {
+        showPreloader();
+    });
+    $(".back_button").on('click', function () {
+        showPreloader();
+        window.history.back();
+    });
     ligthMenuItem();
 });
 function ligthMenuItem() {
@@ -25,7 +35,7 @@ function ligthMenuItem() {
                 menu[i].classList.remove('navigation__link_active');
             }
         }
-    }     
+    }
 }
 
 function GetDiff(fromId, toId) {
@@ -44,6 +54,7 @@ function CalcDiff(fromId, toId) {
 }
 
 function changeUserPhoto(input) {
+
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -54,6 +65,8 @@ function changeUserPhoto(input) {
 }
 
 function ShowRequestPopup(url, id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     url = url + id;
     $.ajax({
         type: "Get",
@@ -62,8 +75,13 @@ function ShowRequestPopup(url, id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error : function() {
+            preloader.css('display', 'none');
         }
     });
+
 }
 
 function getinitialprofilerequests(page_number, data_type) {
@@ -93,6 +111,8 @@ function getprofilerequests(page_number, data_type) {
     );
 }
 function proccessSickleave(method, id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     url = "/request/" + method + "sickleave?id=" + id;
     $.ajax({
         type: "Get",
@@ -101,11 +121,19 @@ function proccessSickleave(method, id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
+
+
 }
 
 function deleteTeam(id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     var url = "/admin/deleteteam";
     $.ajax({
         url: url,
@@ -117,11 +145,17 @@ function deleteTeam(id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 
 function deleteAssignment(id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     var url = "/admin/deleteassignment";
     $.ajax({
         url: url,
@@ -133,8 +167,14 @@ function deleteAssignment(id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
+
+
 }
 
 function showPreloader() {
@@ -147,4 +187,5 @@ function closePreloader(preloader) {
         $(preloader).hide();
     }, 1000);
 }
+
 

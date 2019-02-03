@@ -1,8 +1,8 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.UpdateSickLeaveViewModel
 
-<form asp-action="UpdateSickleave" asp-controller="Request" method="post" enctype="multipart/form-data" id="submit_form" class="box-modal vacmodal" style="border-radius:5px;margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="UpdateSickleave" asp-controller="Request" method="post" enctype="multipart/form-data" id="submit_form" class="box-modal vacmodal" style="border-radius:10px;margin-left:auto;margin-right:auto;margin-top:auto">
     <input asp-for="SickLeaveId" hidden />
-    <div class="modal__header" style="border-radius:5px;">
+    <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <p class="modal__title">Сообщение о болезни</p>
     </div>
     <div class="sickmessagemodal__body">
@@ -16,7 +16,7 @@
             {
                 <p>
                     Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
-                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:45px; height:40px; object-fit: cover;" />
                     </a>
                 </p>
             }
@@ -37,7 +37,7 @@
             <img src="~/images/cancel.png" alt="cancel" />
             <p>Назад</p>
         </button>
-        <button class="button" type="submit">
+        <button class="button submit_button" type="submit">
             <img src="~/images/submit.png" alt="submit" />
             <p>Обновить</p>
         </button>

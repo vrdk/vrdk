@@ -41,6 +41,7 @@ namespace VRdkHRMsysDAL.Entities
         public ICollection<DayOff> DayOffs { get; set; }
         public virtual ICollection<Team> TeamNavigation { get; set; }
         public ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<TimeManagementRecord> TimeManagmentRecords { get; set; }
         public ICollection<EmployeeBalanceResiduals> EmployeeBalanceResiduals { get; set; }
         public ICollection<SickLeaveRequest> SickLeaves { get; set; }
         public ICollection<Transaction> Transaction { get; set; }

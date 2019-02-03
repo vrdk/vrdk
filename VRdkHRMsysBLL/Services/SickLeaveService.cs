@@ -101,7 +101,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _sickLeaveRepository.UpdateAsync();
+                    await _sickLeaveRepository.WriteChangesAsync();
                 }              
             }
         }

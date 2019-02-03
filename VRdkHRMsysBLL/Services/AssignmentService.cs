@@ -103,7 +103,7 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _assignmentRepository.UpdateAsync();
+                await _assignmentRepository.WriteChangesAsync();
             }        
         }
     }

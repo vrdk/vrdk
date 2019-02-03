@@ -9,6 +9,8 @@
     return $state;
 };
 function addAssignment() {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     url = "/admin/addassignment";
     $.ajax({
         type: "Get",
@@ -21,24 +23,30 @@ function addAssignment() {
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
             }); 
-            $("#assignmentaddmodal_datepicker_from").datepicker({
+            $("#datepicker_from").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
                 firstDay: 1
             });
-            $("#assignmentaddmodal_datepicker_to").datepicker({
+            $("#datepicker_to").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
                 firstDay: 1
             });
-            $("#assignmentaddmodal_datepicker_from").mask('00.00.0000');
-            $("#assignmentaddmodal_datepicker_to").mask('00.00.0000');
+            $("#datepicker_from").mask('00.00.0000');
+            $("#datepicker_to").mask('00.00.0000');
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 function editAssignment(id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     url = "/admin/editassignment?id=" + id;
     $.ajax({
         type: "Get",
@@ -51,23 +59,28 @@ function editAssignment(id) {
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
             });
-            $("#assignmentaddmodal_datepicker_from").datepicker({
+            $("#datepicker_from").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1
             });
-            $("#assignmentaddmodal_datepicker_to").datepicker({
+            $("#datepicker_to").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1
             });
-            $("#assignmentaddmodal_datepicker_from").mask('00.00.0000');
-            $("#assignmentaddmodal_datepicker_to").mask('00.00.0000');
-
+            $("#datepicker_from").mask('00.00.0000');
+            $("#datepicker_to").mask('00.00.0000');
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 function checkAssignment(id) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     url = "/teamlead/checkassignment?id=" + id;
     $.ajax({
         type: "Get",
@@ -76,6 +89,10 @@ function checkAssignment(id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }

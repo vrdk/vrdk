@@ -1,0 +1,51 @@
+﻿@model VRdkHRMsystem.Models.Profile.TimeManagement.TimeManagementProccessViewModel
+<div class="box-modal vacmodal planningmodal" id="planningmodal" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+    <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
+        <p class="modal__title">Планирование деятельности</p>
+        <p class="modal__date" style="margin-left:auto">@Model.Date.ToString("dd.MM.yyyy")</p>
+    </div>
+    <div class="planningmodal__table">
+        <div class="planningmodal__tableheader">
+            <div class="planningmodal__date">Интервал времени</div>
+            <div class="planningmodal__type">Деятельность</div>
+            <div class="planningmodal__action">Действие</div>
+        </div>
+        <div class="planningmodal__tablebody" id="table_body">
+            @if (Model.Records != null && Model.Records.Count() != 0)
+            {
+                foreach (var record in Model.Records)
+                {
+                    <form asp-action="createtimemanagementrecord" method="get" class="planningmodal__block timeManagementForm">
+                        <input name="EmployeeId" value="@record.EmployeeId" hidden />
+                        <input name="TimeManagementRecordId" value="@record.TimeManagementRecordId" hidden />
+                        <div class="planningmodal__date">
+                            <div class="tripmodal__date" style="padding:0">
+                                <div class="tripmodal__date_block">
+                                    <input placeholder="C" name="TimeFrom" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker" value="@record.TimeFrom.ToString(@"hh\:mm")" autocomplete="off" />
+                                </div>
+                                <div class="tripmodal__date_block">
+                                    <input placeholder="По" name="TimeTo" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker" value="@record.TimeTo.ToString(@"hh\:mm")" autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                        <input name="Description" value="@record.Description" type="text" class="planningmodal__type input" style="word-break:break-word;" />
+                        <div class="planningmodal__action">
+                            <img src="~/images/cross2.png" alt="cross" class="submit_img" onclick="deleteTimeManagementRecord(this,'@record.TimeManagementRecordId')" />
+                            <img onclick="submitClosestForm(this)" src="~/images/pencil.png" alt="pencil" />
+                        </div>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+    <div class="vacmodal__buttons planningmodal__button">
+        <button class="button" type="button" onclick="AddTimeManagment('table_body','@Model.Date.ToString("dd.MM.yyyy")')">
+            <img src="~/images/plus.png" alt="cancel" />
+            <p>Добавить деятельность</p>
+        </button>
+        <button class="empprofile__button button back_button" data-dismiss="modal" style="width:80px;margin-left:auto; margin-top:0" type="button">
+            <p>Закрыть</p>
+        </button>
+    </div>
+</div>
+<script src="~/js/timemanagment.js"></script>

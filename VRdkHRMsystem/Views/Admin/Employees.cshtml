@@ -71,7 +71,7 @@
             <div class="table__pageblock">
                     @if (Model.PageNumber == 0)
                     {
-                        <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" /></a>
+                        <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
                     }
                     else
                     {
@@ -80,7 +80,7 @@
                     <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count / @Model.PageSize + 1)</p>
                     @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                     {
-                        <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" /></a>
+                        <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
                     }
                     else
                     {

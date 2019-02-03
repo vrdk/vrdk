@@ -37,6 +37,8 @@ function setupCropper(input) {
 
 const setImage = () => {
     if (out) {
+        var preloader = $("#preloader");
+        preloader.css('display', 'flex');
         var formData = new FormData();
         formData.set("photo", dataURItoBlob(out));
         formData.set("id", id);
@@ -49,9 +51,11 @@ const setImage = () => {
             contentType: false,
             success() {
                 outimage.attr("src", out);
+                preloader.css('display', 'none');
             },
             error() {
                 alert('Upload error');
+                preloader.css('display', 'none');
             }
         });
 

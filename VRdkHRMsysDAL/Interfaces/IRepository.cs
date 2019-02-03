@@ -10,6 +10,6 @@ namespace VRdkHRMsysDAL.Interfaces
         Task<T> GetByIdAsync(string id);
         Task CreateAsync(T entity, bool writeChanges);
         Task DeleteAsync(T entity, bool writeChanges);
-        Task UpdateAsync();
+        Task WriteChangesAsync();
     }
 }

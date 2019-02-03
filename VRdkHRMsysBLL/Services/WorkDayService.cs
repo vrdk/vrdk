@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using VRdkHRMsysBLL.DTOs.WorkDay;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -38,8 +39,14 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _workDayRepository.UpdateAsync();
+                await _workDayRepository.WriteChangesAsync();
             }
+        }
+
+        public async Task<WorkDayDTO> GetByDateAsync(DateTime date, string employeeId)
+        {
+            var workDay = await _workDayRepository.GetByDateAsync(date, employeeId);
+            return _mapHelper.Map<WorkDay, WorkDayDTO>(workDay);
         }
 
         public async Task<WorkDayDTO> GetByIdAsync(string id)

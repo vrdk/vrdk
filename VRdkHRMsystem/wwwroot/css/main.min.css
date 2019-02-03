@@ -5218,7 +5218,7 @@ label.sickmessage__ulpoad_label img {
 }
 
 .planningmodal__type {
-    min-width: 100px
+    min-width: 180px
 }
 
 .planningmodal__action {
@@ -5729,8 +5729,15 @@ label.sickmessage__ulpoad_label img {
             padding: 1% 0;
             margin: 5px 0
         }
+    .profile__tabs_loading {
+        width: 100% !important;
+        justify-content: space-between;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+    }
 
-    .profile__tabs_vacation, .profile__tabs_sickleave, .profile__tabs_assignments, .profile__tabs_passes {
+    .profile__tabs_vacation, .profile__tabs_sickleave, .profile__tabs_assignment, .profile__tabs_passes {
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
@@ -5740,9 +5747,9 @@ label.sickmessage__ulpoad_label img {
         flex-direction: row
     }
 
-        .profile__tabs_vacation *, .profile__tabs_sickleave *, .profile__tabs_assignments *, .profile__tabs_passes * {
+    .profile__tabs_vacation *, .profile__tabs_sickleave *, .profile__tabs_assignment *, .profile__tabs_passes * {
             padding: 0
-        }
+    }
 
     .empprofile__days .profile__block:nth-child(2) {
         width: 100%;
@@ -6337,7 +6344,7 @@ label.sickmessage__ulpoad_label img {
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.6);
-    z-index: 100
+    z-index: 10000000000
 }
 
 .item-1 {

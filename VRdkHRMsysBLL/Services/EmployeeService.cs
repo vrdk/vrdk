@@ -123,7 +123,7 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _employeeRepository.UpdateAsync();
+                await _employeeRepository.WriteChangesAsync();
             }           
         }
 
@@ -138,7 +138,7 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _employeeRepository.UpdateAsync();
+                await _employeeRepository.WriteChangesAsync();
             }        
         }
 
@@ -156,7 +156,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _employeeRepository.UpdateAsync();
+                    await _employeeRepository.WriteChangesAsync();
                 }                
             }
         }
@@ -189,7 +189,7 @@ namespace VRdkHRMsysBLL.Services
 
                 if (writeChanges)
                 {
-                    await _employeeRepository.UpdateEmployeeAsync(currentEmployee, writeChanges);
+                    await _employeeRepository.UpdateAsync(currentEmployee, writeChanges);
                 }              
             }         
         }

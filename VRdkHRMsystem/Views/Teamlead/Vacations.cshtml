@@ -50,7 +50,7 @@
                                     <div class="profile__status_circle_@item.RequestStatus" style="margin-right:5px;">
                                         <div></div>
                                     </div>
-                                    <a href="@Url.Action("EmployeeProfile","Teamlead", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" /></a>
+                                    <a href="@Url.Action("EmployeeProfile","Teamlead", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" style="margin-top:5px;" /></a>
                                     @if (item.RequestStatus != "Approved" && item.RequestStatus != "Denied")
                                     {
                                         <img src="~/images/penciltable.png" alt="pencil" style="cursor:pointer;" onclick="ShowRequestPopup('@urlForProccess','@item.VacationId')" />
@@ -79,7 +79,7 @@
             <div class="table__pageblock">
                 @if (Model.PageNumber == 0)
                 {
-                    <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" /></a>
+                    <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
                 }
                 else
                 {
@@ -88,7 +88,7 @@
                 <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count / @Model.PageSize + 1)</p>
                 @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                 {
-                    <a><img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" /></a>
+                    <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
                 }
                 else
                 {
@@ -98,8 +98,8 @@
         }
     </section>
 </form>
-<div class="modal fade" id="request_modal" role="dialog" style="">
-    <div class="modal-dialog" id="modal_place">
+<div class="modal fade" id="request_modal" role="dialog">
+    <div class="modal-dialog" id="modal_place" style="margin-left:auto;margin-right:auto;">
     </div>
 </div>
 <script src="~/js/searchSubmit.js"></script>

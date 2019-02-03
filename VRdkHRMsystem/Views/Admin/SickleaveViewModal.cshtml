@@ -2,8 +2,8 @@
 @{
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
 }
-<div class="box-modal vacmodal" id="sickmessagecheck" style="border-radius:5px;  margin-left:auto;margin-right:auto;margin-top:auto">
-    <div class="modal__header" style="border-radius:5px;">
+<div class="box-modal vacmodal" id="sickmessagecheck" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+    <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <p class="modal__title">Сообщение о болезни</p>
     </div>
     <div class="vacmodal__empinfo">
@@ -36,7 +36,7 @@
             {
                 <p>
                     Фото:<a asp-controller="File" asp-action="DownloadFile" asp-route-fileName="@file" asp-route-containerName="@Model.SickLeaveId">
-                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:55px; height:40px; object-fit: cover;" />
+                        <img src="@Url.Action("DownloadFile","File", new {fileName = file, containerName = Model.SickLeaveId })" alt="spravka" style="width:45px; height:40px; object-fit: cover;" />
                     </a>
                 </p>
             }

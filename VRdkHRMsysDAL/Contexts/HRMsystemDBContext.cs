@@ -17,7 +17,8 @@ namespace VRdkHRMsysDAL.Contexts
         public virtual DbSet<Notification> Notification { get; set; }
         public virtual DbSet<SickLeaveRequest> SickLeaveRequest { get; set; }
         public virtual DbSet<Team> Team { get; set; }
-        public virtual DbSet<Transaction> Transaction { get; set; }
+        public virtual DbSet<TimeManagementRecord> TimeManagementRecord { get; set; }
+        public virtual DbSet<Transaction> Transaction { get; set; }      
         public virtual DbSet<VacationRequest> VacationRequest { get; set; }
         public virtual DbSet<WorkDay> WorkDay { get; set; }
 
@@ -451,6 +452,44 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasForeignKey(d => d.TeamleadId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__team__teamlead_i__214BF109");
+            });
+
+            modelBuilder.Entity<TimeManagementRecord>(entity =>
+            {
+                entity.HasKey(e => e.TimeManagementRecordId)
+                    .HasName("PK__time_man__F5CD42EA8952EF95");
+
+                entity.ToTable("time_managment_record");
+
+                entity.Property(e => e.TimeManagementRecordId)
+                    .HasColumnName("time_management_record_id")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasColumnName("description")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.EmployeeId)
+                    .HasColumnName("employee_id")
+                    .HasMaxLength(450);
+
+                entity.Property(e => e.ProccessDate)
+                    .HasColumnName("proccess_date")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.RecordDate)
+                    .HasColumnName("record_date")
+                    .HasColumnType("date");
+
+                entity.Property(e => e.TimeFrom).HasColumnName("time_from");
+
+                entity.Property(e => e.TimeTo).HasColumnName("time_to");
+
+                entity.HasOne(d => d.Employee)
+                    .WithMany(p => p.TimeManagmentRecords)
+                    .HasForeignKey(d => d.EmployeeId)
+                    .HasConstraintName("FK__time_mana__emplo__160F4887");
             });
 
             modelBuilder.Entity<Transaction>(entity =>

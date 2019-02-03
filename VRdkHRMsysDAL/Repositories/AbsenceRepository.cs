@@ -53,7 +53,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -63,7 +63,7 @@ namespace VRdkHRMsysDAL.Repositories
 
             if (writeChanges)
             {
-                await UpdateAsync();
+                await WriteChangesAsync();
             }
         }
 
@@ -77,7 +77,7 @@ namespace VRdkHRMsysDAL.Repositories
             return await _context.Absence.FirstOrDefaultAsync(ab => ab.AbsenceId.Equals(id));
         }
 
-        public async Task UpdateAsync()
+        public async Task WriteChangesAsync()
         {
            await _context.SaveChangesAsync();
         }

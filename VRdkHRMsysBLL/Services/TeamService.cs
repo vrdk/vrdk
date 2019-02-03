@@ -70,7 +70,7 @@ namespace VRdkHRMsysBLL.Services
 
             if (writeChanges)
             {
-                await _teamRepository.UpdateAsync();
+                await _teamRepository.WriteChangesAsync();
             }          
         }
 
