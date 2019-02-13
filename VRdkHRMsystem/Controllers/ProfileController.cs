@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.Employee;
 using VRdkHRMsysBLL.DTOs.Notification;
 using VRdkHRMsysBLL.DTOs.SickLeave;
@@ -14,6 +15,7 @@ using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
+using VRdkHRMsystem.Models.Profile.Absences;
 using VRdkHRMsystem.Models.Profile.Assignment;
 using VRdkHRMsystem.Models.Profile.Notification;
 using VRdkHRMsystem.Models.Profile.SickLeave;
@@ -35,6 +37,7 @@ namespace VRdkHRMsystem.Controllers
         private readonly IPostService _postService;
         private readonly ISickLeaveService _sickLeaveService;
         private readonly IVacationService _vacationService;
+        private readonly IAbsenceService _absenceService;
         private readonly IAssignmentService _assignmentService;
         private readonly INotificationService _notificationService;
         private readonly IViewListMapper _listMapper;
@@ -45,6 +48,7 @@ namespace VRdkHRMsystem.Controllers
                                  IPostService postService,
                                  IVacationService vacationService,
                                  ITimeManagementService timeManagementService,
+                                 IAbsenceService absenceService,
                                  ITeamService teamService,
                                  IViewListMapper listMapper,
                                  IAssignmentService assignmentService,
@@ -56,6 +60,7 @@ namespace VRdkHRMsystem.Controllers
             _sickLeaveService = sickLeaveService;
             _notificationService = notificationService;
             _timeManagementService = timeManagementService;
+            _absenceService = absenceService;
             _assignmentService = assignmentService;
             _teamService = teamService;
             _listMapper = listMapper;
@@ -158,6 +163,28 @@ namespace VRdkHRMsystem.Controllers
             model.ResidualsModel.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AbsencesPage(int pageNumber = 0)
+        {
+            var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (user != null)
+            {
+                var absences = await _absenceService.GetProfilePageAsync((int)PageSizeEnum.PageSize4, user.EmployeeId, pageNumber);
+                int count = await _absenceService.GetAbsencesCountAsync(null, req => req.EmployeeId == user.EmployeeId);
+                var model = new ProfileAbsencesListViewModel
+                {
+                    PageNumber = pageNumber,
+                    PageSize = (int)PageSizeEnum.PageSize4,
+                    Count = count,
+                    Absences = _mapHelper.MapCollection<AbsenceDTO, ProfileAbsencesViewModel>(absences)
+                };
+
+                return PartialView(model);
+            }
+
+            return PartialView();
         }
 
         [HttpGet]

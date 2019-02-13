@@ -33,11 +33,12 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         [DataType(DataType.Date)]
         public DateTime? DismissalDate { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = " неверный  e-mail")]
         [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string PersonalEmail { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [EmailAddress]
+        [Remote(action: "ValidateEmail", controller: "RemoteValidation", AdditionalFields = "EmployeeId")]
+        [EmailAddress(ErrorMessage =" неверный  e-mail")]
         [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string WorkEmail { get; set; }
         [Required]

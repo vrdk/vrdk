@@ -21,17 +21,17 @@
                         <div class="planningmodal__date">
                             <div class="tripmodal__date" style="padding:0">
                                 <div class="tripmodal__date_block">
-                                    <input placeholder="C" name="TimeFrom" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker" value="@record.TimeFrom.ToString(@"hh\:mm")" autocomplete="off" />
+                                    <input placeholder="C" name="TimeFrom" type="text"  form-number="@record.TimeManagementRecordId" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker form_input" value="@record.TimeFrom.ToString(@"hh\:mm")" autocomplete="off" />
                                 </div>
                                 <div class="tripmodal__date_block">
-                                    <input placeholder="По" name="TimeTo" type="text" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker" value="@record.TimeTo.ToString(@"hh\:mm")" autocomplete="off" />
+                                    <input placeholder="По" name="TimeTo" type="text" form-number="@record.TimeManagementRecordId" class="input tripmodal__checkinput timepicker-dropdown timemanagement_timepicker form_input" value="@record.TimeTo.ToString(@"hh\:mm")" autocomplete="off" />
                                 </div>
                             </div>
                         </div>
-                        <input name="Description" value="@record.Description" type="text" class="planningmodal__type input" style="word-break:break-word;" />
+                        <input name="Description" value="@record.Description" type="text" form-number="@record.TimeManagementRecordId" class="planningmodal__type input form_input" style="word-break:break-word;" />
                         <div class="planningmodal__action">
                             <img src="~/images/cross2.png" alt="cross" class="submit_img" onclick="deleteTimeManagementRecord(this,'@record.TimeManagementRecordId')" />
-                            <img onclick="submitClosestForm(this)" src="~/images/pencil.png" alt="pencil" />
+                            <img onclick="submitClosestForm(this)" src="~/images/submit.png"  form-number="@record.TimeManagementRecordId" alt="pencil" class="submit_image" style="display:none;"/>
                         </div>
                     </form>
                 }

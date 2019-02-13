@@ -2,6 +2,7 @@
 
 @{
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
+    var timeStamp = DateTime.UtcNow;
 }
 <div class="content">
     <div class="teamprofile">
@@ -13,7 +14,7 @@
             <div class="teamprofile__teamlead">
                 <p>Руководитель:</p>
                 <div class="teamprofile__member teamprofile__member_lead">
-                    <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Teamlead", new { id = Model.Teamlead.EmployeeId })"><img src="@($"{photoBlobUrl}{Model.Teamlead.EmployeeId}.png")" style="border-radius:50%;" alt="userphoto" /></a></div>
+                    <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Teamlead", new { id = Model.Teamlead.EmployeeId })"><img src="@($"{photoBlobUrl}{Model.Teamlead.EmployeeId}.png?{timeStamp.ToString()}")" style="border-radius:50%;" alt="userphoto" /></a></div>
                     <p class="teamprofile__username">@Model.Teamlead.FirstName @Model.Teamlead.LastName</p>
                     <div class="teamprofile__userstatus"></div>
                 </div>
@@ -27,7 +28,7 @@
                     foreach (var member in Model.Employees)
                     {
                         <div class="teamprofile__member">
-                            <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Teamlead", new { id = member.EmployeeId })"><img src="@($"{photoBlobUrl}{member.EmployeeId}.png")" style="border-radius:50%;" alt="userphoto" /></a></div>
+                            <div class="teamprofile__userphoto"><a href="@Url.Action("EmployeeProfile", "Teamlead", new { id = member.EmployeeId })"><img src="@($"{photoBlobUrl}{member.EmployeeId}.png?{timeStamp.ToString()}")" style="border-radius:50%;" alt="userphoto" /></a></div>
                             <p class="teamprofile__username">@member.FirstName @member.LastName</p>
                             @if (member.State)
                             {

@@ -8,10 +8,10 @@
         <p>Выберите, пожалуйста, действие</p>
     </div>
     <div class="vacmodal__buttons">
-        <button class="button" type="button" onclick="TeamleadTimeManagmentModal('@Model.Date')">
+        <button class="button" type="button" date-anchor="@Model.Date" onclick="TeamleadTimeManagmentModal(this)">
             <p>План деятельности</p>
         </button>
-        <button class="button" type="button" onclick="proccessCalendarDay('@Model.EmployeeId','@Model.Date','@Model.Name','@Model.Surname','@Model.TeamId','@Model.Role')">
+        <button class="button" type="button" employee-anchor="@Model.EmployeeId" date-anchor="@Model.Date" name-anchor="@Model.Name" surname-anchor ="@Model.Surname" team-anchor="@Model.TeamId" role-anchor="@Model.Role" onclick="proccessCalendarDay(this)">
             <p>Работа с днём</p>
         </button>
     </div>

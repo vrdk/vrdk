@@ -1,7 +1,7 @@
 ﻿@model  VRdkHRMsystem.Models.Profile.TimeManagement.TimeManagementRecordViewModel
 <form asp-action="createtimemanagementrecord" method="get" class="planningmodal__block timeManagementForm">
     <input asp-for="EmployeeId" hidden />
-    <input asp-for="TimeManagementRecordId" hidden />
+    <input name="TimeManagementRecordId" value="@Model.TimeManagementRecordId" hidden />
     <input asp-for="RecordDate" hidden />
     <div class="planningmodal__date">
         <div class="tripmodal__date" style="padding:0">
@@ -16,7 +16,7 @@
     <input asp-for="Description" type="text" class="planningmodal__type input" style="overflow-x: auto;" autocomplete="off" />
     <div class="planningmodal__action">
     <img src="~/images/cross2.png" alt="cross" class="submit_img" onclick="deleteTimeManagementRecord(this,'@Model.TimeManagementRecordId')"/>
-    <img onclick="submitClosestForm(this)" src="~/images/pencil.png" alt="pencil" /></div>
+    <img onclick="submitClosestForm(this)" src="~/images/submit.png" alt="pencil" /></div>
 </form>
 
 

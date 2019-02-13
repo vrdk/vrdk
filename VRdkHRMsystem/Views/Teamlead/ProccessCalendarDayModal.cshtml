@@ -1,11 +1,11 @@
 ﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarDayViewModel
 
-<form asp-action="ProccessCalendarDay" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="ProccessCalendarDay" method="post" class="box-modal vacmodal" id="proc_cal_day_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
-        <input asp-for="Role" hidden />
         <input asp-for="EmployeeId" hidden />
+        <input name="Date" value="@Model.Date.ToString("dd.MM.yyyy")" hidden />
+        <input asp-for="Role" hidden />
         <input asp-for="TeamId" hidden />
-        <input name="Date" value="@Model.Date" hidden />
         <p class="modal__title">@Model.FirstName @Model.LastName</p>
         <p class="modal__date">@Model.Date.ToString("dd.MM.yyyy")</p>
     </div>

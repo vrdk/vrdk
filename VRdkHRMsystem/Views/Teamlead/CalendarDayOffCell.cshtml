@@ -1,0 +1,12 @@
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarDayOffCellViewModel
+<div class="calendar__block
+     @if (Model.DayOffImportance != null) { <text> calendar__block_dayoff@(Model.DayOffImportance) calendar__block_moon</text> } calendar__block_dayoff_img"
+     title="@(Model.Comment!=null? Model.Comment : "Нет комментария")" 
+     type-anchor="dayOff"
+     employee-anchor="@Model.EmployeeId"
+     date-anchor="@Model.Date.ToString("dd.MM.yyyy")"
+     name-anchor="@Model.FirstName"
+     surname-anchor ="@Model.LastName"
+     team-anchor="@Model.TeamId"
+     role-anchor="@Model.Role"
+></div> 

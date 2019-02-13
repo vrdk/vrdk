@@ -1,6 +1,6 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.DayOff.RequestDayOffViewModel
 
-<form asp-action="RequestDayOff" method="post" class="box-modal vacmodal dayoffmodal" id="submit_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="RequestDayOff" method="post" class="box-modal vacmodal dayoffmodal" id="proc_day_off_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <input asp-for="TeamId" hidden />
         <input asp-for="EmployeeId" hidden />
@@ -10,8 +10,8 @@
     </div>
     <div class="dayoffmodal__bodywrapper">
         <div class="dayoffmodal__left">
-            <p>Коментарий</p>
-            <textarea class="input" name="Comment" cols="30" rows="10"></textarea>
+            <p>Коментарий <span asp-validation-for="Comment" style="color: #ad545f;"></span></p>
+            <textarea asp-for="Comment" class="input" cols="30" rows="10"></textarea>
         </div>
         <div class="dayoffmodal__right">
             <p>Важность</p>
@@ -48,4 +48,4 @@
         </div>
     </div>
 </form>
-<script src="~/js/submit.js"></script>
+<script src="~/js/profileCalendarDay.js"></script>

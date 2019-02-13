@@ -22,6 +22,12 @@ namespace VRdkHRMsysBLL.Services
             _mapHelper = mapHelper;
         }
 
+        public async Task<AbsenceDTO[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
+        {
+            var requests = await _absenceRepository.GetProfilePageAsync(pageSize, id, pageNumber);
+            return _mapHelper.MapCollection<Absence, AbsenceDTO>(requests);
+        }
+
         public async Task<int> GetAbsencesCountAsync(string searchKey = null, Expression<Func<Absence, bool>> condition = null)
         {
             return await _absenceRepository.GetAbsencesCountAsync(searchKey, condition);

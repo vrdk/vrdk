@@ -1,9 +1,10 @@
 ﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.EditCalendarDayViewModel
 
-<form asp-action="EditWorkDay" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="EditWorkDay" method="post" class="box-modal vacmodal" id="edit_work_day_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <input asp-for="Role" hidden />
         <input asp-for="CalendarDayId" hidden />
+        <input asp-for="EmployeeId" hidden />
         <input asp-for="TeamId" hidden />
         <input name="Date" value="@Model.Date" hidden />
         <p class="modal__title">@Model.FirstName @Model.LastName</p>

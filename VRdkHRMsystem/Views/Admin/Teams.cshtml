@@ -18,7 +18,7 @@
                 {
                     <div class="table__body_title teamlist__body_title">
                         <p class="teamlist__name">Название команды</p>
-                        <p class="teamlist__leader">Team Leader</p>
+                        <p class="teamlist__leader">Руководитель команды</p>
                         <p class="teamlist__count">Кол-во сотрудников</p>
                         <p class="teamlist__info">Инфо</p>
                     </div>
@@ -59,7 +59,7 @@
                 {
                     <a asp-action="Teams" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
                 }
-                <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count / @Model.PageSize + 1)</p>
+                <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
                 @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                 {
                     <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />

@@ -10,62 +10,110 @@
         position: 'right',
         theme: 'tooltipster-light'
     });
+
+    $('.calendar__block[type-anchor="dayOff"]').on('click', function () {
+        proccessDayOff(this);
+    });
+
+    $('.calendar__block[type-anchor="workDay"]').on('click', function () {
+        callDayProccessMenu(this);
+    });
 });
 
-function proccessProfileCalendarDay(id, dt, tId) {
+
+function proccessDayOff(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var el = $(cellElement);
     var url = "/request/proccesscalendarday";
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            id: id,
-            date: dt,
-            teamId: tId
-        },
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#modal_place').html(modal_html);
-        }
-    });
-}
-
-function timeManagmentModal(date) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var url = "/profile/timemanagment";
-    $.ajax({
-        url: url,
-        method: 'get',
-        data: {
-            date: date
-        },
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#modal_place').html(modal_html);
-        }
-    });
-
-    preloader.css('display', 'none');
-}
-
-function callDayProccessMenu(id, date, teamId) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var url = '/profile/dayproccessmenu';
-    $.ajax({
-        url: url,
-        method: 'get',
-        data: {
-            id: id,
-            date: date,
-            teamId: teamId
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            teamId: el.attr('team-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
+        }
+    });
+}
+
+function proccessWorkDay(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var el = $(cellElement);
+    var url = "/request/proccesscalendarday";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            teamId: el.attr('team-anchor')
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        }
+    });
+}
+
+function timeManagmentModal(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var el = $(cellElement);
+    var url = "/profile/timemanagment";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            date: el.attr('date-anchor'),
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 
-    preloader.css('display', 'none');
+
+}
+
+function callDayProccessMenu(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var el = $(cellElement);
+    var url = '/profile/dayproccessmenu';
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            teamId: el.attr('team-anchor')
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#request_modal').modal();
+            $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
+        }
+    });
+
+ 
 }

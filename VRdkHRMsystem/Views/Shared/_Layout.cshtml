@@ -55,23 +55,20 @@
                         <a href="@Url.Action("Profile","Profile")"><img src="~/images/user.png" alt="usericon" /></a>
                         <div class="header__icons_notifications"><a href="@Url.Action("Notifications","Profile")"><img src="~/images/notif.png" alt="notifications" /></a></div><a href="@Url.Action("Logoff","Account")"><img src="~/images/exit.png" alt="exit" /></a>
                     </div>
-                    <div class="header__burger_button">
+                    <div class="header__burger_button" onclick="manageMenu()">
                         <div></div>
                         <div></div>
                         <div></div>
                     </div>
                 </div>
             </div>
-            <div class="header__burger">
-                <div class="header__burger_closebutton">
-                    <button>as</button>
-                </div>
+            <div class="header__burger">              
                 <div class="navigation">
-                    <ul>
+                    <ul style="padding-top:20px;">
                         @if (User.IsInRole("Administrator"))
                         {
                             <a href="@Url.Action("Calendar","Admin")" style="text-decoration:none">
-                                <li id="calendars" class="navigation__link">
+                                <li id="calendar" class="navigation__link">
                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="21.5" height="21.5" viewBox="0 0 21.5 21.5">
                                         <metadata>
                                             <?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
@@ -176,7 +173,7 @@
                                     <p>Прогулы</p>
                                 </li>
                             </a>
-                            <a href="@Url.Action("Employees", "Admin")">
+                            <a href="@Url.Action("Employees", "Admin")"  style="text-decoration:none">
                                 <li id="employees" class="navigation__link">
                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="23" height="22" viewBox="0 0 23 22">
                                         <metadata>
@@ -282,7 +279,7 @@
                                     <p>Календарь</p>
                                 </li>
                             </a>
-                            <a href="@Url.Action("Vacations","Teamlead")">
+                            <a href="@Url.Action("Vacations","Teamlead")" style="text-decoration:none">
                                 <li id="vacations" class="navigation__link">
                                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="23" viewBox="0 0 24 23">
                                         <metadata>
@@ -632,6 +629,16 @@
                             <p>Список команд</p>
                         </li>
                     </a>
+                    <div class="navigation__buttonwrapper">
+                        <a class="button navigation__button" href="@Url.Action("AddEmployee","Admin")" style="text-decoration:none">
+                            <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
+                            <p>Добавить сотрудника</p>
+                        </a>
+                        <a class="button navigation__button" href="@Url.Action("AddTeam","Admin")" style="text-decoration:none">
+                            <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
+                            <p>Добавить команду</p>
+                        </a>
+                    </div>
                 }
                 else if (User.IsInRole("Teamlead"))
                 {
@@ -839,19 +846,6 @@
                     </a>
                 }
             </ul>
-            @if (User.IsInRole("Administrator"))
-            {
-                <div class="navigation__buttonwrapper">
-                    <a class="button navigation__button" href="@Url.Action("AddEmployee","Admin")" style="text-decoration:none">
-                        <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
-                        <p>Добавить сотрудника</p>
-                    </a>
-                    <a class="button navigation__button" href="@Url.Action("AddTeam","Admin")" style="text-decoration:none">
-                        <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
-                        <p>Добавить команду</p>
-                    </a>
-                </div>
-            }
         </div>
         @RenderBody()
         @RenderSection("Scripts", required: false)

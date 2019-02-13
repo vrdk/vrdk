@@ -3,7 +3,7 @@
 <form asp-action="AddEmployee" method="post" class="content" enctype="multipart/form-data" id="submit_form">
     <div class="profile__globalwrapper">
         <div class="profile empprofileedit">
-           
+
             <div class="profile__data">
                 <div class="profile__datablock">
                     <label class="profile__blockname">
@@ -127,7 +127,12 @@
         </div>
     </div>
 </form>
-    @section Scripts {
-        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-        <script src="~/js/submit.js"></script>
-    }
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $.validator.setDefaults({
+            onkeyup: false
+        })
+    </script>
+    <script src="~/js/submit.js"></script>
+}

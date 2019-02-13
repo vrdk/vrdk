@@ -1,6 +1,7 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.Vacation.VacationRequestCheckViewModel
 @{
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
+    var timeStamp = DateTime.UtcNow;
 }
 <div class="box-modal vacmodal"  style="border-radius:10px;  margin-left:auto;margin-right:auto;">
     <div id="vacrequest">
@@ -10,7 +11,7 @@
             <p class="modal__title">Запрос на отпуск</p>
         </div>
         <div class="vacmodal__empinfo">
-            <img src="@($"{photoBlobUrl}{Model.EmployeeId}.png")" alt="photo" style="object-fit: cover;border-radius:50%;" />
+            <img src="@($"{photoBlobUrl}{Model.EmployeeId}.png?{timeStamp.ToString()}")" alt="photo" style="object-fit: cover;border-radius:50%;" />
             <div>
                 <p class="vacmodal__name">@Model.EmployeeFullName</p>
                 <p class="vacmodal__post">@Model.Post</p>

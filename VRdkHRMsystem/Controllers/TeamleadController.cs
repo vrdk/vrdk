@@ -243,7 +243,7 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult DayProccessMenu(string id, string date,string name,string surname, string teamId, string role)
+        public IActionResult DayProccessMenu(string id, string date, string name, string surname, string teamId, string role)
         {
             var model = new DayProccessMenuViewModel
             {
@@ -254,7 +254,7 @@ namespace VRdkHRMsystem.Controllers
                 Surname = surname,
                 Role = role
             };
-           
+
             return PartialView("DayProccessMenuModal", model);
         }
 
@@ -789,6 +789,21 @@ namespace VRdkHRMsystem.Controllers
                         await _dayOffService.UpdateAsync(dayOffEx);
                         await _notificationService.CreateAsync(notification);
                         await _workDayService.DeleteAsync(workDay.WorkDayId, true);
+
+                        var cellModel = new CalendarDayOffCellViewModel
+                        {
+                            EmployeeId = dayOffEx.EmployeeId,
+                            Date = dayOffEx.DayOffDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            Role = model.Role,
+                            TeamId = workDay.Employee.TeamId,
+                            Comment = dayOffEx.Comment,
+                            DayOffImportance = dayOffEx.DayOffImportance,
+                            DayOffState = dayOffEx.DayOffState                            
+                        };
+
+                        return PartialView("CalendarDayOffCell", cellModel);
                     }
                     else
                     {
@@ -815,12 +830,28 @@ namespace VRdkHRMsystem.Controllers
                         await _workDayService.DeleteAsync(workDay.WorkDayId);
                         await _dayOffService.CreateAsync(dayOff);
                         await _notificationService.CreateAsync(notification, true);
+
+                        var cellModel = new CalendarDayOffCellViewModel
+                        {
+                            EmployeeId = dayOff.EmployeeId,
+                            Date = dayOff.DayOffDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            Role = model.Role,
+                            TeamId = workDay.Employee.TeamId,
+                            Comment = dayOff.Comment,
+                            DayOffImportance = dayOff.DayOffImportance,
+                            DayOffState = dayOff.DayOffState
+                        };
+
+                        return PartialView("CalendarDayOffCell", cellModel);
                     }
                 }
                 else
                 {
                     if (workDay.TimeFrom != model.TimeFrom.TimeOfDay || workDay.TimeTo != model.TimeTo.TimeOfDay)
                     {
+                        var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
                         workDay.TimeFrom = model.TimeFrom.TimeOfDay;
                         workDay.TimeTo = model.TimeTo.TimeOfDay;
                         workDay.ProcessDate = DateTime.UtcNow;
@@ -837,6 +868,21 @@ namespace VRdkHRMsystem.Controllers
                         };
                         await _workDayService.UpdateAsync(workDay);
                         await _notificationService.CreateAsync(notification, true);
+
+                        var cellModel = new CalendarWorkDayCellViewModel
+                        {
+                            EmployeeId = workDay.EmployeeId,
+                            Date = workDay.WorkDayDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            Role = model.Role,
+                            TeamId = workDay.Employee.TeamId,
+                            TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                            TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                            DayOffImportance = dayOffEx?.DayOffImportance
+                        };
+
+                        return PartialView("CalendarWorkDayCell", cellModel);
                     }
                 }
             }
@@ -851,7 +897,24 @@ namespace VRdkHRMsystem.Controllers
             var day = Convert.ToDateTime(date);
             var dayOff = await _dayOffService.GetByDateAsync(day, id);
             var workDay = await _workDayService.GetByDateAsync(day, id);
-            if (dayOff != null && dayOff.DayOffState != DayOffStateEnum.Requested.ToString())
+            if (workDay != null)
+            {
+                var model = new EditCalendarDayViewModel
+                {
+                    CalendarDayId = workDay.WorkDayId,
+                    Date = day,
+                    TimeFrom = new DateTime(day.Year, day.Month, day.Day, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                    TimeTo = new DateTime(day.Year, day.Month, day.Day, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                    FirstName = name,
+                    LastName = surname,
+                    TeamId = teamId,
+                    Role = role,
+                    EmployeeId = id
+                };
+
+                return PartialView("EditWorkDayModal", model);
+            }
+            else if (dayOff != null)
             {
                 var model = new EditCalendarDayViewModel
                 {
@@ -864,22 +927,7 @@ namespace VRdkHRMsystem.Controllers
                 };
 
                 return PartialView("EditDayOffModal", model);
-            }
-            else if (workDay != null)
-            {
-                var model = new EditCalendarDayViewModel
-                {
-                    CalendarDayId = workDay.WorkDayId,
-                    Date = day,
-                    TimeFrom = new DateTime(day.Year, day.Month, day.Day, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
-                    TimeTo = new DateTime(day.Year, day.Month, day.Day, workDay.TimeTo.Hours, workDay.TimeFrom.Minutes, 0),
-                    FirstName = name,
-                    LastName = surname,
-                    TeamId = teamId,
-                    Role = role
-                };
 
-                return PartialView("EditWorkDayModal", model);
             }
             else
             {
@@ -926,6 +974,21 @@ namespace VRdkHRMsystem.Controllers
                     };
                     await _dayOffService.CreateAsync(dayOff);
                     await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarDayOffCellViewModel
+                    {
+                        EmployeeId = dayOff.EmployeeId,
+                        Date = dayOff.DayOffDate,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        Role = model.Role,
+                        TeamId = employee.TeamId,
+                        DayOffState = dayOff.DayOffState,
+                        DayOffImportance = dayOff.DayOffImportance,
+                        
+                    };
+
+                    return PartialView("CalendarDayOffCell", cellModel);
                 }
                 else
                 {
@@ -951,6 +1014,20 @@ namespace VRdkHRMsystem.Controllers
                     };
                     await _workDayService.CreateAsync(workDay);
                     await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarWorkDayCellViewModel
+                    {
+                        EmployeeId = workDay.EmployeeId,
+                        Date = workDay.WorkDayDate,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        Role = model.Role,
+                        TeamId = employee.TeamId,
+                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0)
+                    };
+
+                    return PartialView("CalendarWorkDayCell", cellModel);
                 }
             }
 
@@ -996,9 +1073,10 @@ namespace VRdkHRMsystem.Controllers
                 residual.ResidualBalance += 1;
                 await _residualsService.UpdateAsync(residual);
                 await _absenceService.CreateAsync(absence, true);
+                return Json(true);
             }
 
-            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId });
+            return Json(false);
         }
     }
 }

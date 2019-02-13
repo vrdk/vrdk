@@ -6,6 +6,7 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
     public class EditCalendarDayViewModel
     {
         public string CalendarDayId { get; set; }
+        public string EmployeeId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string TeamId { get; set; }
@@ -20,7 +21,6 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
         public DateTime TimeTo { get; set; }
         public string Result { get; set; }
-        public DateTime ProcessDate { get; set; }
         public string Role { get; set; }
     }
 }

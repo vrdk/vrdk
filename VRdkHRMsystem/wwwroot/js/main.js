@@ -173,14 +173,12 @@ function deleteAssignment(id) {
             preloader.css('display', 'none');
         }
     });
-
-
 }
 
 function showPreloader() {
     var pl = $('#preloader');
     pl.css('display', 'flex');
-}
+}   
 
 function closePreloader(preloader) {
     setTimeout(function () {
@@ -188,4 +186,18 @@ function closePreloader(preloader) {
     }, 1000);
 }
 
-
+function manageMenu() {
+    var menu = $(".header__burger");
+    if (menu.css('visibility') === 'hidden') {
+        menu.css('visibility', 'visible');
+        menu.css('opacity', '1');   
+        $(document.body).on('click', function () {
+            manageMenu();
+        });
+    }
+    else {
+        menu.css('visibility', 'hidden');
+        menu.css('opacity', '0');   
+        $(document.body).off('click');
+    }
+}

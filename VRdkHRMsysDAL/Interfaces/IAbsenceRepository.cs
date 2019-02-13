@@ -9,5 +9,6 @@ namespace VRdkHRMsysDAL.Interfaces
     {
         Task<Absence[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Absence, bool>> condition = null, string searchKey = null);
         Task<int> GetAbsencesCountAsync(string searchKey = null, Expression<Func<Absence, bool>> condition = null);
+        Task<Absence[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
     }
 }

@@ -78,7 +78,6 @@
                                                 <text>
                                                     <div class="calendar__block">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                 </text>
-
                                             }
                                             else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
                                             {
@@ -86,7 +85,7 @@
                                                 if (dayOff.DayOffState == "Approved")
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff"></div>
+                                                        <div class="calendar__block calendar__block_dayoff_img"></div>
                                                     </text>
                                                 }
                                                 else
@@ -130,37 +129,45 @@
                                                 if (dayOffRequest == null)
                                                 {
                                                     <text>
-                                                        <div class="calendar__block" onclick="callDayProccessMenu('@employee.EmployeeId','@date.Date.ToString("dd.MM.yyyy")','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block" type-anchor="workDay" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" onclick="callDayProccessMenu('@employee.EmployeeId','@date.Date.ToString("dd.MM.yyyy")','@Model.TeamId')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" type-anchor="workDay" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
                                                     </text>
                                                 }
-
                                             }
                                             else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
                                             {
                                                 var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
-                                                if (dayOff.DayOffState == "Requested")
+                                                if (dayOff.DayOffState == "Approved")
                                                 {
-                                                    <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" onclick="callDayProccessMenu('@employee.EmployeeId','@date.Date.ToString("dd.MM.yyyy")','@Model.TeamId')">-</div>
-                                                    </text>
+                                                    if (dayOff.DayOffImportance == null)
+                                                    {
+                                                        <text>
+                                                            <div class="calendar__block calendar__block_dayoff_img"  type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId"></div>
+                                                        </text>
+                                                    }
+                                                    else
+                                                    {
+                                                        <text>
+                                                            <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon calendar__block_dayoff_img" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")"  type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId"></div>
+                                                        </text>
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     <text>
-                                                        <div class="calendar__block calendar__block_dayoff"></div>
+                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon"  title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")"   type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId">-</div>
                                                     </text>
                                                 }
 
                                             }
                                             else
                                             {
-                                                <div class="calendar__block" onclick="callDayProccessMenu('@employee.EmployeeId','@date.Date.ToString("dd.MM.yyyy")','@Model.TeamId')">-</div>
+                                                <div class="calendar__block" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId">-</div>
                                             }
 
                                         }

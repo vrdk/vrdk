@@ -32,6 +32,11 @@ namespace VRdkHRMsysDAL.Repositories
 
         }
 
+        public async Task<Absence[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
+        {
+            return await _context.Absence.Where(req => req.EmployeeId == id).OrderByDescending(req => req.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+        }
+
         public async Task<Absence[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Absence, bool>> condition = null, string searchKey = null)
         {
             if (searchKey == null)

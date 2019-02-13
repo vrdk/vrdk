@@ -1,0 +1,17 @@
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarWorkDayCellViewModel
+<div class="calendar__block @if (Model.DayOffImportance != null) { <text> calendar__block_dayoff@(Model.DayOffImportance) calendar__block_moon  </text> }"
+     @if(Model.TeamId != null)
+     {
+         <text> type-anchor="workDay" </text>
+     }
+     else
+     {
+         <text> type-anchor="teamleadWorkDay" </text>
+     }
+     employee-anchor="@Model.EmployeeId"
+     date-anchor="@Model.Date.ToString("dd.MM.yyyy")"
+     name-anchor="@Model.FirstName"
+     surname-anchor ="@Model.LastName"
+     team-anchor="@Model.TeamId"
+     role-anchor="@Model.Role"
+>@Model.TimeFrom.TimeOfDay.Hours-@Model.TimeTo.TimeOfDay.Hours</div>

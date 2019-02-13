@@ -10,40 +10,69 @@
         position: 'right',
         theme: 'tooltipster-light'
     });
+
+    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor="free"]', function () {
+        proccessCalendarDay(this);
+    });  
+    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor= "dayOff"]', function () {
+        proccessCalendarDay(this);
+    });   
+    
+    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor= "teamleadWorkDay"]', function () {
+        callSelfDayProccessMenu(this);
+    });
+
+    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor="workDay"]', function () {
+        callDayProccessMenuForTeamlead(this);
+    });
+
+    $(".calendar__passes").on('click', '.calendar__pass[type-anchor="absence"]', function () {
+       setAbsence(this);
+    });
 });
 
-function setAbsence(id, tId, fn, ln, rl) {
+function setAbsence(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
+    var el = $(cellElement);  
     var url = "/teamlead/setAbsence";
     $.ajax({
         url: url,
         data: {
-            id: id,
-            teamId: tId,
-            firstName: fn,
-            lastName: ln,
-            role: rl
+            id: el.attr('employee-anchor'),
+            teamId: el.attr('team-anchor'),
+            firstName: el.attr('name-anchor'),
+            lastName: el.attr('surname-anchor'),
+            role: el.attr('role-anchor')
         },
         method: 'get',
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 
-function proccessCalendarDay(id, dt, fn, ln, tId, rl) {
+function proccessCalendarDay(cellElement) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     var url = "/teamlead/proccesscalendarday";
+    var el = $(cellElement);    
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            id: id,
-            date: dt,
-            name: fn,
-            surname: ln,
-            teamId: tId,
-            role : rl
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            name: el.attr('name-anchor'),
+            surname: el.attr('surname-anchor'),
+            teamId: el.attr('team-anchor'),
+            role: el.attr('role-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -61,11 +90,17 @@ function proccessCalendarDay(id, dt, fn, ln, tId, rl) {
             });
             $("#datepicker_from").mask('00:00');
             $("#datepicker_to").mask('00:00');
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 
 function editWorkDay(id, dt, tId, rl) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     var url = "/teamlead/editworkday";
     $.ajax({
         url: url,
@@ -92,11 +127,17 @@ function editWorkDay(id, dt, tId, rl) {
             });
             $("#workDay_timepicker_from").mask('00:00');
             $("#workDay_timepicker_to").mask('00:00');
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 
 function editDayOff(id, dt, tId, rl) {
+    var preloader = $("#preloader");
+    preloader.css('display', 'flex');
     var url = "/teamlead/editdayoff";
     $.ajax({
         url: url,
@@ -123,96 +164,114 @@ function editDayOff(id, dt, tId, rl) {
             });
             $("#workDay_timepicker_from").mask('00:00');
             $("#workDay_timepicker_to").mask('00:00');
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 }
 
-function callSelfDayProccessMenu(id, dt, fn, ln, tId, rl) {
+function callSelfDayProccessMenu(cellElement) {
     var preloader = $("#preloader");
     preloader.css('display', 'flex');
     var url = '/teamlead/selfdayproccessmenu';
+    var el = $(cellElement);    
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            id: id,
-            date: dt,
-            name: fn,
-            surname: ln,
-            teamId: tId,
-            role: rl
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            name: el.attr('name-anchor'),
+            surname: el.attr('surname-anchor'),
+            teamId: el.attr('team-anchor'),
+            role: el.attr('role-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
-
-    preloader.css('display', 'none');
 }
 
-function callDayProccessMenuForTeamlead(id, dt, fn, ln, tId, rl) {
+function callDayProccessMenuForTeamlead(cellElement) {
     var preloader = $("#preloader");
     preloader.css('display', 'flex');
     var url = '/teamlead/dayproccessmenu';
+    var el = $(cellElement);     
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            id: id,
-            date: dt,
-            name: fn,
-            surname: ln,
-            teamId: tId,
-            role: rl
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor'),
+            name: el.attr('name-anchor'),
+            surname: el.attr('surname-anchor'),
+            teamId: el.attr('team-anchor'),
+            role: el.attr('role-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
-
-    preloader.css('display', 'none');
 }
 
-function getEmployeesTimeManagementRecords(id, date) {
+function getEmployeesTimeManagementRecords(event_element) {
     var preloader = $("#preloader");
     preloader.css('display', 'flex');
+    var el = $(event_element);
     var url = '/teamlead/timemanagementrecords';
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            id: id,
-            date: date
+            id: el.attr('employee-anchor'),
+            date: el.attr('date-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
-    });
-
-    preloader.css('display', 'none');
+    });  
 }
 
-function TeamleadTimeManagmentModal(date) {
+function TeamleadTimeManagmentModal(event_element) {
     var preloader = $("#preloader");
     preloader.css('display', 'flex');
+    var el = $(event_element);
     var url = "/profile/timemanagment";
     $.ajax({
         url: url,
         method: 'get',
         data: {
-            date: date
+            date: el.attr('date-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#modal_place').html(modal_html);
+            preloader.css('display', 'none');
+        },
+        error: function () {
+            preloader.css('display', 'none');
         }
     });
 
-    preloader.css('display', 'none');
+
 }

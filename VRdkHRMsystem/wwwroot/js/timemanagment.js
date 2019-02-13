@@ -2,9 +2,16 @@
     $(".timemanagement_timepicker").timepicker({
         timeFormat: 'H:mm',
         startHour: 9,
-        interval: 60
+        interval: 60,
+        change: function () {
+                $(this).change();
+        }
     });
     $(".timemanagement_timepicker").mask('00:00');
+    $(".form_input").on('keydown change', function () {
+        var formNumber = $(this).attr('form-number');
+        $('img[form-number=' + formNumber + ']').css('display', 'flex');    
+    });
 });
 
 function AddTimeManagment(objAppendToId, date) {
@@ -26,11 +33,14 @@ function AddTimeManagment(objAppendToId, date) {
                 interval: 60
             });
             $(".timemanagement_timepicker").mask('00:00');
-           
+            preloader.css('display', 'none');
+        },
+        error: function() {
+            preloader.css('display', 'none');
         }
     });
 
-    preloader.css('display', 'none');
+  
 }
 
 function deleteTimeManagementRecord(element, id) {
@@ -47,15 +57,20 @@ function deleteTimeManagementRecord(element, id) {
             success: function () {
                 var elemToDelete = $(element).parent().parent();
                 elemToDelete.empty();
+                preloader.css('display', 'none');
+            },
+            error: function () {
+                preloader.css('display', 'none');
             }
         });
     }
     else {
         var elemToDelete = $(element).parent().parent();
         elemToDelete.empty();
+        preloader.css('display', 'none');
     }
 
-    preloader.css('display', 'none');
+   
 }
 
 function submitForm(form_elem) {
@@ -70,12 +85,21 @@ function submitForm(form_elem) {
             data: form.serialize(),
             success: function (html_data) {
                 form.replaceWith(html_data);
+                $(".timemanagement_timepicker").timepicker({
+                    timeFormat: 'H:mm',
+                    startHour: 9,
+                    interval: 60
+                });
+                $(".timemanagement_timepicker").mask('00:00');
+                preloader.css('display', 'none');
+            },
+            error: function () {
+                preloader.css('display', 'none');
             }
         });
     }
     
     event.preventDefault();
-    preloader.css('display', 'none');
 }
 
 function submitClosestForm(submit_element) {

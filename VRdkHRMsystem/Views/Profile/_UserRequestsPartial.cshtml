@@ -57,7 +57,7 @@
                 <div class="profile__tab" id="vacation" onclick="getinitialprofilerequests('0','vacation')">Мои отпуска</div>
                 <div class="profile__tab" id="sickleave" onclick="getinitialprofilerequests('0','sickleave')">Мои больничные</div>
                 <div class="profile__tab" id="assignment" onclick="getinitialprofilerequests('0','assignment')">Мои командировки</div>
-                <div class="profile__tab" id="absences" onclick="timeManagmentModal('02.02.2019')">Мои прогулы</div>
+                <div class="profile__tab" id="absence" onclick="getinitialprofilerequests('0','absence')">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
                 <div class="profile__tabs_vacation profile__tab_post">
@@ -69,21 +69,8 @@
                 <div class="profile__tabs_assignment profile__tab_post">
                     <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
-                <div class="profile__tabs_passes profile__tab_post">
-                    <div class="profile__tabs_body_block">
-                        <div class="profile__tabs_passestitle profile__tabs_title">
-                            <p class="profile__tabs_passesdates">Даты</p>
-                            <div class="profile__tabs_arrows"><img src="~/images/angle-left.png" alt="angle" /><img src="~/images/angle-right.png" alt="angle" /></div>
-                        </div>
-                        <div class="profile__tabs_passescontent profile__tabs_content">
-                            <p class="profile__tabs_passesdate">12.12.2012</p>
-                            <p class="profile__tabs_passesdate">12.12.2012</p>
-                            <p class="profile__tabs_passesdate">12.12.2012</p>
-                            <p class="profile__tabs_passesdate">12.12.2012</p>
-                            <p class="profile__tabs_passesdate">12.12.2012</p>
-
-                        </div>
-                    </div>
+                <div class="profile__tabs_absence profile__tab_post">
+                    <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>                   
                 </div>
             </div>
         </div>

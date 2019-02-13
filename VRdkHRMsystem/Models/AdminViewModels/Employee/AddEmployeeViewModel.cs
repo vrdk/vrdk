@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
@@ -32,11 +33,12 @@ namespace VRdkHRMsystem.Models.AdminViewModels.Employee
         [DataType(DataType.Date)]
         public DateTime? DismissalDate { get; set; }
         [Required(ErrorMessage = " необходино заполнить")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = " неверный  e-mail")]
         [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string PersonalEmail { get; set; }
+        [Remote(action: "ValidateEmail", controller: "RemoteValidation", AdditionalFields = "EmployeeId")]
         [Required(ErrorMessage = " необходино заполнить")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = " неверный  e-mail")]
         [MaxLength(50, ErrorMessage = " до 50 символов")]
         public string WorkEmail { get; set; }
         [Required]

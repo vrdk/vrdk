@@ -64,13 +64,17 @@ namespace VRdkHRMsystem.Controllers
                 if (model.DayOffImportance == "delete")
                 {
                    await _dayOffService.DeleteAsync(dayOff.DayOffId, true);
+
+                    return Json(false);
                 }
                 else
                 {
                     dayOff.DayOffImportance = model.DayOffImportance;
                     dayOff.Comment = model.Comment;
                     await _dayOffService.UpdateAsync(dayOff, true);
-                }              
+                }
+                dayOff.Employee = null;
+                return Json(dayOff);
             }
 
             if (User.IsInRole("Administrator"))
@@ -148,6 +152,8 @@ namespace VRdkHRMsystem.Controllers
                 };
                 await _dayOffService.CreateAsync(dayOff);
                 await _notificationService.CreateAsync(notification, true);
+
+                return Json(dayOff);
             }
 
             if (User.IsInRole("Administrator"))
