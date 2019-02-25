@@ -23,20 +23,26 @@ function addAssignment() {
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
             }); 
-            $("#datepicker_from").datepicker({
+            $("#from_datepicker").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
                 firstDay: 1
             });
-            $("#datepicker_to").datepicker({
+            $("#to_datepicker").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
                 firstDay: 1
             });
-            $("#datepicker_from").mask('00.00.0000');
-            $("#datepicker_to").mask('00.00.0000');
+            $("#from_datepicker").mask('00.00.0000');
+            $("#to_datepicker").mask('00.00.0000');
+            $(".date_picker_diff").on('change', function () {
+                var input = $(this);
+                var date = parseDate(input.val());
+                input.val(date);
+                CalcDiff('from_datepicker', 'to_datepicker');
+            });
             preloader.css('display', 'none');
         },
         error: function () {
@@ -59,18 +65,24 @@ function editAssignment(id) {
                 placeholder: "Выберите cотрудников...",
                 templateResult: formatState
             });
-            $("#datepicker_from").datepicker({
+            $("#from_datepicker").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1
             });
-            $("#datepicker_to").datepicker({
+            $("#to_datepicker").datepicker({
                 dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
                 dateFormat: 'dd.mm.yy',
                 monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1
             });
-            $("#datepicker_from").mask('00.00.0000');
-            $("#datepicker_to").mask('00.00.0000');
+            $("#from_datepicker").mask('00.00.0000');
+            $("#to_datepicker").mask('00.00.0000');
+            $(".date_picker_diff").on('change', function () {
+                var input = $(this);
+                var date = parseDate(input.val());
+                input.val(date);
+                CalcDiff('from_datepicker', 'to_datepicker');
+            });
             preloader.css('display', 'none');
         },
         error: function () {
@@ -96,8 +108,3 @@ function checkAssignment(id) {
         }
     });
 }
-$(document).ready(function () {
-    $("#assignments_form").on('submit', function () {
-        showPreloader();
-    });
-});

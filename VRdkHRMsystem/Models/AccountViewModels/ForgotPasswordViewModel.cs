@@ -8,8 +8,8 @@ namespace VRdkHRMsystem.Models.AccountViewModels
 {
     public class ForgotPasswordViewModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage =" заполните")]
+        [EmailAddress(ErrorMessage =" неверный e-mail")]
         public string Email { get; set; }
     }
 }

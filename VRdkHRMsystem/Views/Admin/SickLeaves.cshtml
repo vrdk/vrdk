@@ -13,7 +13,7 @@
                 <p>Список сообщений о болезнях</p>
                 <div class="table__header_search">
                     <input type="text" placeholder="Найти больничный..." name="searchKey" value="@searchKey" />
-                    <button type="submit"><img src="~/images/search.png" alt="search" /></button>
+                    <button class="submit_button" type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
             <div class="table__body">
@@ -108,4 +108,3 @@
     <div class="modal-dialog" id="modal_place" style="margin-left:auto;margin-right:auto;"></div>
 </div>
 @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-<script src="~/js/searchSubmit.js"></script>

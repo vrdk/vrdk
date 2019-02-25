@@ -14,16 +14,16 @@
         <p>Учасники <span asp-validation-for="AssignmentMembers" style="color: #ad545f;"></span></p>
         <select asp-for="AssignmentMembers" asp-items="Model.Employees" multiple="multiple" id="tripMembers" style="width:100%;" hidden></select>
     </div>
+    <span asp-validation-for="Duration" style="color: #ad545f; margin-left:auto;margin-right:auto"></span>
     <div class="tripmodal__date">
         <div class="tripmodal__date_block">
-            <p>С: <span asp-validation-for="Duration" style="color: #ad545f;"></span></p>
-            <input asp-for="BeginDate" class="input" type="text" id="datepicker_from" name="BeginDate" autocomplete="off" onchange="CalcDiff('datepicker_from','datepicker_to')" />
+            <p>С:</p>
+            <input asp-for="BeginDate" class="input date_picker_diff" type="text" id="from_datepicker" name="BeginDate" autocomplete="off"/>
         </div>
         <div class="tripmodal__date_block">
-            <p>По: <span asp-validation-for="Duration" style="color: #ad545f;"></span></p>
-            <input asp-for="EndDate" class="input" type="text" id="datepicker_to" autocomplete="off" onchange="CalcDiff('datepicker_from','datepicker_to')" />
+            <p>По:</p>
+            <input asp-for="EndDate" class="input date_picker_diff" type="text" id="to_datepicker" autocomplete="off" />
         </div>
-
     </div>
     <input asp-for="Duration" readonly id="Duration" class="input" hidden />
     <div class="vacmodal__buttons">

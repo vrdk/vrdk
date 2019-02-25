@@ -14,8 +14,8 @@
                 <div class="profile__imgblock"><img src="@($"{photoBlobUrl}{Model.EmployeeId}.png?{timeStamp.ToString()}")" alt="photo" id="user_photo" style="object-fit: cover;" /></div>
                 <label class=" empprofile__button button empprofileedit__button" for="Photo" id="photoUploadLabel">
                     <img src="~/images/plus.png" alt="plus" />
-                    <p>Изменить фото</p>
-                    <input class="sickmessage__ulpoad_my" type="file" id="Photo" multiple="multiple" accept="image/*" onchange="setupCropper(this)" />
+                    <p id="photoUploadText">Изменить фото</p>
+                    <input class="sickmessage__ulpoad_my" type="file" id="Photo" accept="image/*" onchange="setupCropper(this)" />
                 </label>
             </div>
             <div class="profile__data">
@@ -136,7 +136,7 @@
                 </div>
             </div>
             <div class="empprofileedit__buttonwrapper">
-                <button class="empprofile__button button" type="button" onclick="window.history.back()">
+                <button class="empprofile__button button back_button" type="button">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Назад</p>
                 </button>
@@ -150,7 +150,7 @@
 </form>
 
 <div class="modal fade" id="user_photo_modal">
-    <div class="modal-dialog modal-content" style="width:700px;margin-left:auto;margin-right:auto;margin-top:5%">
+    <div class="modal-dialog modal-content" style="margin-left:auto;margin-right:auto;margin-top:5%">
         <div id="questionmodal1" style="width:auto">
             <div class="modal__header" style="border-radius: 6px;">
                 <p class="modal__title">Изменить фото</p>
@@ -159,11 +159,11 @@
                 <img style="max-width:100%;height:auto" id="image" src="" alt="">
             </div>
             <div class="vacmodal__buttons">
-                <button class="button" type="button" data-dismiss="modal">
+                <button class="button" type="button" id="cancel" data-dismiss="modal">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Отменить</p>
                 </button>
-                <button class="button" type="button" onclick="setImage()" data-dismiss="modal">
+                <button class="button" type="button" id="croppImage" data-dismiss="modal">
                     <img src="~/images/submit.png" alt="submit" />
                     <p>Изменить</p>
                 </button>

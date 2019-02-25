@@ -307,7 +307,7 @@ namespace VRdkHRMsystem.Controllers
                     OrganisationId = employee.OrganisationId,
                     EmployeeId = employee.Team?.TeamleadId,
                     NotificationDate = DateTime.UtcNow,
-                    NotificationType = NotificationTypeEnum.Vacation.ToString(),
+                    NotificationType = NotificationTypeEnum.SickLeave.ToString(),
                     IsChecked = false,
                     NotificationRange = NotificationRangeEnum.Organisation.ToString(),
                     Description = $"{employee.FirstName} {employee.LastName} запросил больничный"

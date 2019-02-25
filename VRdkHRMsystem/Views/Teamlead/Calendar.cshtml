@@ -25,17 +25,17 @@
             <div class="calendar__main">
                 <div class="calendar__passes">
                     <div class="calendar__pass"></div>
-                    @if (now.Month == Model.Month && now.Year == Model.Year)
+                    @if (now.ToLocalTime().Month == Model.Month && now.ToLocalTime().Year == Model.Year)
                     {
                         @foreach (var employee in Model.Employees)
                         {
-                            if (!employee.Absences.Any(a => a.AbsenceDate.Day == now.Day) && !employee.DayOffs.Any(d => d.DayOffDate.Day == now.Day && d.DayOffState == "Approved"))
+                            if (!employee.Absences.Any(a => a.AbsenceDate.Day == now.ToLocalTime().Day))
                             {
                                 <div class="calendar__pass" type-anchor="absence" employee-anchor="@employee.EmployeeId" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role">Прогул</div>
                             }
                             else
                             {
-                                <div class="calendar__pass" disabled="disabled" style="cursor:not-allowed">Прогул</div>
+                                <div class="calendar__pass" disabled="disabled" style="cursor:not-allowed;">-</div>
                             }
                         }
                     }
@@ -64,74 +64,75 @@
                             {
                                 if (employee.EmployeeId != Model.MainMemberId)
                                 {
-                                    <div class="calendar__contentblock">
-                                        @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
+                            <div class="calendar__contentblock">
+                                @for (var date = startDate; date.Month == Model.Month; date = date.AddDays(1))
+                                {
+                                    if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
+                                    {
+                                        <div class="calendar__block calendar__block_pass"></div>
+                                    }
+                                    else if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day >= date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day >= date.Day)))
+                                    {
+                                        <div class="calendar__block calendar__block_vacation"></div>
+                                    }
+                                    else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day) || (s.CreateDate.Month != date.Month && s.CreateDate.Day >= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day))))
+                                    {
+                                        <div class="calendar__block calendar__block_health"></div>
+                                    }
+
+                                    else if (employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day >= date.Day) || (a.Assignment.BeginDate.Month != date.Month && a.Assignment.BeginDate.Day >= date.Day && a.Assignment.EndDate.Day >= date.Day)))
+                                    {
+                                        <div class="calendar__block calendar__block_assignment"></div>
+                                    }
+                                    else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
+                                    {
+                                        var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
+                                        var dayOffRequest = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day && d.DayOffState == "Requested");
+                                        if (dayOffRequest == null)
                                         {
-                                            if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day >= date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day >= date.Day)))
+                                            <text>
+                                                <div class="calendar__block" type-anchor="workDay" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role" onclick="callDayProccessMenuForTeamlead(this)">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                            </text>
+                                        }
+                                        else
+                                        {
+                                            <text>
+                                                <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
+                                            </text>
+                                        }
+                                    }
+                                    else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
+                                    {
+                                        var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
+                                        if (dayOff.DayOffState == "Approved")
+                                        {
+                                            if (dayOff.DayOffImportance == null)
                                             {
-                                                <div class="calendar__block calendar__block_vacation"></div>
-                                            }
-                                            else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day) || (s.CreateDate.Month != date.Month && s.CreateDate.Day >= date.Day && (s.CloseDate == null || s.CloseDate.Day >= date.Day))))
-                                            {
-                                                <div class="calendar__block calendar__block_health"></div>
-                                            }
-                                            else if (employee.Absences.Any(a => a.AbsenceDate.Day == date.Day))
-                                            {
-                                                <div class="calendar__block calendar__block_pass"></div>
-                                            }
-                                            else if (employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day >= date.Day) || (a.Assignment.BeginDate.Month != date.Month && a.Assignment.BeginDate.Day >= date.Day && a.Assignment.EndDate.Day >= date.Day)))
-                                            {
-                                                <div class="calendar__block calendar__block_assignment"></div>
-                                            }
-                                            else if (employee.WorkDays.Any(w => w.WorkDayDate.Day == date.Day))
-                                            {
-                                                var workDay = employee.WorkDays.FirstOrDefault(w => w.WorkDayDate.Day == date.Day);
-                                                var dayOffRequest = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day && d.DayOffState == "Requested");
-                                                if (dayOffRequest == null)
-                                                {
-                                                    <text>
-                                                        <div class="calendar__block" type-anchor="workDay" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role" onclick="callDayProccessMenuForTeamlead(this)">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                                    </text>
-                                                }
-                                                else
-                                                {
-                                                    <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOffRequest.DayOffImportance) calendar__block_moon" title="@(dayOffRequest.Comment!=null? dayOffRequest.Comment : "Нет комментария")" onclick="callDayProccessMenuForTeamlead('@employee.EmployeeId','@date.ToString("dd.MM.yyyy")','@employee.FirstName','@employee.LastName','@Model.TeamId','@Model.Role')">@workDay.TimeFrom.Hours-@workDay.TimeTo.Hours</div>
-                                                    </text>
-                                                }
-                                            }
-                                            else if (employee.DayOffs.Any(d => d.DayOffDate.Day == date.Day))
-                                            {
-                                                var dayOff = employee.DayOffs.FirstOrDefault(d => d.DayOffDate.Day == date.Day);
-                                                if (dayOff.DayOffState == "Approved")
-                                                {
-                                                    if (dayOff.DayOffImportance == null)
-                                                    {
-                                                        <text>
-                                                            <div class="calendar__block calendar__block_dayoff_img" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role"></div>
-                                                        </text>
-                                                    }
-                                                    else
-                                                    {
-                                                        <text>
-                                                            <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon calendar__block_dayoff_img" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role"></div>
-                                                        </text>
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    <text>
-                                                        <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role">-</div>
-                                                    </text>
-                                                }
+                                                <text>
+                                                    <div class="calendar__block calendar__block_dayoff_img" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role"></div>
+                                                </text>
                                             }
                                             else
                                             {
-                                                <div class="calendar__block" type-anchor="free" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor ="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role">-</div>
+                                                <text>
+                                                    <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon calendar__block_dayoff_img" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role"></div>
+                                                </text>
                                             }
-
                                         }
-                                    </div>
+                                        else
+                                        {
+                                            <text>
+                                                <div class="calendar__block calendar__block_dayoff@(dayOff.DayOffImportance) calendar__block_moon" title="@(dayOff.Comment!=null? dayOff.Comment : "Нет комментария")" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role">-</div>
+                                            </text>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="calendar__block" type-anchor="free" employee-anchor="@employee.EmployeeId" date-anchor="@date.ToString("dd.MM.yyyy")" name-anchor="@employee.FirstName" surname-anchor="@employee.LastName" team-anchor="@Model.TeamId" role-anchor="@Model.Role">-</div>
+                                    }
+
+                                }
+                            </div>
                                 }
                                 else
                                 {

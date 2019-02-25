@@ -44,11 +44,11 @@
                 <div class="vacrequest__body_right">
                     <div class="vacrequest__block">
                         <p>От<span asp-validation-for="BeginDate" style="color: #ad545f; padding:0"></span></p>
-                        <input asp-for="BeginDate" class="input" type="text" id="vacrequest__from_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
+                        <input asp-for="BeginDate" class="input  date_picker_diff" type="text" id="from_datepicker" value="@null" autocomplete="off" />
                     </div>
                     <div class="vacrequest__block">
                         <p>До<span asp-validation-for="EndDate" style="color: #ad545f; padding:0"></span></p>
-                        <input asp-for="EndDate" class="input" type="text" id="vacrequest__to_datepicker" value="@null" onchange="CalcDiff('vacrequest__from_datepicker','vacrequest__to_datepicker')" autocomplete="off" />
+                        <input asp-for="EndDate" class="input date_picker_diff" type="text" id="to_datepicker" value="@null" autocomplete="off" />
                     </div>
                     <div class="vacrequest__block">
                         <p>Длительность</p>

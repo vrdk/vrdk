@@ -383,10 +383,10 @@ namespace VRdkHRMsystem.Controllers
                 if (User.IsInRole("Administrator"))
                 {
                     notifications = await _notificationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
-                                                                            note => note.EmployeeId == user.EmployeeId
-                                                                                 || note.EmployeeId == null
+                                                                            note => (note.EmployeeId == user.EmployeeId
+                                                                                 || note.EmployeeId == null)
                                                                                  && note.OrganisationId == user.OrganisationId, searchKey);
-                    count = await _notificationService.GetNotificationsNumber(note => note.EmployeeId == user.EmployeeId || note.EmployeeId == null && note.OrganisationId == user.OrganisationId, searchKey);
+                    count = await _notificationService.GetNotificationsNumber(note => (note.EmployeeId == user.EmployeeId || note.EmployeeId == null) && note.OrganisationId == user.OrganisationId, searchKey);
                 }
                 else
                 {
@@ -422,7 +422,7 @@ namespace VRdkHRMsystem.Controllers
                 {
                     if (notificationType == NotificationTypeEnum.DayOff.ToString() || notificationType == NotificationTypeEnum.WorkDay.ToString())
                     {
-                        return RedirectToAction("Profile", "Calendar");
+                        return RedirectToAction("Calendar", "Profile");
                     }
                     else
                     {
@@ -451,6 +451,20 @@ namespace VRdkHRMsystem.Controllers
             }
 
             return RedirectToAction("Profile", "Profile");
+        }
+
+        [HttpGet]
+        public async Task<bool> CheckNotificationsNuvelty(string userEmail)
+        {
+            var notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail && n.IsChecked == false);
+            if(notifications == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

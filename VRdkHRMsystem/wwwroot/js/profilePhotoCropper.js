@@ -1,6 +1,13 @@
-﻿var cropper;
+﻿$(document).ready(function () {
+    $('#croppImage').on('click', function () {
+        setImage();
+    });
+    $('#cancel').on('click', function () {
+        $('#image').attr('src', '');
+    });
+});
+var cropper;
 var out;
-
 var outimage = $("#user_photo");
 var id = $("#EmployeeId").val();
 function setupCropper(input) {
@@ -42,7 +49,6 @@ const setImage = () => {
         var formData = new FormData();
         formData.set("photo", dataURItoBlob(out));
         formData.set("id", id);
-
         $.ajax({
             url: "/File/UploadUserPhoto",
             method: "post",
@@ -51,7 +57,7 @@ const setImage = () => {
             contentType: false,
             success() {
                 outimage.attr("src", out);
-                preloader.css('display', 'none');
+                preloader.css('display', 'none');                
             },
             error() {
                 alert('Upload error');
@@ -62,7 +68,6 @@ const setImage = () => {
     }
 };
 function dataURItoBlob(dataURI) {
-    // convert base64 to raw binary data held in a string
     var byteString = atob(dataURI.split(',')[1]);
 
     var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using VRdkHRMsysBLL.DTOs.Absence;
 using VRdkHRMsysBLL.DTOs.Assignment;
 using VRdkHRMsysBLL.DTOs.BalanceResiduals;
@@ -652,43 +653,50 @@ namespace VRdkHRMsystem.Controllers
             var sickLeaveRequest = await _sickLeaveService.GetByIdAsync(model.SickLeaveId);
             if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
-                sickLeaveRequest.ProccessedbyId = user.Id;
-                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
+                try
                 {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
-                    var notification = new NotificationDTO
+                    sickLeaveRequest.ProccessedbyId = user.Id;
+                    if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                     {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = sickLeaveRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на больничный был подтвердён.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
+                        sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = sickLeaveRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш запрос на больничный был подтвердён.",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            IsChecked = false
+                        };
 
-                    await _notificationService.CreateAsync(notification);
+                        await _notificationService.CreateAsync(notification);
+                    }
+                    else
+                    {
+                        sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = sickLeaveRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш запрос на больничный был отклонён.",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            IsChecked = false
+                        };
+
+                        await _notificationService.CreateAsync(notification);
+                    }
+
+                    await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
                 }
-                else
+                catch(DbUpdateConcurrencyException)
                 {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = sickLeaveRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на больничный был отклонён.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-
-                    await _notificationService.CreateAsync(notification);
+                    return View("Error");
                 }
-
-                await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
             }
 
             return RedirectToAction("Sickleaves", "Admin");
@@ -728,60 +736,67 @@ namespace VRdkHRMsystem.Controllers
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
             var vacationRequest = await _vacationService.GetByIdAsync(model.VacationId);
-            if (vacationRequest != null)
+            if (vacationRequest != null && (vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString()))
             {
-                vacationRequest.ProccessDate = DateTime.UtcNow;
-                vacationRequest.ProccessedbyId = user.Id;
-                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
+                try
                 {
-                    vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
-                    await _vacationService.UpdateAsync(vacationRequest);
-                    var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
-                    residual.ResidualBalance -= vacationRequest.Duration;
-                    await _residualsService.UpdateAsync(residual);
-                    var transaction = new TransactionDTO()
+                    vacationRequest.ProccessDate = DateTime.UtcNow;
+                    vacationRequest.ProccessedbyId = user.Id;
+                    if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
                     {
-                        TransactionId = Guid.NewGuid().ToString(),
-                        EmployeeId = vacationRequest.EmployeeId,
-                        Change = model.Duration,
-                        Description = model.VacationType,
-                        TransactionDate = DateTime.UtcNow,
-                        TransactionType = model.VacationType
-                    };
-                    await _transactionService.CreateAsync(transaction);
-                    vacationRequest.TransactionId = transaction.TransactionId;
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = vacationRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.Vacation.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваша заявка на отпуск была подтверждена.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
+                        vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                        await _vacationService.UpdateAsync(vacationRequest);
+                        var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
+                        residual.ResidualBalance -= vacationRequest.Duration;
+                        await _residualsService.UpdateAsync(residual);
+                        var transaction = new TransactionDTO()
+                        {
+                            TransactionId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            Change = model.Duration,
+                            Description = model.VacationType,
+                            TransactionDate = DateTime.UtcNow,
+                            TransactionType = model.VacationType
+                        };
+                        await _transactionService.CreateAsync(transaction);
+                        vacationRequest.TransactionId = transaction.TransactionId;
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваша заявка на отпуск была подтверждена.",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            IsChecked = false
+                        };
 
-                    await _notificationService.CreateAsync(notification, true);
+                        await _notificationService.CreateAsync(notification, true);
+                    }
+                    else
+                    {
+                        vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                        await _vacationService.UpdateAsync(vacationRequest);
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            Description = $"Ваша заявка на отпуск была отклонена.",
+                            IsChecked = false
+                        };
+
+                        await _notificationService.CreateAsync(notification, true);
+                    }
                 }
-                else
+                catch(DbUpdateConcurrencyException)
                 {
-                    vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                    await _vacationService.UpdateAsync(vacationRequest);
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = vacationRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.Vacation.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        Description = $"Ваша заявка на отпуск была отклонена.",
-                        IsChecked = false
-                    };
-
-                    await _notificationService.CreateAsync(notification, true);
-                }
+                    return View("Error");
+                }                
             }
 
             return RedirectToAction("Vacations", "Admin");

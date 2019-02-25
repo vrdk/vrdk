@@ -378,6 +378,8 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("sick_leave_id")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.RequestStatus).IsConcurrencyToken();
+
                 entity.Property(e => e.CloseDate)
                     .HasColumnName("close_date")
                     .HasColumnType("date");
@@ -538,6 +540,8 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.Property(e => e.VacationId)
                     .HasColumnName("vacation_id")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.RequestStatus).IsConcurrencyToken();
 
                 entity.Property(e => e.BeginDate)
                     .HasColumnName("begin_date")

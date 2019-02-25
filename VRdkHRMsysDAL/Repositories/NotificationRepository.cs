@@ -23,21 +23,21 @@ namespace VRdkHRMsysDAL.Repositories
         public async Task<int> GetNotificationsCountAsync(Expression<Func<Notification, bool>> condition = null, string searchKey = null)
         {
             return searchKey == null ? await _context.Notification.Where(condition).CountAsync() : 
-                                       await _context.Notification.Where(condition).Where(note => note.NotificationDate.ToString().Contains(searchKey) || note.Description.Contains(searchKey)).CountAsync();
-        }
+                                       await _context.Notification.Where(condition).Where(note => note.Description.ToLower().Contains(searchKey.ToLower())).CountAsync();
+        }   
 
         public async Task<Notification[]> GetPageAsync(int pageNumber,int pageSize, Expression<Func<Notification, bool>> condition = null, string searchKey = null)
         {
             if(searchKey == null)
             {
                 return condition != null
-                                 ? await _context.Notification.Where(condition).Skip(pageNumber * pageSize).Take(pageSize).OrderByDescending(note => note.NotificationDate).ToArrayAsync()
-                                 : await _context.Notification.Where(condition).Skip(pageNumber * pageSize).Take(pageSize).OrderByDescending(note => note.NotificationDate).ToArrayAsync();
+                                 ? await _context.Notification.Where(condition).OrderByDescending(note => note.NotificationDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync()
+                                 : await _context.Notification.OrderByDescending(note => note.NotificationDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
             }
 
             return condition != null
-                                 ? await _context.Notification.Where(condition).Where(note=>note.Description.ToLower().Contains(searchKey.ToLower())).Skip(pageNumber * pageSize).Take(pageSize).OrderByDescending(note => note.NotificationDate).ToArrayAsync()
-                                 : await _context.Notification.Where(condition).Where(note =>note.Description.ToLower().Contains(searchKey.ToLower())).Skip(pageNumber * pageSize).Take(pageSize).OrderByDescending(note => note.NotificationDate).ToArrayAsync();
+                                 ? await _context.Notification.Where(condition).Where(note=>note.Description.ToLower().Contains(searchKey.ToLower())).OrderByDescending(note => note.NotificationDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync()
+                                 : await _context.Notification.Where(note => note.Description.ToLower().Contains(searchKey.ToLower())).OrderByDescending(note => note.NotificationDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }
 
         public async Task<Notification[]> GetAsync(Expression<Func<Notification, bool>> condition = null)

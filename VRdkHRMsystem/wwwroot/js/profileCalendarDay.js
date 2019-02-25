@@ -4,7 +4,7 @@
     });
     $.validator.unobtrusive.parse("#proc_day_off_form");
 
-    $("#proc_day_off_form").on('submit', function () {
+    $("#proc_day_off_form").on('submit', function (event) {
         event.preventDefault();
         var form = $(this);
         if ($("#proc_day_off_form").valid()) {
@@ -35,7 +35,7 @@
 
     $.validator.unobtrusive.parse("#edit_day_off_form");
 
-    $("#edit_day_off_form").on('submit', function () {
+    $("#edit_day_off_form").on('submit', function (event) {
         event.preventDefault();
         var form = $(this);
         if ($("#edit_day_off_form").valid()) {

@@ -54,13 +54,13 @@
     <div class="profile__tabs_section">
         <div class="profile__tabs">
             <div class="profile__tabs_header">
-                <div class="profile__tab" id="vacation" onclick="getinitialprofilerequests('0','vacation')">Мои отпуска</div>
-                <div class="profile__tab" id="sickleave" onclick="getinitialprofilerequests('0','sickleave')">Мои больничные</div>
-                <div class="profile__tab" id="assignment" onclick="getinitialprofilerequests('0','assignment')">Мои командировки</div>
-                <div class="profile__tab" id="absence" onclick="getinitialprofilerequests('0','absence')">Мои прогулы</div>
+                <div class="profile__tab profile__tab_active" id="vacation">Мои отпуска</div>
+                <div class="profile__tab" id="sickleave">Мои больничные</div>
+                <div class="profile__tab" id="assignment">Мои командировки</div>
+                <div class="profile__tab" id="absence">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post">
+                <div class="profile__tabs_vacation profile__tab_post profile__tab_postactive">
                     <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
                 <div class="profile__tabs_sickleave profile__tab_post">
@@ -81,4 +81,5 @@
     </div>
 </div>
 @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script src="~/js/profile.js"></script>
 

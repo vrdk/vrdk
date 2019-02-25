@@ -750,16 +750,46 @@ namespace VRdkHRMsystem.Controllers
 
                     await _workDayService.CreateAsync(workDay);
                     await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarWorkDayCellViewModel
+                    {
+                        EmployeeId = workDay.EmployeeId,
+                        Date = workDay.WorkDayDate,
+                        FirstName = dayOff.Employee.FirstName,
+                        LastName = dayOff.Employee.LastName,
+                        Role = model.Role,
+                        TeamId = dayOff.Employee.TeamId,
+                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                        DayOffImportance = dayOff?.DayOffImportance
+                    };
+
+                    return PartialView("CalendarWorkDayCell", cellModel);
                 }
                 else if (dayOff.DayOffState == DayOffStateEnum.Requested.ToString())
                 {
                     dayOff.DayOffState = DayOffStateEnum.Approved.ToString();
                     dayOff.ProcessDate = DateTime.UtcNow;
                     await _dayOffService.UpdateAsync(dayOff, true);
+
+                    var cellModel = new CalendarDayOffCellViewModel
+                    {
+                        EmployeeId = dayOff.EmployeeId,
+                        Date = dayOff.DayOffDate,
+                        FirstName = dayOff.Employee.FirstName,
+                        LastName = dayOff.Employee.LastName,
+                        Role = model.Role,
+                        TeamId = dayOff.Employee.TeamId,
+                        Comment = dayOff.Comment,
+                        DayOffImportance = dayOff.DayOffImportance,
+                        DayOffState = dayOff.DayOffState
+                    };
+
+                    return PartialView("CalendarDayOffCell", cellModel);
                 }
             }
 
-            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
+            return Json(false);
         }
 
         [HttpPost]
@@ -884,6 +914,10 @@ namespace VRdkHRMsystem.Controllers
 
                         return PartialView("CalendarWorkDayCell", cellModel);
                     }
+                    else
+                    {
+                        return Json(false);
+                    }
                 }
             }
 
@@ -923,6 +957,7 @@ namespace VRdkHRMsystem.Controllers
                     FirstName = name,
                     LastName = surname,
                     TeamId = teamId,
+                    EmployeeId = id,
                     Role = role
                 };
 

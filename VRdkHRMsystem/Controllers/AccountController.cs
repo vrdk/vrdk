@@ -310,20 +310,20 @@ namespace VRdkHRMsystem.Controllers
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+                if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToAction(nameof(ForgotPasswordConfirmation));
+                    ViewData["Message"] = "Пожалуйста, проверьте введённую почту";
+                    return View(model);
                 }
 
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 string callbackUrl = Url.Action("ResetPassword", "Account", new { user.Id, code, email = user.Email}, Request.Scheme);
                 await _emailSender.SendPasswordResetLink(model.Email,"", "Reset Password","",
-                   $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
-                return RedirectToAction(nameof(Login));
+                   $"Чтобы перейти к форме изменения пароля, нажмите на ссылку: <a href='{callbackUrl}'>изменить пароль</a>");
+                ViewData["Message"] = "Пожалуйста, проверьте введённую почту";
+                return View(model);
             }
 
-            // If we got this far, something failed, redisplay form
             return View(model);
         }
 
@@ -379,6 +379,7 @@ namespace VRdkHRMsystem.Controllers
             {
                 return RedirectToAction(nameof(Login));
             }
+            ViewData["Error"] = " должен содержать только буквы латинского алфавита либо цифры, а также, как минимум, 6 уникальных символов и одну заглавную букву";
             AddErrors(result);
             return View();
         }
