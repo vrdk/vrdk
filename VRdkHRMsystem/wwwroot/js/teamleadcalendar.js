@@ -10,19 +10,18 @@
         position: 'right',
         theme: 'tooltipster-light'
     });
-
-    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor="free"]', function () {
+    $(".content").on('click', '.calendar__block[type-anchor="free"]', function () {
         proccessCalendarDay(this);
     });  
-    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor= "dayOff"]', function () {
+    $(".content").on('click', '.calendar__block[type-anchor= "dayOff"]', function () {
         proccessCalendarDay(this);
     });   
     
-    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor= "teamleadWorkDay"]', function () {
+    $(".content").on('click', '.calendar__block[type-anchor= "teamleadWorkDay"]', function () {
         callSelfDayProccessMenu(this);
     });
 
-    $(".calendar__contentblock").on('click', '.calendar__block[type-anchor="workDay"]', function () {
+    $(".content").on('click', '.calendar__block[type-anchor="workDay"]', function () {
         callDayProccessMenuForTeamlead(this);
     });
 

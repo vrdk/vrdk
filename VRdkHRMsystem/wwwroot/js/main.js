@@ -38,9 +38,50 @@ $(document).ready(function () {
     $(".date_picker").on('change', function () {
         var input = $(this);
         var date = parseDate(input.val());
-        input.val(date);       
+        input.val(date);
     });
     ligthMenuItem();
+    $('.content').on('click', '.list_paggination', function () {
+        var target = $(this);
+        var action = target.attr('action-anchor');
+        var page = target.attr('pageNumber-anchor');
+        var searchKey = target.attr('searchKey-anchor');
+        $('#paggination_list').css('display', 'none');
+        $('#paggination_list_gif').css('display', 'flex');
+        $.ajax({
+            url: action,
+            method: 'get',
+            data: {
+                pageNumber: page,
+                searchKey: searchKey
+            },
+            success: function (page_html) {
+                $('.listsection').replaceWith(page_html);
+            },
+            error: function () {
+                alert('pagination error');
+            }
+        });
+    });
+    $('#list_form').on('submit', function (event) {
+        showPreloader();
+        event.preventDefault();
+        var form = $(this);
+        var data = form.serializeArray();
+        $.ajax({
+            url: form.attr('action'),
+            method: 'get',
+            data: data,
+            success: function (search_result_html) {
+                $('.listsection').replaceWith(search_result_html);
+                closePreloader();
+            },
+            error: function () {
+                alert('search error');
+                closePreloader();
+            }
+        });
+    });
     $("#notes-new").on('change', function () {
         var icon = $(this);
         var url = "/profile/checknotificationsnuvelty";
@@ -84,7 +125,7 @@ function parseDate(date) {
         var month = stringDate[1];
         if (month && regex.test(month)) {
             var intMonth = parseInt(month);
-            
+
             if (intMonth > 12) {
                 month = 12;
             } else {
@@ -252,10 +293,8 @@ function showPreloader() {
     pl.css('display', 'flex');
 }
 
-function closePreloader(preloader) {
-    setTimeout(function () {
-        $(preloader).hide();
-    }, 1000);
+function closePreloader() {
+    $('#preloader').css('display', 'none');
 }
 
 function manageMenu() {

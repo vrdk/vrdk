@@ -7,14 +7,14 @@
     var urlForCheck = "/Admin/ViewVacationRequest?id=";
 }
 
-<form asp-action="Vacations" method="get" class="content" id="submit_form">
+<form asp-action="VacationsPage" method="get" class="content" id="list_form">
     <section class="listsection">
         <div class="table">
             <div class="table__header">
                 <p>Список запросов на отпуск</p>
                 <div class="table__header_search">
                     <input type="text" name="searchKey" placeholder="Найти запрос..." value="@searchKey" />
-                    <button class="submit_button" type="submit"><img src="~/images/search.png" alt="search" /></button>
+                    <button type="submit"><img src="~/images/search.png" alt="search" /></button>
                 </div>
             </div>
             <div class="table__body">
@@ -74,32 +74,34 @@
                 }
             </div>
         </div>
-            @if (Model.Count > Model.PageSize)
-            {
-                <div class="table__pageblock">
-                    @if (Model.PageNumber == 0)
-                    {
-                        <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
-                    }
-                    else
-                    {
-                        <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
-                    }
-                    <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
-                    @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
-                    {
-                        <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
-                    }
-                    else
-                    {
-                        <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
-                    }
-                </div>
-            }
+        @if (Model.Count > Model.PageSize)
+        {
+            <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
+                <img src="~/images/load.gif" />
+            </div>
+            <div class="table__pageblock" id="paggination_list">
+                @if (Model.PageNumber == 0)
+                {
+                    <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
+                }
+                else
+                {
+                    <img class="list_paggination" action-anchor="VacationsPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
+                }
+                <p>@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
+                @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+                {
+                    <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
+                }
+                else
+                {
+                    <img class="list_paggination" action-anchor="VacationsPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
+                }
+            </div>
+        }
     </section>
 </form>
 <div class="modal fade" id="request_modal" role="dialog">
     <div class="modal-dialog" id="modal_place" style="margin-left:auto;margin-right:auto;">
     </div>
 </div>
-<script src="~/js/searchSubmit.js"></script>

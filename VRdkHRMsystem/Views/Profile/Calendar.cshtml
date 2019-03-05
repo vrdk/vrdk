@@ -197,7 +197,7 @@
                                     <div class="calendar__workdays_daysblock">@(completeWorkDays.Count())</div>
                                 </div>
                                 <div class="calendar__workdays_hoursblocks">
-                                    <div class="calendar__workdays_hoursblock">@(completeWorkDays.Sum(i => i.TimeTo.TotalHours - i.TimeFrom.TotalHours))</div>
+                                    <div class="calendar__workdays_hoursblock">@(Math.Round(completeWorkDays.Sum(i => i.TimeTo.TotalHours - i.TimeFrom.TotalHours > 0 ? i.TimeTo.TotalHours - i.TimeFrom.TotalHours : i.TimeTo.TotalHours - i.TimeFrom.TotalHours + 24), 1).ToString(System.Globalization.CultureInfo.InvariantCulture))</div>
                                 </div>
                             </div>
                         }

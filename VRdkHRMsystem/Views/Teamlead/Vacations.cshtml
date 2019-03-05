@@ -1,13 +1,12 @@
 ﻿@model VRdkHRMsystem.Models.SharedModels.Vacation.VacationRequestListViewModel
 
 @{
-    ViewData["Title"] = "Vacations";
     var searchKey = ViewData["SearchKey"] as string;
     var urlForProccess = "/Teamlead/ProccessVacationRequest?id=";
     var urlForCheck = "/Teamlead/ViewVacationRequest?id=";
 }
 
-<form asp-action="Vacations" method="get" class="content" id="submit_form">
+<form asp-action="VacationsPage" method="get" class="content" id="list_form">
     <section class="listsection">
         <div class="table">
             <div class="table__header">
@@ -76,23 +75,26 @@
         </div>
         @if (Model.Count > Model.PageSize)
         {
-            <div class="table__pageblock">
+            <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
+                <img src="~/images/load.gif" />
+            </div>
+            <div class="table__pageblock" id="paggination_list">
                 @if (Model.PageNumber == 0)
                 {
                     <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
                 }
                 else
                 {
-                    <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber-1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-left.png" alt="arrow" /></a>
+                    <img class="list_paggination" action-anchor="VacationsPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
                 }
-                <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
+                <p>@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
                 @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
                 {
                     <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
                 }
                 else
                 {
-                    <a asp-action="Vacations" asp-route-pageNumber=@(Model.PageNumber+1) asp-route-searchKey="@searchKey"><img src="~/images/arrow-right.png" alt="arrow" /></a>
+                    <img class="list_paggination" action-anchor="VacationsPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
                 }
             </div>
         }

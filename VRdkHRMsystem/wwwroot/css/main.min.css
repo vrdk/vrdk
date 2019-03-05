@@ -5381,7 +5381,8 @@ label.sickmessage__ulpoad_label img {
 
 @media screen and (max-width: 1550px) {
     .calendar__body {
-        overflow-x: scroll
+        overflow-x: scroll;
+        overflow-y: hidden;
     }
 }
 

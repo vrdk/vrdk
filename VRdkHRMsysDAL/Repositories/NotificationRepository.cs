@@ -57,7 +57,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<Notification> GetByIdAsync(string id)
         {
-            return await _context.Notification.FirstOrDefaultAsync(nt=> nt.NotificationId.Equals(id));
+            return await _context.Notification.FirstOrDefaultAsync(nt=> nt.NotificationId == id);
         }
 
         public async Task WriteChangesAsync()

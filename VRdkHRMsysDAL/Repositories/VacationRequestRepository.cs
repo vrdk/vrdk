@@ -66,6 +66,7 @@ namespace VRdkHRMsysDAL.Repositories
                                                ThenInclude(emp => emp.EmployeeBalanceResiduals).
                                                Where(condition).
                                                Where(req => req.BeginDate.ToString().Contains(searchKey)
+                                                        || req.EndDate.ToString().Contains(searchKey)
                                                         || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                         || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync()
               : await _context.VacationRequest.Include(r => r.Employee).
@@ -73,6 +74,7 @@ namespace VRdkHRMsysDAL.Repositories
                                                Include(req => req.Employee).
                                                ThenInclude(emp => emp.EmployeeBalanceResiduals).
                                                Where(req => req.BeginDate.ToString().Contains(searchKey)
+                                                        || req.EndDate.ToString().Contains(searchKey)
                                                         || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
                                                         || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }

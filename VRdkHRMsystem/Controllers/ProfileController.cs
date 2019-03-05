@@ -122,7 +122,6 @@ namespace VRdkHRMsystem.Controllers
             return RedirectToAction("Profile", "Profile");
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Profile(string id = null)
         {
@@ -412,11 +411,7 @@ namespace VRdkHRMsystem.Controllers
             var notification = await _notificationService.GetByIdAsync(notificationId);
             if (notification != null)
             {
-
-                if (!isChecked)
-                {
-                    await _notificationService.CheckNotificationAsync(notification.NotificationId);
-                }
+                await _notificationService.DeleteAsync(notification.NotificationId, true);
 
                 if (notificationRange == NotificationRangeEnum.User.ToString())
                 {
@@ -456,8 +451,16 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<bool> CheckNotificationsNuvelty(string userEmail)
         {
-            var notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail && n.IsChecked == false);
-            if(notifications == null)
+            var notifications = new NotificationDTO[] { };
+            if (User.IsInRole("Administrator"))
+            {
+                notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail || n.EmployeeId == null);
+            }
+            else
+            {
+                notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail || n.EmployeeId == null);
+            }
+            if(notifications.Count() == 0)
             {
                 return false;
             }

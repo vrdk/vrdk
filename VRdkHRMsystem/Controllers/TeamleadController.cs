@@ -220,6 +220,30 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> TeamsPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var teams = new TeamListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                teams = await _teamService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId);
+                count = await _teamService.GetTeamsCountAsync(searchKey, t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedTeams = new TeamListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Teams = _mapHelper.MapCollection<TeamListUnitDTO, TeamViewModel>(teams)
+            };
+
+            return PartialView(pagedTeams);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> EmployeeProfile(string id)
         {
             var employee = await _employeeService.GetByIdWithResidualsAsync(id);
@@ -330,6 +354,39 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> VacationsPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var vacations = new VacationRequestViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                vacations = await _vacationService.GetPageAsync(pageNumber,
+                                                                          (int)PageSizeEnum.PageSize15,
+                                                                          RequestStatusEnum.Pending.ToString(),
+                                                                          searchKey,
+                                                                          req => (req.Employee.Team.TeamleadId == employee.EmployeeId)
+                                                                          && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
+                                                                          && req.Employee.OrganisationId == employee.OrganisationId);
+                count = await _vacationService.GetVacationsNumberAsync(searchKey,
+                                                                  req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                  && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
+                                                                  && req.Employee.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedVacations = new VacationRequestListViewModel
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Vacations = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(vacations)
+            };
+
+            return PartialView(pagedVacations);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
         {
             ViewData["SearchKey"] = searchKey;
@@ -351,6 +408,30 @@ namespace VRdkHRMsystem.Controllers
             };
 
             return View(pagedAbsences);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AbsencesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return PartialView(pagedAbsences);
         }
 
         [HttpGet]
@@ -503,6 +584,31 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> SickleavesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var sickLeaves = new SickLeaveViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
+                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
+            }
+
+            var pagedSickLeaves = new SickLeaveListViewModel()
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
+            };
+
+            return PartialView(pagedSickLeaves);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CheckSickleaveRequest(string id)
         {
             var sickLiveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
@@ -568,6 +674,31 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> EmployeesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var employees = new EmployeeListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+            }
+
+            var pagedEmployees = new EmployeeListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
+            };
+
+            return PartialView(pagedEmployees);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
         {
             ViewData["SearchKey"] = searchKey;
@@ -576,8 +707,9 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId
-                                                                                                                && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId), searchKey);
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
+                                                                    a => a.OrganisationId == employee.OrganisationId
+                                                                    && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId), searchKey);
 
                 count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId));
             }
@@ -591,6 +723,33 @@ namespace VRdkHRMsystem.Controllers
             };
 
             return View(pagedAssignments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AssignmentsPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var assignments = new AssignmentListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
+                                                                    a => a.OrganisationId == employee.OrganisationId
+                                                                    && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId), searchKey);
+
+                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId && a.AssignmentEmployee.Any(ae => ae.Employee.Team.TeamleadId == employee.EmployeeId));
+            }
+
+            var pagedAssignments = new AssignmentListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
+            };
+
+            return PartialView(pagedAssignments);
         }
 
         [HttpGet]
@@ -830,7 +989,7 @@ namespace VRdkHRMsystem.Controllers
                             TeamId = workDay.Employee.TeamId,
                             Comment = dayOffEx.Comment,
                             DayOffImportance = dayOffEx.DayOffImportance,
-                            DayOffState = dayOffEx.DayOffState                            
+                            DayOffState = dayOffEx.DayOffState
                         };
 
                         return PartialView("CalendarDayOffCell", cellModel);
@@ -1020,7 +1179,7 @@ namespace VRdkHRMsystem.Controllers
                         TeamId = employee.TeamId,
                         DayOffState = dayOff.DayOffState,
                         DayOffImportance = dayOff.DayOffImportance,
-                        
+
                     };
 
                     return PartialView("CalendarDayOffCell", cellModel);

@@ -14,6 +14,7 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<NotificationDTO[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Notification, bool>> condition = null, string searchKey = null);
         Task<NotificationDTO> GetByIdAsync(string notificationId);
         Task CheckNotificationAsync(string notificationId);
+        Task DeleteAsync(string id, bool writeChanges = false);
         Task<int> GetNotificationsNumber(Expression<Func<Notification, bool>> condition = null, string searchKey = null);
     }
 }

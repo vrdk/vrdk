@@ -76,7 +76,7 @@ function timeManagmentModal(cellElement) {
         url: url,
         method: 'get',
         data: {
-            date: el.attr('date-anchor'),
+            date: el.attr('date-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();

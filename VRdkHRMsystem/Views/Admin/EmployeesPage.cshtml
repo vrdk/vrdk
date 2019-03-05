@@ -1,0 +1,93 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Employee.EmployeeListViewModel
+@{
+    ViewData["Title"] = "Employees";
+    string searchKey = ViewData["SearchKey"] as string;
+}
+<section class="listsection">
+    <div class="table">
+        <div class="table__header">
+            <p>Список сотрудников</p>
+            <div class="table__header_search">
+                <input type="text" placeholder="Найти работника..." name="searchKey" value="@searchKey" autocomplete="off" />
+                <button class="submit_button" type="submit"><img src="~/images/search.png" alt="search" /></button>
+            </div>
+        </div>
+        <div class="table__body">
+            @if (Model != null && Model.Employees.Count() != 0)
+            {
+                <div class="table__body_title emplist__body_title">
+                    <p class="emplist__name">Имя</p>
+                    <p class="emplist__payvac">Команда</p>
+                    <p class="emplist__payvac">Баланс оплач. отп.</p>
+                    <p class="emplist__vac">Баланс неоплач. отп.</p>
+                    <p class="emplist__sickleavedays">Больничные</p>
+                    <p class="emplist__assignments">Командировки</p>
+                    <p class="emplist__passes">Прогулы</p>
+                    <p class="emplist__info">Инфо</p>
+                </div>
+                foreach (var employee in Model.Employees)
+                {
+                    <div class="table__body_content emplist__body_content">
+                        <div class="table__body_block" style="min-width:800px">
+                            <p class="emplist__name">@employee.FirstName @employee.LastName</p>
+                            @if (employee.TeamName != null)
+                            {
+                                <p class="emplist__payvac">@employee.TeamName</p>
+                            }
+                            else
+                            {
+                                <p class="emplist__payvac">Нет</p>
+                            }
+                            <p class="emplist__payvac">@employee.PaidVacationBalance</p>
+                            <p class="emplist__vac">@employee.UnpaidVacationBalance</p>
+                            <p class="emplist__sickleavedays">@employee.SickLeaveBalance</p>
+                            <p class="emplist__assignments">@employee.AssignmentBalance</p>
+                            <p class="emplist__passes">@employee.AbsenceBalance</p>
+                            <p class="emplist__info">
+                                <a href="@Url.Action("EmployeeProfile", new { id = employee.EmployeeId })"><img src="~/images/usertable.png" alt="user" /></a>
+                                @if (employee.TeamId != null)
+                                {
+                                    <a href="@Url.Action("TeamProfile", "Admin", new { id = employee.TeamId })"><img src="~/images/users.png" alt="users" /></a>
+                                }
+                                <a href="@Url.Action("EditEmployee", new { id = employee.EmployeeId })"><img src="~/images/penciltable.png" alt="pencil" /></a>
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="table__body_content emplist__body_content">
+                    <div class="table__body_block">
+                        <p class="emplist__name">Нет записей</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    @if (Model.Count > Model.PageSize)
+    {
+        <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
+            <img src="~/images/load.gif" />
+        </div>
+        <div class="table__pageblock" id="paggination_list">
+            @if (Model.PageNumber == 0)
+            {
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
+            }
+            else
+            {
+                <img class="list_paggination" action-anchor="EmployeesPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
+            }
+            <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
+            @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+            {
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
+            }
+            else
+            {
+                <img class="list_paggination" action-anchor="EmployeesPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
+            }
+        </div>
+    }
+</section>

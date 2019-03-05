@@ -52,6 +52,15 @@ namespace VRdkHRMsysBLL.Services
             await _notificationRepository.CreateAsync(notificationToAdd, writeChanges);
         }
 
+        public async Task DeleteAsync(string id, bool writeChanges = false)
+        {
+            var note = await _notificationRepository.GetByIdAsync(id);
+            if(note != null)
+            {
+                await _notificationRepository.DeleteAsync(note, writeChanges);
+            }            
+        }
+
         public async Task CreateRangeAsync(NotificationDTO[] notification, bool writeChanges = false)
         {
             var notificationsToAdd = _mapHelper.MapCollection<NotificationDTO, Notification>(notification);

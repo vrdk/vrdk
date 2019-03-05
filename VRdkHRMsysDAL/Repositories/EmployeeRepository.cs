@@ -60,8 +60,8 @@ namespace VRdkHRMsysDAL.Repositories
         {
             if(searchKey == null)
             {
-                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp=>emp.Team.Name).ToArrayAsync() :
-                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp => emp.Team.Name).ToArrayAsync();
+                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp=>emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
             }
                 return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
                                                                    Where(emp=>emp.Team.Name.ToLower().Contains(searchKey.ToLower())

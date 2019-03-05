@@ -1,0 +1,82 @@
+﻿@model VRdkHRMsystem.Models.SharedModels.Assignment.AssignmentListViewModel
+
+@{
+    ViewData["Title"] = "SickLeaves";
+    var searchKey = ViewData["SearchKey"] as string;
+}
+
+<section class="listsection">
+    <div class="table">
+        <div class="table__header">
+            <p>Список командировок</p>
+            <button class="assignmentlist__button" type="button" onclick="addAssignment()">
+                <img src="~/images/plus.png" alt="plus" />
+                <p>Добавить<span> командировку</span></p>
+            </button>
+            <div class="table__header_search">
+                <input type="text" placeholder="Найти" name="searchKey" value="@searchKey" autocomplete="off" />
+                <button class="submit_button" type="submit"><img src="~/images/search.png" alt="search" /></button>
+            </div>
+        </div>
+        <div class="table__body">
+            @if (Model != null && Model.Assignments.Count() != 0)
+            {
+                <div class="table__body_title assignmentlist__body_title">
+                    <p class="assignmentlist__name">Название</p>
+                    <p class="assignmentlist__countmembers">Учасники</p>
+                    <p class="assignmentlist__dates">Даты</p>
+                    <p class="assignmentlist__duration">Длительность</p>
+                    <p class="assignmentlist__info">Инфо</p>
+                </div>
+                foreach (var item in Model.Assignments)
+                {
+                    <div class="table__body_content assignmentlist__body_content">
+                        <div class="table__body_block">
+                            <p class="assignmentlist__name">@item.Name</p>
+                            <p class="assignmentlist__countmembers">@item.EmployeesCount</p>
+                            <p class="assignmentlist__dates">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
+                            <p class="assignmentlist__duration">@item.Duration</p>
+                            <p class="assignmentlist__info">
+                                <img src="~/images/cross2.png" alt="exit" style="cursor:pointer" onclick="deleteAssignment('@item.AssignmentId')" />
+                                <img src="~/images/penciltable.png" alt="pencil" onclick="editAssignment('@item.AssignmentId')" style="cursor:pointer" />
+                            </p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="table__body_content assignmentlist__body_content">
+                    <div class="table__body_block">
+                        <p class="vaclist__name">Нет записей</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    @if (Model.Count > Model.PageSize)
+    {
+        <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
+            <img src="~/images/load.gif" />
+        </div>
+        <div class="table__pageblock" id="paggination_list">
+            @if (Model.PageNumber == 0)
+            {
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
+            }
+            else
+            {
+                <img class="list_paggination" action-anchor="AssignmentsPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
+            }
+            <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
+            @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+            {
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
+            }
+            else
+            {
+                <img class="list_paggination" action-anchor="AssignmentsPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
+            }
+        </div>
+    }
+</section>
