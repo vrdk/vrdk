@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.Absences
+namespace VRdkHRMsystem.Models.Profile
 {
     public class ProfileAbsencesViewModel
     {

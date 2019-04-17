@@ -86,7 +86,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<VacationRequest> GetByIdWithEmployeeWithTeamAsync(string id)
         {
-            return await _context.VacationRequest.Include(req=>req.Employee).ThenInclude(emp=>emp.Team).FirstOrDefaultAsync(req => req.VacationId.Equals(id));
+            return await _context.VacationRequest.Include(req=>req.Employee).ThenInclude(emp=>emp.Team).ThenInclude(t=>t.Teamlead).FirstOrDefaultAsync(req => req.VacationId.Equals(id));
         }
 
         public async Task CreateAsync(VacationRequest entity, bool writeChanges)

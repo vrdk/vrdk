@@ -1,8 +1,5 @@
 ﻿using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Team;
-using VRdkHRMsysBLL.DTOs.Vacation;
-using VRdkHRMsysBLL.Enums;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;

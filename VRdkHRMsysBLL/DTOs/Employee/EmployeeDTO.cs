@@ -1,16 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using VRdkHRMsysBLL.DTOs.Absence;
-using VRdkHRMsysBLL.DTOs.Assignment;
-using VRdkHRMsysBLL.DTOs.BalanceResiduals;
-using VRdkHRMsysBLL.DTOs.DayOff;
-using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Team;
-using VRdkHRMsysBLL.DTOs.Vacation;
-using VRdkHRMsysBLL.DTOs.WorkDay;
 
-namespace VRdkHRMsysBLL.DTOs.Employee
+namespace VRdkHRMsysBLL.DTOs
 {
     public class EmployeeDTO
     {

@@ -17,7 +17,7 @@ namespace VRdkHRMsysDAL.Repositories
         {
             _context = context;
         }
-
+       
         public async Task<Team> GetForCalendarAsync(string id)
         {
             return await _context.Team.Include(t => t.Teamlead).FirstOrDefaultAsync(t=>t.TeamId == id);

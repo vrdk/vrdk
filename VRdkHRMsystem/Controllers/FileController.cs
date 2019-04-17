@@ -20,12 +20,19 @@ namespace VRdkHRMsystem.Controllers
             _employeeService = employeeService;
         }
 
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> UploadUserPhoto(IFormFile photo, string id)
-        {           
-            await _fileManagmentService.UploadUserPhoto(photo, "photos", id);
-            return Json(true);
+        {    
+            if(photo != null && id != null)
+            {
+                await _fileManagmentService.UploadUserPhoto(photo, "photos", id);
+                return Json(true);
+            }
+            else
+            {
+                return Json(false);
+            }         
         }
 
         public async Task<FileResult> DownloadFile(string fileName,string containerName)

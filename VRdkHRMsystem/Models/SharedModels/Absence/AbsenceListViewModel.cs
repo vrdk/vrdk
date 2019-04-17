@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsystem.Models.SharedModels.Absence
+﻿namespace VRdkHRMsystem.Models.SharedModels
 {
     public class AbsenceListViewModel
     {

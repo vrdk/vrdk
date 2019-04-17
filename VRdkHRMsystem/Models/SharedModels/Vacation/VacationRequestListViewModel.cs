@@ -1,6 +1,4 @@
-﻿using VRdkHRMsystem.Models.SharedModels.Vacation;
-
-namespace VRdkHRMsystem.Models.SharedModels.Vacation
+﻿namespace VRdkHRMsystem.Models.SharedModels
 {
     public class VacationRequestListViewModel
     {

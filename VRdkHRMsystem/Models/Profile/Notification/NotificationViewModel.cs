@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.Notification
+namespace VRdkHRMsystem.Models.Profile
 {
     public class NotificationViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.RequestViewModels.DayOff
+namespace VRdkHRMsystem.Models.RequestViewModels
 {
     public class EditDayOffRequestViewModel
     {

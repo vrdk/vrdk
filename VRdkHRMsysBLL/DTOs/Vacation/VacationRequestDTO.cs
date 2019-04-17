@@ -1,7 +1,6 @@
 ﻿using System;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.Vacation
+namespace VRdkHRMsysBLL.DTOs
 {
     public class VacationRequestDTO
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsysBLL.DTOs.SickLeave
+namespace VRdkHRMsysBLL.DTOs
 {
     public class SickLeaveViewDTO
     {

@@ -9,8 +9,7 @@
     return $state;
 };
 function addAssignment() {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    showPreloader('preloader');
     url = "/admin/addassignment";
     $.ajax({
         type: "Get",
@@ -43,16 +42,15 @@ function addAssignment() {
                 input.val(date);
                 CalcDiff('from_datepicker', 'to_datepicker');
             });
-            preloader.css('display', 'none');
+            closePreloader('preloader');
         },
         error: function () {
-            preloader.css('display', 'none');
+            closePreloader('preloader');
         }
     });
 }
 function editAssignment(id) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    showPreloader('preloader');
     url = "/admin/editassignment?id=" + id;
     $.ajax({
         type: "Get",
@@ -83,16 +81,15 @@ function editAssignment(id) {
                 input.val(date);
                 CalcDiff('from_datepicker', 'to_datepicker');
             });
-            preloader.css('display', 'none');
+            closePreloader('preloader');
         },
         error: function () {
-            preloader.css('display', 'none');
+            closePreloader('preloader');
         }
     });
 }
 function checkAssignment(id) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    showPreloader('preloader');
     url = "/teamlead/checkassignment?id=" + id;
     $.ajax({
         type: "Get",
@@ -101,10 +98,31 @@ function checkAssignment(id) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+            closePreloader('preloader');
         },
         error: function () {
-            preloader.css('display', 'none');
+            closePreloader('preloader');
+        }
+    });
+}
+
+function deleteAssignment(id) {
+    showPreloader('preloader');
+    var url = "/admin/deleteassignment";
+    $.ajax({
+        url: url,
+        method: 'get',
+        data: {
+            id: id
+        },
+        success: function (modal_html) {
+            $('#modal_place').empty();
+            $('#request_modal').modal();
+            $('#modal_place').html(modal_html);
+            closePreloader('preloader');
+        },
+        error: function () {
+            closePreloader('preloader');
         }
     });
 }

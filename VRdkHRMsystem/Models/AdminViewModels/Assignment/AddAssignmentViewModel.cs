@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
 
-namespace VRdkHRMsystem.Models.AdminViewModels.Assignment
+namespace VRdkHRMsystem.Models.AdminViewModels
 {
     public class AddAssignmentViewModel
     {

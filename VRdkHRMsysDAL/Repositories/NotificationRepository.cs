@@ -45,16 +45,6 @@ namespace VRdkHRMsysDAL.Repositories
             return condition != null ? await _context.Notification.Where(condition).OrderByDescending(note=>note.NotificationDate).ToArrayAsync() : await _context.Notification.OrderByDescending(note => note.NotificationDate).ToArrayAsync();
         }
 
-        public async Task ChangeStateAsync(string id)
-        {
-            var notification = await _context.Notification.FirstOrDefaultAsync(note => note.NotificationId == id);
-            if(notification != null && notification.IsChecked != true)
-            {
-                notification.IsChecked = true;
-                await _context.SaveChangesAsync();
-            }
-        }
-
         public async Task<Notification> GetByIdAsync(string id)
         {
             return await _context.Notification.FirstOrDefaultAsync(nt=> nt.NotificationId == id);

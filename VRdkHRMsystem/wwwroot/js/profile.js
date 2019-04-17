@@ -1,4 +1,14 @@
 ﻿$(document).ready(function () {
+    var initialActiveTab = $('#active_tab').attr('value');
+    if (initialActiveTab) {        
+        $('#' + initialActiveTab).addClass('profile__tab_active');
+        $('div[tab-anchor="' + initialActiveTab + '"]').addClass('profile__tab_postactive');
+    }
+    else {        
+        var tab = $('.profile__tab').first();
+        tab.addClass('profile__tab_active');        
+        $('div[tab-anchor="' + tab.attr('id') + '"]').addClass('profile__tab_postactive');
+    }
     $('.profile__tab').on('click.initial', function () {
         getinitialprofilerequests(0, this.id);
     });
@@ -24,6 +34,7 @@ function getinitialprofilerequests(page_number, data_type) {
     }
     );
 }
+
 function getprofilerequests(element) {
     var target = $(element);
     var page_number = target.attr('page-anchor');

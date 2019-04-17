@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.Vacation.VacationRequestListViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.VacationRequestListViewModel
 
 @{
     var searchKey = ViewData["SearchKey"] as string;
@@ -48,14 +48,7 @@
                                     <div></div>
                                 </div>
                                 <a href="@Url.Action("EmployeeProfile","Teamlead", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" style="margin-top:5px;" /></a>
-                                @if (item.RequestStatus != "Approved" && item.RequestStatus != "Denied")
-                                {
-                                    <img src="~/images/penciltable.png" alt="pencil" style="cursor:pointer;" onclick="ShowRequestPopup('@urlForProccess','@item.VacationId')" />
-                                }
-                                else
-                                {
-                                    <img src="~/images/penciltable.png" alt="pencil" style="cursor:pointer;" onclick="ShowRequestPopup('@urlForCheck','@item.VacationId')" />
-                                }
+                                <img src="~/images/penciltable.png" class="vacation__popup" alt="pencil" style="cursor:pointer;" request-anchor="@item.VacationId" />
                             </div>
                         </div>
                     </div>
@@ -79,7 +72,7 @@
         <div class="table__pageblock" id="paggination_list">
             @if (Model.PageNumber == 0)
             {
-                <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {
@@ -88,7 +81,7 @@
             <p>@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
             @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
             {
-                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.UpdateSickLeaveViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.UpdateSickLeaveViewModel
 
 <form asp-action="UpdateSickleave" asp-controller="Request" method="post" enctype="multipart/form-data" id="submit_form" class="box-modal vacmodal" style="border-radius:10px;margin-left:auto;margin-right:auto;margin-top:auto">
     <input asp-for="SickLeaveId" hidden />
@@ -33,11 +33,11 @@
         }
     </div>
     <div class="vacmodal__buttons">
-        <button class="button" type="button" data-dismiss="modal">
+        <button class="button ripple" type="button" data-dismiss="modal">
             <img src="~/images/cancel.png" alt="cancel" />
             <p>Назад</p>
         </button>
-        <button class="button submit_button" type="submit">
+        <button class="button submit_button ripple" type="submit">
             <img src="~/images/submit.png" alt="submit" />
             <p>Обновить</p>
         </button>

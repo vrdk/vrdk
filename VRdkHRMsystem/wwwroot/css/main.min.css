@@ -2310,7 +2310,7 @@ header {
     background: #fff;
     padding-left: 20px;
     display: flex;
-    z-index: 10000000;
+    z-index: 1000000;
     visibility: hidden;
     opacity: 0;
     transition: all 0.5s ease;
@@ -4049,9 +4049,9 @@ header {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    -webkit-box-pack: end;
-    -ms-flex-pack: end;
-    justify-content: flex-end
+    -webkit-box-pack: center;
+    -ms-flex-pack:center;
+    justify-content: center
 }
 
 .sickmessage__body {
@@ -4076,9 +4076,9 @@ header {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    -webkit-box-pack: end;
-    -ms-flex-pack: end;
-    justify-content: flex-end;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
     margin-top: 10px
 }
 
@@ -5454,6 +5454,10 @@ label.sickmessage__ulpoad_label img {
         width: min-content
     }
 
+    .sicklist__dates span{
+        display: none;
+    }
+
     .calendar__icons {
         -webkit-box-orient: vertical;
         -webkit-box-direction: normal;
@@ -5564,22 +5568,6 @@ label.sickmessage__ulpoad_label img {
 
     .profile__vacdays_wrapper {
         margin-top: 15px
-    }
-}
-
-@media screen and (max-width: 680px) {
-    .assignmentlist__body_title, .assignmentlist__body_content {
-        width: -webkit-min-content;
-        width: -moz-min-content;
-        width: min-content
-    }
-
-    .assignmentlist__button img {
-        display: none
-    }
-
-    .assignmentlist__button p span {
-        display: none
     }
 }
 
@@ -5841,6 +5829,23 @@ label.sickmessage__ulpoad_label img {
 }
 
 @media screen and (max-width: 680px) {
+    .assignmentlist__body_title, .assignmentlist__body_content {
+        width: -webkit-min-content;
+        width: -moz-min-content;
+        width: min-content
+    }
+
+    .sicklist__dates span{
+        display: none;
+    }
+    .assignmentlist__button img {
+        display: none
+    }
+
+    .assignmentlist__button p span {
+        display: none
+    }
+
     .header__user {
         display: none
     }
@@ -6085,7 +6090,7 @@ label.sickmessage__ulpoad_label img {
 
 @media screen and (max-width: 400px) {
     .vacmodal {
-        width: 95%
+        width: 100%
     }
 
     .vacmodal__buttons button img {
@@ -6356,7 +6361,7 @@ label.sickmessage__ulpoad_label img {
     align-items: center;
     overflow: hidden;
     animation-delay: 1s;
-    position: absolute;
+    position: fixed;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.6);
@@ -6590,3 +6595,55 @@ label.sickmessage__ulpoad_label img {
     align-items: center;
     flex-direction: column;
 }
+
+.popup {
+ position: fixed;
+height:100%;
+ width:100%;
+ top:0;
+ left:0;
+ display:none;
+ text-align:center;
+}
+
+.popup_bg {
+ background:rgba(0,0,0,0.4);
+ position:fixed;
+ z-index: 2000000;
+ height:100%;
+ width:100%;
+}
+
+.popup_img {
+ 
+    -webkit-transition: -webkit-transform 0.3s ease-out;
+    -o-transition: -o-transform 0.3s ease-out;
+    transition: transform 0.3s ease-out;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+    z-index: 20000001;
+    max-height: 80%;
+    max-width: 75%;
+}
+
+.sickmessage__upload_check{
+    display:none ;
+}
+
+/* Ripple effect */
+.ripple {
+    background-position: center;
+    transition: background 0.8s;
+}
+
+    .ripple:hover {
+        background: #ccd0d4 radial-gradient(circle, transparent 1%, #ccd0d4 1%) center/15000%;
+    }
+
+    .ripple:active {
+        background-color: #f4f4f4;
+        background-size: 100%;
+        transition: background -5s;
+    }

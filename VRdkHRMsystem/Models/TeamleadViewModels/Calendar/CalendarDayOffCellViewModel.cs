@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class CalendarDayOffCellViewModel
     {
@@ -12,6 +12,5 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         public string Comment { get; set; }
         public string TeamId { get; set; }
         public DateTime Date { get; set; }
-        public string Role { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace VRdkHRMsystem.Models.RequestViewModels.SickLeave
+namespace VRdkHRMsystem.Models.RequestViewModels
 {
     public class RequestSickLeaveViewModel
     {

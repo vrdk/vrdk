@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.SickLeave
+namespace VRdkHRMsystem.Models.Profile
 {
     public class ProfileSickLeavesViewModel
     {

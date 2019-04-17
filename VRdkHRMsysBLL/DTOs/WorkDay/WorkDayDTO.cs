@@ -1,7 +1,6 @@
 ﻿using System;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.WorkDay
+namespace VRdkHRMsysBLL.DTOs
 {
     public class WorkDayDTO
     {

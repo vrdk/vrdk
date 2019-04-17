@@ -1,6 +1,5 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.Vacation.RequestVacationViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.RequestVacationViewModel
 
-<form asp-action="RequestVacation" method="post" id="submit_form">
     <div class="profile__right">
         <div class="profile__days vacrequest__days">
             <div class="profile__block">
@@ -25,7 +24,7 @@
                 </div>
             </div>
         </div>
-        <div class="vacrequest__request">
+        <form asp-action="RequestVacation" method="post" id="profile__request_form" class="vacrequest__request">
             <p>Запрос на отпуск</p>
             <div class="vacrequest__body">
                 <div class="vacrequest__body_left">
@@ -57,18 +56,17 @@
 
                     </div>
                     <div class="vacrequest__button_wrapper">
-                        <button class="empprofile__button button back_button" type="button">
+                        <button class="empprofile__button button back_button ripple" type="button">
                             <img src="~/images/cancel.png" alt="cancel" />
                             <p>Отменить</p>
                         </button>
-                        <button class="empprofile__button button" type="submit">
+                        <button class="empprofile__button button ripple" type="submit">
                             <img src="~/images/plus.png" alt="submit" />
                             <p>Готово</p>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-</form>
 <script src="~/js/submit.js"></script>

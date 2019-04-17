@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsystem.Models.SharedModels.Employee
+﻿namespace VRdkHRMsystem.Models.SharedModels
 {
     public class EmployeeViewModel
     {

@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.AdminViewModels.Employee.AddEmployeeViewModel
+﻿@model VRdkHRMsystem.Models.AdminViewModels.AddEmployeeViewModel
 
 <form asp-action="AddEmployee" method="post" class="content" enctype="multipart/form-data" id="submit_form">
     <div class="profile__globalwrapper">
@@ -115,11 +115,11 @@
                 </div>
             </div>
             <div class="empprofileedit__buttonwrapper">
-                <button class="empprofile__button button" type="button" onclick="window.history.back()">
+                <button class="empprofile__button button ripple" type="button" onclick="window.history.back()">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Отменить</p>
                 </button>
-                <button class="empprofile__button button" type="submit">
+                <button class="empprofile__button button ripple" type="submit">
                     <img src="~/images/submit.png" alt="submit" />
                     <p>Готово</p>
                 </button>

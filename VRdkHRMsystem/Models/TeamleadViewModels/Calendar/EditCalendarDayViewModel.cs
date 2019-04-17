@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class EditCalendarDayViewModel
     {
@@ -21,6 +21,5 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:H:mm}")]
         public DateTime TimeTo { get; set; }
         public string Result { get; set; }
-        public string Role { get; set; }
     }
 }

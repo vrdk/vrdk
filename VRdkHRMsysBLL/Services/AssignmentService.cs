@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Assignment;
-using VRdkHRMsysBLL.DTOs.Employee;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;

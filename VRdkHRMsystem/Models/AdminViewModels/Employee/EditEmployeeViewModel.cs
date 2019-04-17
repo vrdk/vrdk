@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.AdminViewModels.Employee
+namespace VRdkHRMsystem.Models.AdminViewModels
 {
     public class EditEmployeeViewModel
     {

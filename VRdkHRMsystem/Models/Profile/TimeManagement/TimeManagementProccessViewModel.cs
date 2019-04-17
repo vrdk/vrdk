@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.TimeManagement
+namespace VRdkHRMsystem.Models.Profile
 {
     public class TimeManagementProccessViewModel
     {

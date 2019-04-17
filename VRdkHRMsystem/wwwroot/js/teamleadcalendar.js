@@ -1,9 +1,9 @@
 ﻿$(document).ready(function () {
     $("#team_select").on('change', function () {
-        showPreloader();
+        showPreloader('preloader');
         var teamId = $(this).val();
         var role = $("#redirectUrl").val();
-        var url = "/"+role+"/calendar?teamid=" + teamId;
+        var url = "/" + role + "/calendar?teamid=" + teamId;
         window.location.href = url;
     });
     $(".calendar__block_moon").tooltipster({
@@ -12,11 +12,11 @@
     });
     $(".content").on('click', '.calendar__block[type-anchor="free"]', function () {
         proccessCalendarDay(this);
-    });  
+    });
     $(".content").on('click', '.calendar__block[type-anchor= "dayOff"]', function () {
         proccessCalendarDay(this);
-    });   
-    
+    });
+
     $(".content").on('click', '.calendar__block[type-anchor= "teamleadWorkDay"]', function () {
         callSelfDayProccessMenu(this);
     });
@@ -26,14 +26,13 @@
     });
 
     $(".calendar__passes").on('click', '.calendar__pass[type-anchor="absence"]', function () {
-       setAbsence(this);
+        setAbsence(this);
     });
 });
 
 function setAbsence(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var el = $(cellElement);  
+    var toast = toastr.info('Запрос формы подтверждения прогула...');
+    var el = $(cellElement);
     var url = "/teamlead/setAbsence";
     $.ajax({
         url: url,
@@ -41,27 +40,26 @@ function setAbsence(cellElement) {
             id: el.attr('employee-anchor'),
             teamId: el.attr('team-anchor'),
             firstName: el.attr('name-anchor'),
-            lastName: el.attr('surname-anchor'),
-            role: el.attr('role-anchor')
+            lastName: el.attr('surname-anchor')
         },
         method: 'get',
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 }
 
 function proccessCalendarDay(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    var toast = toastr.info('Запрос формы работы с днём...');
     var url = "/teamlead/proccesscalendarday";
-    var el = $(cellElement);    
+    var el = $(cellElement);
     $.ajax({
         url: url,
         method: 'get',
@@ -70,8 +68,7 @@ function proccessCalendarDay(cellElement) {
             date: el.attr('date-anchor'),
             name: el.attr('name-anchor'),
             surname: el.attr('surname-anchor'),
-            teamId: el.attr('team-anchor'),
-            role: el.attr('role-anchor')
+            teamId: el.attr('team-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
@@ -89,93 +86,19 @@ function proccessCalendarDay(cellElement) {
             });
             $("#datepicker_from").mask('00:00');
             $("#datepicker_to").mask('00:00');
-            preloader.css('display', 'none');
-        },
-        error: function () {
-            preloader.css('display', 'none');
-        }
-    });
-}
 
-function editWorkDay(id, dt, tId, rl) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var url = "/teamlead/editworkday";
-    $.ajax({
-        url: url,
-        method: 'get',
-        data: {
-            id: id,
-            date: dt,
-            teamId: tId,
-            role: rl
-        },
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#request_modal').modal();
-            $('#modal_place').html(modal_html);
-            $("#workDay_timepicker_from").timepicker({
-                timeFormat: 'H:mm',
-                startHour: 9,
-                interval: 60
-            });
-            $("#workDay_timepicker_to").timepicker({
-                timeFormat: 'H:mm',
-                startHour: 9,
-                interval: 60
-            });
-            $("#workDay_timepicker_from").mask('00:00');
-            $("#workDay_timepicker_to").mask('00:00');
-            preloader.css('display', 'none');
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
-        }
-    });
-}
-
-function editDayOff(id, dt, tId, rl) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var url = "/teamlead/editdayoff";
-    $.ajax({
-        url: url,
-        method: 'get',
-        data: {
-            id: id,
-            date: dt,
-            teamId: tId,
-            role: rl
-        },
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#request_modal').modal();
-            $('#modal_place').html(modal_html);
-            $("#workDay_timepicker_from").timepicker({
-                timeFormat: 'H:mm',
-                startHour: 9,
-                interval: 60
-            });
-            $("#workDay_timepicker_to").timepicker({
-                timeFormat: 'H:mm',
-                startHour: 9,
-                interval: 60
-            });
-            $("#workDay_timepicker_from").mask('00:00');
-            $("#workDay_timepicker_to").mask('00:00');
-            preloader.css('display', 'none');
-        },
-        error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 }
 
 function callSelfDayProccessMenu(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    var toast = toastr.info('Запрос формы работы с рабочим днём...');
     var url = '/teamlead/selfdayproccessmenu';
-    var el = $(cellElement);    
+    var el = $(cellElement);
     $.ajax({
         url: url,
         method: 'get',
@@ -184,26 +107,25 @@ function callSelfDayProccessMenu(cellElement) {
             date: el.attr('date-anchor'),
             name: el.attr('name-anchor'),
             surname: el.attr('surname-anchor'),
-            teamId: el.attr('team-anchor'),
-            role: el.attr('role-anchor')
+            teamId: el.attr('team-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 }
 
 function callDayProccessMenuForTeamlead(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    var toast = toastr.info('Запрос формы работы с рабочим днём...');
     var url = '/teamlead/dayproccessmenu';
-    var el = $(cellElement);     
+    var el = $(cellElement);
     $.ajax({
         url: url,
         method: 'get',
@@ -212,24 +134,23 @@ function callDayProccessMenuForTeamlead(cellElement) {
             date: el.attr('date-anchor'),
             name: el.attr('name-anchor'),
             surname: el.attr('surname-anchor'),
-            teamId: el.attr('team-anchor'),
-            role: el.attr('role-anchor')
+            teamId: el.attr('team-anchor')
         },
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 }
 
 function getEmployeesTimeManagementRecords(event_element) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    var toast = toastr.info('Запрос распорядка дня работника...');
     var el = $(event_element);
     var url = '/teamlead/timemanagementrecords';
     $.ajax({
@@ -243,17 +164,17 @@ function getEmployeesTimeManagementRecords(event_element) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
-    });  
+    });
 }
 
 function TeamleadTimeManagmentModal(event_element) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+    var toast = toastr.info('Запрос распорядка дня работника...');
     var el = $(event_element);
     var url = "/profile/timemanagment";
     $.ajax({
@@ -265,10 +186,11 @@ function TeamleadTimeManagmentModal(event_element) {
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+
+            toastr.clear(toast);
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 

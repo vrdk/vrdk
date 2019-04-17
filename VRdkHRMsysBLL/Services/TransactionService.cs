@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Transaction;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;

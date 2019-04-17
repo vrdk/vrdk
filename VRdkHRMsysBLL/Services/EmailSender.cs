@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using VRdkHRMsysBLL.Interfaces;
 

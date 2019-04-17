@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Notification;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;
@@ -17,11 +17,6 @@ namespace VRdkHRMsysBLL.Services
         {
             _notificationRepository = notificationRepository;
             _mapHelper = mapHelper;
-        }
-
-        public async Task CheckNotificationAsync(string notificationId)
-        {
-            await _notificationRepository.ChangeStateAsync(notificationId);
         }
 
         public async Task<NotificationDTO> GetByIdAsync(string notificationId)

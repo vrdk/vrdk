@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Post;
-using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.ViewListsModels;

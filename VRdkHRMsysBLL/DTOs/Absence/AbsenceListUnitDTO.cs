@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsysBLL.DTOs.Absence
+namespace VRdkHRMsysBLL.DTOs
 {
     public class AbsenceListUnitDTO
     {

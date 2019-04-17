@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace VRdkHRMsysBLL.DTOs.Transaction
+namespace VRdkHRMsysBLL.DTOs
 {
     public class TransactionDTO
     {

@@ -2,8 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
@@ -176,16 +175,19 @@ namespace VRdkHRMsysBLL.Services
                 currentEmployee.WorkEmail = newEmployee.WorkEmail;
                 currentEmployee.PostId = newEmployee.PostId;
                 currentEmployee.PhoneNumber = newEmployee.PhoneNumber;
-                foreach(var res in currentEmployee.EmployeeBalanceResiduals)
+                if(newEmployee.EmployeeBalanceResiduals != null)
                 {
-                    foreach(var newRes in newEmployee.EmployeeBalanceResiduals)
+                    foreach (var res in currentEmployee.EmployeeBalanceResiduals)
                     {
-                        if (res.Name == newRes.Name)
+                        foreach (var newRes in newEmployee.EmployeeBalanceResiduals)
                         {
-                            res.ResidualBalance = newRes.ResidualBalance;
-                        }                    
+                            if (res.Name == newRes.Name)
+                            {
+                                res.ResidualBalance = newRes.ResidualBalance;
+                            }
+                        }
                     }
-                }
+                }             
 
                 if (writeChanges)
                 {

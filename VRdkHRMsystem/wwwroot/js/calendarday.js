@@ -14,7 +14,8 @@
 $(document).ready(function () {
     $.validator.setDefaults({
         ignore: []
-    });    
+    });
+
     $("#submit_form").on('submit', function () {
         var form = $(this);
         $.validator.unobtrusive.parse(form);
@@ -22,163 +23,190 @@ $(document).ready(function () {
             if ($("#submit_form").valid()) {
                 var modal = $("#request_modal");
                 modal.modal('hide');
-                $('#preloader').css('display', 'flex');
+                showPreloader('preloader');
             }
         }
         else {
             modal = $("#request_modal");
             modal.modal('hide');
-            $('#preloader').css('display', 'flex');
+            showPreloader('preloader');
         }
     });
-   
+
     $("#proc_cal_day_form").on('submit', function (event) {
         event.preventDefault();
         var form = $(this);
-        $.validator.unobtrusive.parse(form);
+        $.validator.unobtrusive.parse(form);        
         if ($('#submit_button').attr('formnovalidate') !== 'formnovalidate') {
-            if ($("#proc_cal_day_form").valid()) {
-                $('#preloader').css('display', 'flex');
+            if ($("#proc_cal_day_form").valid()) {               
                 var data = form.serializeArray();
-                var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
-                var date_anchor = data.find(x => x.name === 'Date').value.split(' ')[0];
-                var time_from = data.find(x => x.name === 'TimeFrom').value.split(':');
-                var time_to = data.find(x => x.name === 'TimeTo').value.split(':');
-                var date_from = new Date(0, 0, 0, time_from[0], time_from[1], 0, 0);
-                var date_to = new Date(0, 0, 0, time_to[0], time_to[1], 0, 0);
-                var diff = date_to.getTime() - date_from.getTime() > 0 ? (date_to.getTime() - date_from.getTime()) / 36e5 : (date_to.getTime() - date_from.getTime()) / 36e5 + 24;
+                var employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
+                var dateAnchor = data.find(x => x.name === 'Date').value.split(' ')[0];
+                var toast = toastr.info('Назначение рабочего дня...', dateAnchor);
+                modal = $("#request_modal");
+                modal.modal('hide');
+                var timeFrom = data.find(x => x.name === 'TimeFrom').value;
+                var timeTo = data.find(x => x.name === 'TimeTo').value;
+                var selectedWorkHours = getSelectedWorkDayDurationFromForm(timeFrom, timeTo);
                 $.ajax({
                     url: form.attr('action'),
                     method: 'post',
                     data: data,
-                    success: function (cal_cell_html) {
-                        modal = $("#request_modal");
-                        modal.modal('hide');
-                        var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                        current_cell.replaceWith(cal_cell_html);
-                        var work_days_count = $(".calendar__workdays_daysblock[employee-anchor='" + employee_anchor + "']");
-                        var work_days_hours = $(".calendar__workdays_hoursblock[employee-anchor='" + employee_anchor + "']");
-                        work_days_count.text(parseFloat(work_days_count.text()) + 1);
-                        work_days_hours.text((parseFloat(work_days_hours.text()) + diff).toFixed(1));
-                        $('#preloader').css('display', 'none');
+                    success: function (calCellHtml) {                        
+                        var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                        currentCell.replaceWith(calCellHtml);
+                        var workDaysCount = $(".calendar__workdays_daysblock[employee-anchor='" + employeeAnchor + "']");
+                        var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
+                        var newWorkHours = (parseFloat(workDaysHours.text()) + selectedWorkHours).toFixed(1);
+                        workDaysCount.text(parseFloat(workDaysCount.text()) + 1);
+                        if (isInt(newWorkHours)) {
+                            workDaysHours.text(parseInt(newWorkHours));
+                        }
+                        else {
+                            workDaysHours.text(newWorkHours);
+                        }
+
+                        toastr.clear(toast);
+                        toastr.success('Рабочий день назначен', dateAnchor);                       
+                    },
+                    error: function () {
+                        toastr.clear(toast);
+                        toastr.error('Не удалось назначить рабочий день');
                     }
                 });
             }
         }
         else {
-            $('#preloader').css('display', 'flex');
             data = form.serializeArray();
-            employee_anchor = data.find(x => x.name === 'EmployeeId').value;
-            date_anchor = data.find(x => x.name === 'Date').value.split(' ')[0];
+            employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
+            dateAnchor = data.find(x => x.name === 'Date').value.split(' ')[0];
+            toast = toastr.info('Назначение выходного дня...', dateAnchor);
+            modal = $("#request_modal");
+            modal.modal('hide');
             $.ajax({
                 url: form.attr('action'),
                 method: 'post',
                 data: data,
-                success: function (cal_cell_html) {
-                    modal = $("#request_modal");
-                    modal.modal('hide');
-                    var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                    current_cell.replaceWith(cal_cell_html);
-                    var day_offs_count = $(".calendar__chilldays_block[employee-anchor='" + employee_anchor + "']");
-                    day_offs_count.text(parseFloat(day_offs_count.text()) + 1);
-                    $('#preloader').css('display', 'none');
+                success: function (calCellHtml) {                   
+                    var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                    currentCell.replaceWith(calCellHtml);
+                    var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                    dayOffsCount.text(parseFloat(dayOffsCount.text()) + 1);
+
+                    toastr.clear(toast);
+                    toastr.success('Выходной день назначен', dateAnchor);
+                },
+                error: function () {
+                    toastr.clear(toast);
+                    toastr.error('Не удалось назначить выходной день', dateAnchor);
                 }
+
             });
         }
     });
-   
+
     $("#edit_work_day_form").on('submit', function (event) {
         event.preventDefault();
         var form = $(this);
-        $.validator.unobtrusive.parse(form);       
+        $.validator.unobtrusive.parse(form);
+        var data = form.serializeArray();
+        var employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
+        var dateAnchor = data.find(x => x.name === 'Date').value.split(' ')[0];
+        var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
         if ($('#submit_button').attr('formnovalidate') !== 'formnovalidate') {
             if ($("#edit_work_day_form").valid()) {
-                $('#preloader').css('display', 'flex');
-                var data = form.serializeArray();
-                if (data.find(x => x.name === 'result').value === 'WorkDay') {                   
-                    var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
-                    var date_anchor = data.find(x => x.name === 'Date').value.split(' ')[0];
-                    var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                    var time_from = data.find(x => x.name === 'TimeFrom').value.split(':');
-                    var time_to = data.find(x => x.name === 'TimeTo').value.split(':');
-                    var date_from = new Date(0, 0, 0, time_from[0], time_from[1], 0, 0);
-                    var date_to = new Date(0, 0, 0, time_to[0], time_to[1], 0, 0);                   
-                    var diff = date_to.getTime() - date_from.getTime() > 0 ? (date_to.getTime() - date_from.getTime()) / 36e5 : (date_to.getTime() - date_from.getTime()) / 36e5 + 24;
-                    var current_timeFrom = current_cell.attr('timeFrom-anchor').split(':');
-                    var current_timeTo = current_cell.attr('timeTo-anchor').split(':');
-                    var current_dateFrom = new Date(0, 0, 0, current_timeFrom[0], current_timeFrom[1], 0, 0);
-                    var current_dateTo = new Date(0, 0, 0, current_timeTo[0], current_timeTo[1], 0, 0);
-                    var current_diff = current_dateTo.getTime() - current_dateFrom.getTime() > 0 ? (current_dateTo.getTime() - current_dateFrom.getTime()) / 36e5 : (current_dateTo.getTime() - current_dateFrom.getTime()) / 36e5 + 24;                                   
-                    $.ajax({
-                        url: form.attr('action'),
-                        method: 'post',
-                        data: data,
-                        success: function (cal_cell_html) {
-                            if (cal_cell_html) {
-                                if (current_cell.hasClass('tooltipstered')) {
-                                    var cell_title = current_cell.tooltipster('content');
-                                }
-                                current_cell.replaceWith(cal_cell_html);
-                                if (cell_title) {
-                                    current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                                    current_cell.attr('title', cell_title);
-                                    current_cell.tooltipster({
-                                        position: 'right',
-                                        theme: 'tooltipster-light'
-                                    });
-                                }                         
-                                var work_days_hours = $(".calendar__workdays_hoursblock[employee-anchor='" + employee_anchor + "']");
-                                work_days_hours.text((parseFloat(work_days_hours.text()) + (diff - current_diff)).toFixed(1));
-                                modal = $("#request_modal");
-                                modal.modal('hide');
-                                $('#preloader').css('display', 'none');
+                var toast = toastr.info('Внесение изменений...', 'Рабочий день на ' + dateAnchor);
+                modal = $("#request_modal");
+                modal.modal('hide');
+                var timeFrom = data.find(x => x.name === 'TimeFrom').value;
+                var timeTo = data.find(x => x.name === 'TimeTo').value;
+                var selectedWorkDayDuration = getSelectedWorkDayDurationFromForm(timeFrom, timeTo);
+                var currentWorkDayDuration = getWorkDayDurationFromCalendarCell(currentCell);
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'post',
+                    data: data,
+                    success: function (calCellHtml) {
+                        if (calCellHtml) {
+                            if (currentCell.hasClass('tooltipstered')) {
+                                var cell_title = currentCell.tooltipster('content');
+                            }
+                            currentCell.replaceWith(calCellHtml);
+                            if (cell_title) {
+                                var newCalendarCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                                newCalendarCell.attr('title', cell_title);
+                                newCalendarCell.tooltipster({
+                                    position: 'right',
+                                    theme: 'tooltipster-light'
+                                });
+                            }
+
+                            var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
+                            var newWorkHours = (parseFloat(workDaysHours.text()) + (selectedWorkDayDuration - currentWorkDayDuration)).toFixed(1);
+                            if (isInt(newWorkHours)) {
+                                workDaysHours.text(parseInt(newWorkHours));
                             }
                             else {
-                                modal = $("#request_modal");
-                                modal.modal('hide');
-                                $('#preloader').css('display', 'none');
+                                workDaysHours.text(newWorkHours);
                             }
-                        },
-                        error: function () {
+
+                            toastr.clear(toast);
+                            toastr.success('Изменения внесены', 'Рабочий день на ' + dateAnchor);
+                        }
+                        else {
                             modal = $("#request_modal");
                             modal.modal('hide');
-                            $('#preloader').css('display', 'none');
                         }
-                    });
-                }
+                    },
+                    error: function () {
+                        toastr.clear(toast);
+                        toastr.error('Не удалось внести изменения', 'Рабочий день на ' + dateAnchor);
+                    }
+                });
             }
         }
         else {
-            $('#preloader').css('display', 'flex');
-            data = form.serializeArray();
-            employee_anchor = data.find(x => x.name === 'EmployeeId').value;
-            date_anchor = data.find(x => x.name === 'Date').value.split(' ')[0];
-            time_from = data.find(x => x.name === 'TimeFrom').value.split(':');
-            time_to = data.find(x => x.name === 'TimeTo').value.split(':');
-            date_from = new Date(0, 0, 0, time_from[0], time_from[1], 0, 0);
-            date_to = new Date(0, 0, 0, time_to[0], time_to[1], 0, 0);
-            diff = date_to.getTime() - date_from.getTime() > 0 ? (date_to.getTime() - date_from.getTime()) / 36e5 : (date_to.getTime() - date_from.getTime()) / 36e5 + 24;
+            toast = toastr.info('Изменение на выходной день', 'Рабочий день на ' + dateAnchor);
+            var removedWorkDayDuration = getWorkDayDurationFromCalendarCell(currentCell);
+            modal = $("#request_modal");
+            modal.modal('hide');
             $.ajax({
                 url: form.attr('action'),
                 method: 'post',
                 data: data,
-                success: function (cal_cell_html) {
-                    var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                    current_cell.replaceWith(cal_cell_html);
-                    var work_days_count = $(".calendar__workdays_daysblock[employee-anchor='" + employee_anchor + "']");
-                    var work_days_hours = $(".calendar__workdays_hoursblock[employee-anchor='" + employee_anchor + "']");
-                    var day_offs_count = $(".calendar__chilldays_block[employee-anchor='" + employee_anchor + "']");
-                    day_offs_count.text(parseFloat(day_offs_count.text()) + 1);
-                    work_days_count.text(parseFloat(work_days_count.text()) - 1);
-                    work_days_hours.text((parseFloat(work_days_hours.text()) - diff).toFixed(1));
-                    modal = $("#request_modal");
-                    modal.modal('hide');
-                    $('#preloader').css('display', 'none');
+                success: function (calCellHtml) {
+                    var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                    if (currentCell.hasClass('tooltipstered')) {
+                        var cell_title = currentCell.tooltipster('content');
+                    }
+                    currentCell.replaceWith(calCellHtml);
+                    if (cell_title) {
+                        var newCalendarCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                        newCalendarCell.attr('title', cell_title);
+                        newCalendarCell.tooltipster({
+                            position: 'right',
+                            theme: 'tooltipster-light'
+                        });
+                    }
+                    var workDaysCount = $(".calendar__workdays_daysblock[employee-anchor='" + employeeAnchor + "']");
+                    var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
+                    var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                    dayOffsCount.text(parseFloat(dayOffsCount.text()) + 1);
+                    workDaysCount.text(parseFloat(workDaysCount.text()) - 1);
+                    var newWorkHours = (parseFloat(workDaysHours.text()) - removedWorkDayDuration).toFixed(1);
+                    if (isInt(newWorkHours)) {
+                        workDaysHours.text(parseInt(newWorkHours));
+                    }
+                    else {
+                        workDaysHours.text(newWorkHours);
+                    }             
+
+                    toastr.clear(toast);
+                    toastr.success('Изменения внесены', 'Рабочий день на ' + dateAnchor);
                 },
                 error: function () {
-                    modal = $("#request_modal");
-                    modal.modal('hide');
-                    $('#preloader').css('display', 'none');
+                    toastr.clear(toast);
+                    toastr.error('Не удалось внести изменения', 'Рабочий день на ' + dateAnchor);
                 }
             });
         }
@@ -187,90 +215,163 @@ $(document).ready(function () {
     $("#edit_day_off_form").on('submit', function (event) {
         event.preventDefault();
         var form = $(this);
-        $.validator.unobtrusive.parse(form);        
+        $.validator.unobtrusive.parse(form);
+        var data = form.serializeArray();
+        var employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
+        var dateAnchor = data.find(x => x.name === 'Date').value.split(' ')[0];
         if ($('#submit_button').attr('formnovalidate') !== 'formnovalidate') {
-            if ($("#edit_day_off_form").valid()) {
-                $('#preloader').css('display', 'flex');
-                var data = form.serializeArray();
-                if (data.find(x => x.name === 'result').value === 'WorkDay') {                 
-                    var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
-                    var date_anchor = data.find(x => x.name === 'Date').value.split(' ')[0];
-                    var time_from = data.find(x => x.name === 'TimeFrom').value.split(':');
-                    var time_to = data.find(x => x.name === 'TimeTo').value.split(':');
-                    var date_from = new Date(0, 0, 0, time_from[0], time_from[1], 0, 0);
-                    var date_to = new Date(0, 0, 0, time_to[0], time_to[1], 0, 0);
-                    var diff = date_to.getTime() - date_from.getTime() > 0 ? (date_to.getTime() - date_from.getTime()) / 36e5 : (date_to.getTime() - date_from.getTime()) / 36e5 + 24;
-                    $.ajax({
-                        url: form.attr('action'),
-                        method: 'post',
-                        data: data,
-                        success: function (cal_cell_html) {
-                            var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + date_anchor + "']");
-                            current_cell.replaceWith(cal_cell_html);
-                            var work_days_count = $(".calendar__workdays_daysblock[employee-anchor='" + employee_anchor + "']");
-                            var work_days_hours = $(".calendar__workdays_hoursblock[employee-anchor='" + employee_anchor + "']");
-                            var day_offs_count = $(".calendar__chilldays_block[employee-anchor='" + employee_anchor + "']");
-                            day_offs_count.text(parseFloat(day_offs_count.text()) - 1);
-                            work_days_count.text(parseFloat(work_days_count.text()) + 1);
-                            work_days_hours.text((parseFloat(work_days_hours.text()) + diff).toFixed(1));
-                            modal = $("#request_modal");
-                            modal.modal('hide');
-                            $('#preloader').css('display', 'none');
+            if ($("#edit_day_off_form").valid()) {               
+                var toast = toastr.info('Подтверждение рабочего дня', dateAnchor);
+                modal = $("#request_modal");
+                modal.modal('hide');
+                var timeFrom = data.find(x => x.name === 'TimeFrom').value;
+                var timeTo = data.find(x => x.name === 'TimeTo').value;
+                var selectedWorkDayDuration = getSelectedWorkDayDurationFromForm(timeFrom, timeTo);
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'post',
+                    data: data,
+                    success: function (calCellHtml) {
+                        var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                        if (currentCell.hasClass('tooltipstered')) {
+                            var cell_title = currentCell.tooltipster('content');
                         }
-                    });
-                }
+                        currentCell.replaceWith(calCellHtml);
+                        if (cell_title) {
+                            var newCalendarCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+                            newCalendarCell.attr('title', cell_title);
+                            newCalendarCell.tooltipster({
+                                position: 'right',
+                                theme: 'tooltipster-light'
+                            });
+                        }                     
+                        var workDaysCount = $(".calendar__workdays_daysblock[employee-anchor='" + employeeAnchor + "']");
+                        var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
+                        var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                        dayOffsCount.text(parseFloat(dayOffsCount.text()) - 1);
+                        workDaysCount.text(parseFloat(workDaysCount.text()) + 1);
+                        var newWorkHours = (parseFloat(workDaysHours.text()) + selectedWorkDayDuration).toFixed(1);
+                        if (isInt(newWorkHours)) {
+                            workDaysHours.text(parseInt(newWorkHours));
+                        }
+                        else {
+                            workDaysHours.text(newWorkHours);
+                        }    
+
+                        toastr.clear(toast);
+                        toastr.success('Изменения внесены', 'Выходной день на ' + dateAnchor);
+                    },
+                    error: function () {
+                        toastr.clear(toast);
+                        toastr.error('Не удалось внести изменения', 'Выходной день на ' + dateAnchor);
+                    }
+                });
             }
         }
-        else {
-            modal = $("#request_modal");
-            modal.modal('hide');
+        else {           
+            employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
+            dateAnchor = data.find(x => x.name === 'Date').value.split(' ')[0];
+            var currentCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + dateAnchor + "']");
+            if (currentCell.attr('requested')) {
+                toast = toastr.info('Подтверждение выходного дня', dateAnchor);
+                modal = $("#request_modal");
+                modal.modal('hide');
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'post',
+                    data: data,
+                    success: function (calCellHtml) {                       
+                        currentCell.replaceWith(calCellHtml);
+                        var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                        dayOffsCount.text(parseFloat(dayOffsCount.text()) + 1);
+
+                        toastr.clear(toast);
+                        toastr.success('Выходной день подтверждён', dateAnchor);
+                    },
+                    error: function () {
+                        toastr.clear(toast);
+                        toastr.success('Не удалось внести изменения', dateAnchor);
+                    }
+                });
+            }
+            else {
+                closePreloader('preloader');
+                modal = $("#request_modal");
+                modal.modal('hide');
+            }
         }
     });
 
     $("#absence_set_form").on('submit', function (event) {
         event.preventDefault();
-        var form = $(this);
-        $('#preloader').css('display', 'flex');
+        var form = $(this);        
         var data = form.serializeArray();
-        var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
+        var employeeAnchor = data.find(x => x.name === 'EmployeeId').value;
         var date = data.find(x => x.name === 'Date').value.split('T')[0].split('-');
         var parsedDate = date[2] + "." + date[1] + "." + date[0];
+        var toast = toastr.info('Подтверждение прогула', parsedDate);
+        modal = $("#request_modal");
+        modal.modal('hide');
         $.ajax({
             url: form.attr('action'),
             method: 'post',
             data: data,
             success: function (response) {
                 if (response) {
-                    var calendar_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + parsedDate + "']");
-                    var new_cell = $('<div>').addClass('calendar__block calendar__block_pass');
-                    calendar_cell.replaceWith(new_cell);
-                    if (calendar_cell.attr('type-anchor') === 'workDay') {
-                        var current_timeFrom = calendar_cell.attr('timeFrom-anchor').split(':');
-                        var current_timeTo = calendar_cell.attr('timeTo-anchor').split(':');
-                        var current_dateFrom = new Date(0, 0, 0, current_timeFrom[0], current_timeFrom[1], 0, 0);
-                        var current_dateTo = new Date(0, 0, 0, current_timeTo[0], current_timeTo[1], 0, 0);
-                        var current_diff = current_dateTo.getTime() - current_dateFrom.getTime() > 0 ? (current_dateTo.getTime() - current_dateFrom.getTime()) / 36e5 : (current_dateTo.getTime() - current_dateFrom.getTime()) / 36e5 + 24;  
-                        var work_days_count = $(".calendar__workdays_daysblock[employee-anchor='" + employee_anchor + "']");
-                        var work_days_hours = $(".calendar__workdays_hoursblock[employee-anchor='" + employee_anchor + "']");
-                        work_days_count.text(parseFloat(work_days_count.text()) - 1);
-                        work_days_hours.text((parseFloat(work_days_hours.text()) - current_diff).toFixed(1));
-                    } else if (calendar_cell.attr('type-anchor') === 'dayOff') {
-                        var day_offs_count = $(".calendar__chilldays_block[employee-anchor='" + employee_anchor + "']");
-                        day_offs_count.text(parseFloat(day_offs_count.text()) - 1);
+                    var calendarCell = $(".calendar__block[employee-anchor='" + employeeAnchor + "'][date-anchor='" + parsedDate + "']");
+                    var newCell = $('<div>').addClass('calendar__block calendar__block_pass');
+                    calendarCell.replaceWith(newCell);
+                    if (calendarCell.attr('type-anchor') === 'workDay' || calendarCell.attr('type-anchor') === 'teamleadWorkDay') {
+                        var currentDifference = getWorkDayDurationFromCalendarCell(calendarCell);
+                        var workDaysCount = $(".calendar__workdays_daysblock[employee-anchor='" + employeeAnchor + "']");
+                        var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
+                        workDaysCount.text(parseFloat(workDaysCount.text()) - 1);
+                        var newWorkHours = (parseFloat(workDaysHours.text()) - currentDifference).toFixed(1);
+                        if (isInt(newWorkHours)) {
+                            workDaysHours.text(parseInt(newWorkHours));
+                        }
+                        else {
+                            workDaysHours.text(newWorkHours);
+                        }
+                    } else if (calendarCell.attr('type-anchor') === 'dayOff') {
+                        var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                        dayOffsCount.text(parseFloat(dayOffsCount.text()) - 1);
                     }
-                    var absence_cell = $(".calendar__pass[employee-anchor='" + employee_anchor + "']");                   
-                    absence_cell.attr('disabled', 'disabled');
-                    absence_cell.css('cursor', 'not-allowed');
-                    absence_cell.removeAttr('type-anchor');
-                    absence_cell.text('-');
-                    modal = $("#request_modal");
-                    modal.modal('hide');
-                    $('#preloader').css('display', 'none');
+
+                    var absenceCell = $(".calendar__pass[employee-anchor='" + employeeAnchor + "']");
+                    absenceCell.attr('disabled', 'disabled');
+                    absenceCell.css('cursor', 'not-allowed');
+                    absenceCell.removeAttr('type-anchor');
+                    absenceCell.text('-');
+
+                    toastr.clear(toast);
+                    toastr.success('Прогул подтверждён', parsedDate);
                 }
                 else {
-                    $('#preloader').css('display', 'none');
+                    toastr.clear(toast);
+                    toastr.error('Не удалось внести изменениня', parsedDate);
                 }
             }
         });
     });
 });
+
+function getWorkDayDurationFromCalendarCell(calendarDayObj) {
+    var currentTimeFrom = calendarDayObj.attr('timeFrom-anchor').split(':');
+    var currentTimeTo = calendarDayObj.attr('timeTo-anchor').split(':');
+    var currentDateFrom = new Date(0, 0, 0, currentTimeFrom[0], currentTimeFrom[1], 0, 0);
+    var currentDateTo = new Date(0, 0, 0, currentTimeTo[0], currentTimeTo[1], 0, 0);
+    return currentDateTo.getTime() - currentDateFrom.getTime() > 0 ? (currentDateTo.getTime() - currentDateFrom.getTime()) / 36e5 : (currentDateTo.getTime() - currentDateFrom.getTime()) / 36e5 + 24;
+}
+
+function getSelectedWorkDayDurationFromForm(timeFromString, timeToString) {
+    var timeFrom = timeFromString.split(':');
+    var timeTo = timeToString.split(':');
+    var dateFrom = new Date(0, 0, 0, timeFrom[0], timeFrom[1], 0, 0);
+    var dateTo = new Date(0, 0, 0, timeTo[0], timeTo[1], 0, 0);
+    return dateTo.getTime() - dateFrom.getTime() > 0 ? (dateTo.getTime() - dateFrom.getTime()) / 36e5 : (dateTo.getTime() - dateFrom.getTime()) / 36e5 + 24;
+}
+
+function isInt(n) {
+    return n % 1 === 0;
+}

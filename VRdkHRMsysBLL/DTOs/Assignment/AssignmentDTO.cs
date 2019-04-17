@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.Assignment
+namespace VRdkHRMsysBLL.DTOs
 {
     public class AssignmentDTO
     {

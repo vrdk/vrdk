@@ -1,11 +1,11 @@
-﻿@model VRdkHRMsystem.Models.AdminViewModels.Employee.EditEmployeeViewModel
+﻿@model VRdkHRMsystem.Models.AdminViewModels.EditEmployeeViewModel
 
 @{
     ViewData["Title"] = "EditEmployee";
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
     var timeStamp = DateTime.UtcNow;
 }
-<form asp-action="EditEmployee" method="post" class="content" id="submit_form">
+<form asp-action="EditEmployee" method="post" class="content" id="profile__edit_form">
     <div class="profile__globalwrapper">
         <input asp-for="OrganisationId" hidden />
         <input asp-for="EmployeeId" hidden />
@@ -136,11 +136,11 @@
                 </div>
             </div>
             <div class="empprofileedit__buttonwrapper">
-                <button class="empprofile__button button back_button" type="button">
+                <button class="empprofile__button button back_button ripple" type="button">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Назад</p>
                 </button>
-                <button class="empprofile__button button" type="submit">
+                <button class="empprofile__button button ripple" type="submit">
                     <img src="~/images/submit.png" alt="submit" />
                     <p>Сохранить изменения</p>
                 </button>
@@ -159,11 +159,11 @@
                 <img style="max-width:100%;height:auto" id="image" src="" alt="">
             </div>
             <div class="vacmodal__buttons">
-                <button class="button" type="button" id="cancel" data-dismiss="modal">
+                <button class="button ripple" type="button" id="cancel" data-dismiss="modal">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Отменить</p>
                 </button>
-                <button class="button" type="button" id="croppImage" data-dismiss="modal">
+                <button class="button ripple" type="button" id="croppImage" data-dismiss="modal">
                     <img src="~/images/submit.png" alt="submit" />
                     <p>Изменить</p>
                 </button>
@@ -180,6 +180,5 @@
             onkeyup: false
         })
     </script>
-    <script src="~/js/submit.js"></script>
     <link rel="stylesheet" href="~/css/cropper.min.css" />
 }

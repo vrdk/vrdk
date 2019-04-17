@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using VRdkHRMsystem.Models.Profile;
+﻿using VRdkHRMsystem.Models.Profile;
 
-namespace VRdkHRMsystem.Models.RequestViewModels.SickLeave
+namespace VRdkHRMsystem.Models.RequestViewModels
 {
     public class CompositeRequestSickLeaveViewModel
     {

@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsystem.Models.SharedModels.Team
+﻿namespace VRdkHRMsystem.Models.SharedModels
 {
     public class TeamViewModel
     {

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
 
-namespace VRdkHRMsystem.Models.AdminViewModels.Team
+namespace VRdkHRMsystem.Models.AdminViewModels
 {
     public class AddTeamViewModel
     {

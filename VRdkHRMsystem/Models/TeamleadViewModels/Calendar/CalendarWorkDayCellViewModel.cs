@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class CalendarWorkDayCellViewModel
     {
@@ -12,6 +12,5 @@ namespace VRdkHRMsystem.Models.TeamleadViewModels.Calendar
         public DateTime Date { get; set; }
         public DateTime TimeFrom { get; set; }
         public DateTime TimeTo { get; set; }
-        public string Role { get; set; }
     }
 }

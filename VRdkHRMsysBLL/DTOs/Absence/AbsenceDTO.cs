@@ -1,7 +1,6 @@
 ﻿using System;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.Absence
+namespace VRdkHRMsysBLL.DTOs
 {
     public class AbsenceDTO
     {

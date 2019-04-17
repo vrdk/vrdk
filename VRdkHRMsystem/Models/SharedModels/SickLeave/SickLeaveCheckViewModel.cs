@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.SharedModels.SickLeave
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class SickLeaveCheckViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.SharedModels.SickLeave
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class SickLeaveRequestViewModel
     {

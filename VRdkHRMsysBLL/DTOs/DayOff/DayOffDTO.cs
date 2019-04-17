@@ -1,7 +1,6 @@
 ﻿using System;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.DayOff
+namespace VRdkHRMsysBLL.DTOs
 {
     public class DayOffDTO
     {

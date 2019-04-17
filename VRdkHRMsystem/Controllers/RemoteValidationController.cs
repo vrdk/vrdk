@@ -5,7 +5,7 @@ using VRdkHRMsysBLL.Interfaces;
 
 namespace VRdkHRMsystem.Controllers
 {
-    [Authorize(Roles = "Administrator")]
+    [Authorize]
     public class RemoteValidationController : Controller
     {
         private readonly IEmployeeService _employeeService;

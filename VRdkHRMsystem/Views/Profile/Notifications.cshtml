@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.Profile.Notification.NotificationListViewModel
+﻿@model VRdkHRMsystem.Models.Profile.NotificationListViewModel
 @{
     var searchKey = ViewData["SearchKey"] as string;
 }
@@ -24,19 +24,8 @@
                         {
                             foreach (var item in Model.Notifications)
                             {
-                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked, role = "Admin" })">
+                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, role = "Admin" })">
                                     <div class="table__body_block">
-
-                                        @if (item.IsChecked == false)
-                                        {
-                                            <div class="profile__status_circle_Approved" style="margin-right:3px;">
-                                                <div></div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div style="margin-left:15px;"></div>
-                                        }
                                         <p class="notiflist__date">@item.NotificationDate.ToLocalTime().ToShortDateString() в @item.NotificationDate.ToLocalTime().ToShortTimeString()</p>
                                         <p class="notiflist__content">@item.Description</p>
                                     </div>
@@ -47,7 +36,7 @@
                         {
                             foreach (var item in Model.Notifications)
                             {
-                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, isChecked = item.IsChecked, role = "Teamlead" })">
+                                <a style="text-decoration:none; color: inherit;" href="@Url.Action("RedirectWithNotification", "Profile", new { notificationId = item.NotificationId, notificationRange = item.NotificationRange, notificationType = item.NotificationType, role = "Teamlead" })">
                                     <div class="table__body_block">
 
                                         <p class="notiflist__date">@item.NotificationDate.ToLocalTime().ToShortDateString() в @item.NotificationDate.ToLocalTime().ToShortTimeString()</p>

@@ -26,7 +26,7 @@ namespace VRdkHRMsysDAL.Contexts
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=LAPTOP-6R7SBS7T;Database=VRdkHRMsystemDB;Trusted_Connection=True;MultipleActiveResultSets=true");
+                optionsBuilder.UseSqlServer(@"Server=tcp:vrdkserver.database.windows.net,1433;Initial catalog=VRdkdb;Persist Security Info=False;User ID=vrdk;Password=Northtsev314159265;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
             }
         }
 
@@ -290,8 +290,6 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("employee_id")
                     .HasMaxLength(450);
 
-                entity.Property(e => e.IsChecked).HasColumnName("isChecked");
-
                 entity.Property(e => e.NotificationDate)
                     .HasColumnName("notification_date")
                     .HasColumnType("datetime");
@@ -301,6 +299,14 @@ namespace VRdkHRMsysDAL.Contexts
                     .HasColumnName("notification_range")
                     .HasMaxLength(512)
                     .HasDefaultValueSql("('user')");
+
+                entity.Property(e => e.RelatedTeamId)
+                   .HasColumnName("related_team_id")
+                   .HasMaxLength(450);
+
+                entity.Property(e => e.RelatedDate)
+                    .HasColumnName("related_date")
+                    .HasColumnType("date");
 
                 entity.Property(e => e.NotificationType)
                     .IsRequired()

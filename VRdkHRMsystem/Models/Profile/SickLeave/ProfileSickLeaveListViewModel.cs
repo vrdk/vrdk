@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsystem.Models.Profile.SickLeave
+﻿namespace VRdkHRMsystem.Models.Profile
 {
     public class ProfileSickLeaveListViewModel
     {

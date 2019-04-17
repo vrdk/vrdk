@@ -7,26 +7,34 @@
     <link rel="icon" href="~/favicon.ico" />
     <environment include="Development">
         <link rel="stylesheet" href="~/css/select2.min.css" />
+        <link rel="stylesheet" href="~/css/toastr.css" />
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/js/bootstrap.min.js"></script>
         <script src="~/js/jquery-ui.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/js/main.js"></script>
         <script src="~/js/select2.min.js"></script>
         <script src="~/js/jquery.mask.min.js"></script>
         <script src="~/js/jquery.timepicker.min.js"></script>
+        <script src="~/js/toastr.js"></script>
         <link rel="stylesheet" href="~/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/main.min.css" />
         <link rel="stylesheet" href="~/css/jquery.timepicker.min.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="~/css/select2.min.css" />
+        <link rel="stylesheet" href="~/css/toastr.css" />
         <script src="~/lib/jquery/dist/jquery.min.js"></script>
         <script src="~/js/bootstrap.min.js"></script>
         <script src="~/js/jquery-ui.js"></script>
+        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
         <script src="~/js/main.js"></script>
         <script src="~/js/select2.min.js"></script>
         <script src="~/js/jquery.mask.min.js"></script>
         <script src="~/js/jquery.timepicker.min.js"></script>
+        <script src="~/js/toastr.js"></script>
         <link rel="stylesheet" href="~/css/bootstrap.min.css" />
         <link rel="stylesheet" href="~/css/main.min.css" />
         <link rel="stylesheet" href="~/css/jquery.timepicker.min.css" />
@@ -630,11 +638,11 @@
                         </li>
                     </a>
                     <div class="navigation__buttonwrapper">
-                        <a class="button navigation__button" href="@Url.Action("AddEmployee","Admin")" style="text-decoration:none">
+                        <a class="button navigation__button  ripple" href="@Url.Action("AddEmployee","Admin")" style="text-decoration:none">
                             <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
                             <p>Добавить сотрудника</p>
                         </a>
-                        <a class="button navigation__button" href="@Url.Action("AddTeam","Admin")" style="text-decoration:none">
+                        <a class="button navigation__button ripple" href="@Url.Action("AddTeam","Admin")" style="text-decoration:none">
                             <img class="navigation__button_icon" src="~/images/plus.png" alt="plus" />
                             <p>Добавить команду</p>
                         </a>

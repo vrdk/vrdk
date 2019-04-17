@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.AdminViewModels.Team.AddTeamViewModel
+﻿@model VRdkHRMsystem.Models.AdminViewModels.AddTeamViewModel
 
 @{
     ViewData["Title"] = "AddTeam";
@@ -23,11 +23,11 @@
                 <select asp-for="TeamMembers" asp-items="Model.Employees" multiple="multiple" id="teamMembers" style="width:100%;" hidden></select>
             </div>
             <div class="teamprofile__empbuttons">
-                <button class="empprofile__button button" type="button" onclick="window.history.back()">
+                <button class="empprofile__button button ripple" type="button" onclick="window.history.back()">
                     <img src="~/images/cancel.png" alt="cancel" />
                     <p>Отменить</p>
                 </button>
-                <button class="empprofile__button button" type="submit">
+                <button class="empprofile__button button ripple" type="submit">
                     <img src="~/images/submit.png" alt="submit" />
                     <p>Создать</p>
                 </button>

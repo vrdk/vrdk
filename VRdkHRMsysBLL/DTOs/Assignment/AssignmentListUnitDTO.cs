@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsysBLL.DTOs.Assignment
+namespace VRdkHRMsysBLL.DTOs
 {
     public class AssignmentListUnitDTO
     {

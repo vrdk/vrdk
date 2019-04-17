@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.Vacation
+namespace VRdkHRMsystem.Models.Profile
 {
     public class ProfileVacationsViewModel
     {

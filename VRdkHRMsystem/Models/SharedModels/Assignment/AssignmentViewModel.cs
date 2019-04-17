@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.SharedModels.Assignment
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class AssignmentViewModel
     {

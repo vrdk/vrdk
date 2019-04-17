@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.DayOff;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;
 using VRdkHRMsysDAL.Interfaces;

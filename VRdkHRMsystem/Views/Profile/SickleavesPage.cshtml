@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.Profile.SickLeave.ProfileSickLeaveListViewModel
+﻿@model VRdkHRMsystem.Models.Profile.ProfileSickLeaveListViewModel
 
 @if (Model != null && Model.SickLeaves.Count() != 0)
 {
@@ -18,7 +18,14 @@
                         <div></div>
                     </div>
                 </div>
-                <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
+                @if (item.RequestStatus == "Denied")
+                {
+                    <p class="profile__tabs_sickleaveduration">-</p>
+                }
+                else
+                {
+                    <p class="profile__tabs_sickleaveduration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
+                }
                 <div class="profile__tabs_sickleavechoice profile__tabs_sickleavechoice-item">
                     @if (item.RequestStatus != "Denied")
                     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.AdminViewModels.Team
+namespace VRdkHRMsystem.Models.AdminViewModels
 {
     public class EditTeamViewModel
     {

@@ -1,4 +1,11 @@
 ﻿@model VRdkHRMsystem.Models.Profile.ProfileResidualsViewModel
+@{
+    var activeTab = TempData["ActiveTab"] as string;
+}
+@if (activeTab != null)
+{
+    <span id="active_tab" value="@activeTab" hidden></span>
+}
 <div class="profile__right">
     <div class="profile__days">
         <div class="profile__block">
@@ -54,23 +61,23 @@
     <div class="profile__tabs_section">
         <div class="profile__tabs">
             <div class="profile__tabs_header">
-                <div class="profile__tab profile__tab_active" id="vacation">Мои отпуска</div>
+                <div class="profile__tab" id="vacation">Мои отпуска</div>
                 <div class="profile__tab" id="sickleave">Мои больничные</div>
                 <div class="profile__tab" id="assignment">Мои командировки</div>
                 <div class="profile__tab" id="absence">Мои прогулы</div>
             </div>
             <div class="profile__tabs_body">
-                <div class="profile__tabs_vacation profile__tab_post profile__tab_postactive">
+                <div tab-anchor="vacation" class="profile__tabs_vacation profile__tab_post">
                     <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
-                <div class="profile__tabs_sickleave profile__tab_post">
+                <div tab-anchor="sickleave" class="profile__tabs_sickleave profile__tab_post">
                     <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
-                <div class="profile__tabs_assignment profile__tab_post">
+                <div tab-anchor="assignment" class="profile__tabs_assignment profile__tab_post">
                     <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
-                <div class="profile__tabs_absence profile__tab_post">
-                    <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>                   
+                <div tab-anchor="absence" class="profile__tabs_absence profile__tab_post">
+                    <div class="profile__tabs_loading profile__tabs_content">Загрузка...</div>
                 </div>
             </div>
         </div>

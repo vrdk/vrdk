@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Transaction;
+using VRdkHRMsysBLL.DTOs;
 
 namespace VRdkHRMsysBLL.Interfaces
 {

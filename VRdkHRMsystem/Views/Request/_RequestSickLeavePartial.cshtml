@@ -1,46 +1,49 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.SickLeave.RequestSickLeaveViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.RequestSickLeaveViewModel
 
-<form asp-action="RequestSickLeave" method="post" enctype="multipart/form-data" id="submit_form">
-    <div class="profile__right">
-        <div class="profile__days sickmessage__days">
-            <div class="profile__block">
-                <p class="profile__daystitle">Больничные</p>
-                <div class="profile__daysblock">
-                    <p class="profile__dayscount">@Model.SickLeaveBalance</p>
-                    <p class="profile__days_word">Дн.</p>
-                </div>
+<form asp-action="RequestSickLeave" method="post" enctype="multipart/form-data" id="submit_form" class="profile__right">
+    <div class="profile__days sickmessage__days">
+        <div class="profile__block">
+            <p class="profile__daystitle">Больничные</p>
+            <div class="profile__daysblock">
+                <p class="profile__dayscount">@Model.SickLeaveBalance</p>
+                <p class="profile__days_word">Дн.</p>
             </div>
         </div>
-        <div class="vacrequest__request">
-            <p>Сообщение о болезни</p>
-            <input asp-for="EmployeeId" hidden />
-            <div class="vacrequest__body sickmessage__body">
-                <div class="vacrequest__body_left sickmessage__body_left">
-                    <div class="vacrequest__block">
-                        <p>Комментарий</p>
-                        <textarea class="input" type="text" name="Comment"></textarea>
-                    </div>
-                    <p></p>
+    </div>
+    <div class="vacrequest__request">
+        <p>Сообщение о болезни</p>
+        <input asp-for="EmployeeId" hidden />
+        <div class="vacrequest__body sickmessage__body">
+            <div class="vacrequest__body_left sickmessage__body_left">
+                <div class="vacrequest__block">
+                    <p>Комментарий</p>
+                    <textarea class="input" type="text" name="Comment"></textarea>
                 </div>
+                <p></p>
+            </div>
 
-                <div class="sickmessage__upload">
-                    <label class="sickmessage__ulpoad_label" for="File" id="fileUploadLabel">
-                        <img src="~/images/camera.png" alt="cross" />
-                        <p id="fileUploadText">Добавить фото</p>
-                    </label>
-                    <input asp-for="File" class="sickmessage__ulpoad_my" type="file" id="File" accept="image/*" />
-                </div>
-                <div class="vacrequest__body_right sickmessage__body_right">
-                    <div class="vacrequest__button_wrapper sickmessage__button_wrapper">
-                        <button class="empprofile__button button back_button" type="button">
-                            <img src="~/images/cancel.png" alt="cancel" />
-                            <p>Отменить</p>
-                        </button>
-                        <button class="empprofile__button button" type="submit">
-                            <img src="~/images/submit.png" alt="submit" />
-                            <p>Отправить</p>
-                        </button>
-                    </div>
+            <div class="sickmessage__upload">
+                <label class="sickmessage__ulpoad_label" for="File" id="fileUploadLabel">
+                    <img src="~/images/camera.png" alt="cross" />
+                    <p id="fileUploadText">Добавить фото</p>
+                </label>
+                <input asp-for="File" class="sickmessage__ulpoad_my" type="file" id="File" accept="image/*" />
+            </div>
+            <div class="sickmessage__upload">
+                <label class="sickmessage__ulpoad_label sickmessage__upload_check" id="check_photo" file-anchor="File">             
+                    <p id="fileUploadText">Просмотреть фото</p>
+                </label>             
+            </div>
+            <div class="vacrequest__body_right sickmessage__body_right">
+                <div class="vacrequest__button_wrapper sickmessage__button_wrapper">
+                    <button class="empprofile__button button back_button ripple" type="button">
+                        <img src="~/images/cancel.png" alt="cancel" />
+                        <p>Отменить</p>
+                    </button>
+                    <button class="empprofile__button button ripple" type="submit">
+                        <img src="~/images/submit.png" alt="submit" />
+                        <p>Отправить</p>
+                    </button>
                 </div>
             </div>
         </div>

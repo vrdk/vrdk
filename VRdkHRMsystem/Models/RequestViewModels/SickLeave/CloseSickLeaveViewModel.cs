@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.ComponentModel.DataAnnotations;
-namespace VRdkHRMsystem.Models.RequestViewModels.SickLeave
+namespace VRdkHRMsystem.Models.RequestViewModels
 {
     public class CloseSickLeaveViewModel
     {

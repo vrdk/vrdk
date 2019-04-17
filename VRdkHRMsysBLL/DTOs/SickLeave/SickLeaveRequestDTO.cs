@@ -1,7 +1,6 @@
 ﻿using System;
-using VRdkHRMsysBLL.DTOs.Employee;
 
-namespace VRdkHRMsysBLL.DTOs.SickLeave
+namespace VRdkHRMsysBLL.DTOs
 {
     public class SickLeaveRequestDTO
     {

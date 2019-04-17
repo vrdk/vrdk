@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsysBLL.DTOs.BalanceResiduals
+﻿namespace VRdkHRMsysBLL.DTOs
 {
     public class BalanceResidualsDTO
     {

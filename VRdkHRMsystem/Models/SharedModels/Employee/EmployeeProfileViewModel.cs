@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace VRdkHRMsystem.Models.SharedModels.Employee
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class EmployeeProfileViewModel
     {

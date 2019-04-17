@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.RequestViewModels.Vacation
+namespace VRdkHRMsystem.Models.RequestViewModels
 {
     public class RequestVacationViewModel
     {        

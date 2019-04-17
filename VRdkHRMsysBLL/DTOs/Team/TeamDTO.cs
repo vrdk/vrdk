@@ -1,6 +1,4 @@
-﻿using VRdkHRMsysBLL.DTOs.Employee;
-
-namespace VRdkHRMsysBLL.DTOs.Team
+﻿namespace VRdkHRMsysBLL.DTOs
 {
     public class TeamDTO
     {

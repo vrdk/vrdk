@@ -1,4 +1,4 @@
-﻿namespace VRdkHRMsysBLL.DTOs.Employee
+﻿namespace VRdkHRMsysBLL.DTOs
 {
     public class EmployeeListUnitDTO
     {

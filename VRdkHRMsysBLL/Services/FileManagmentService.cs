@@ -28,6 +28,7 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task UploadUserPhoto(IFormFile file, string containerName, string fileName)
         {
+            
             await UploadFile(file, containerName, fileName);
         }
 

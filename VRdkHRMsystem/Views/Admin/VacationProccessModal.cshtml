@@ -1,9 +1,9 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.Vacation.VacationRequestProccessViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.VacationRequestProccessViewModel
 @{
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
     var timeStamp = DateTime.UtcNow;
 }
-<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal"  id="submit_form"  style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal"  id="submit_form"  style="border-radius:10px;">
     <div id="vacrequest">
         <input asp-for="VacationId" hidden />
         <input asp-for="VacationType" hidden />
@@ -69,11 +69,11 @@
             </div>
         </div>
         <div class="vacmodal__buttons">
-            <button class="button" data-dismiss="modal">
+            <button class="button ripple" data-dismiss="modal">
                 <img src="~/images/cancel.png" alt="cancel" />
                 <p>Отменить</p>
             </button>
-            <button class="button" type="submit">
+            <button class="button ripple" type="submit">
                 <img src="~/images/submit.png" alt="submit" />
                 <p>Готовo</p>
             </button>

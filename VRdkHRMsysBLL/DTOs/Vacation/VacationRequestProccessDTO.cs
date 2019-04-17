@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsysBLL.DTOs.Vacation
+namespace VRdkHRMsysBLL.DTOs
 {
     public class VacationRequestProccessDTO
     {

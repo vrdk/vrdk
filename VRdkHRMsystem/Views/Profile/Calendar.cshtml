@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.Calendar.CalendarViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.CalendarViewModel
 
 @{
     var startDate = new DateTime(Model.Year, Model.Month, 1);
@@ -147,7 +147,7 @@
                                                     if (dayOff.DayOffImportance == null)
                                                     {
                                                         <text>
-                                                            <div class="calendar__block calendar__block_dayoff_img"  type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId"></div>
+                                                            <div class="calendar__block calendar__block_dayoff_img" type-anchor="dayOff" employee-anchor="@employee.EmployeeId" date-anchor="@date.Date.ToString("dd.MM.yyyy")" team-anchor="@Model.TeamId"></div>
                                                         </text>
                                                     }
                                                     else

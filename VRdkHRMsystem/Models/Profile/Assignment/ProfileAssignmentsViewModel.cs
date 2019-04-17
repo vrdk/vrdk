@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.Profile.Assignment
+namespace VRdkHRMsystem.Models.Profile
 {
     public class ProfileAssignmentsViewModel
     {

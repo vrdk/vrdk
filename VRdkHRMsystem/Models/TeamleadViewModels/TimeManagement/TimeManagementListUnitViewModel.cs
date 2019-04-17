@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace VRdkHRMsystem.Models.Profile.TimeManagement
+namespace VRdkHRMsystem.Models.Profile
 {
     public class TimeManagementListUnitViewModel
     {

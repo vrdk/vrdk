@@ -9,7 +9,6 @@
 var cropper;
 var out;
 var outimage = $("#user_photo");
-var id = $("#EmployeeId").val();
 function setupCropper(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
@@ -44,27 +43,33 @@ function setupCropper(input) {
 
 const setImage = () => {
     if (out) {
-        var preloader = $("#preloader");
-        preloader.css('display', 'flex');
-        var formData = new FormData();
-        formData.set("photo", dataURItoBlob(out));
-        formData.set("id", id);
-        $.ajax({
-            url: "/File/UploadUserPhoto",
-            method: "post",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success() {
-                outimage.attr("src", out);
-                preloader.css('display', 'none');                
-            },
-            error() {
-                alert('Upload error');
-                preloader.css('display', 'none');
-            }
-        });
-
+        var id = $('#EmployeeId').val();
+        if (id) {
+            var toast = toastr.info('Изменение фото...','', { timeOut: 0, extendedTimeOut: 0 });
+            var formData = new FormData();
+            formData.set("photo", dataURItoBlob(out));
+            formData.set("id", id);
+            $.ajax({
+                url: "/File/UploadUserPhoto",
+                method: "post",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success() {
+                    outimage.attr("src", out);
+                    toastr.clear(toast);
+                    toastr.success('Фото изменено');
+                },
+                error() {
+                    toastr.clear(toast);
+                    toastr.error('Не удалось изменить фото');
+                }
+            });
+        }
+        else {
+            toastr.clear(toast);
+            toastr.error('Не удалось определить пользователя');
+        }
     }
 };
 function dataURItoBlob(dataURI) {

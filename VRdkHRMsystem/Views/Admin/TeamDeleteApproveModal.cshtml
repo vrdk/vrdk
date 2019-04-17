@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.Team.TeamViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.TeamViewModel
 
 <form asp-action="DeleteTeam" method="post" class="box-modal vacmodal" id="submit_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <input asp-for="TeamId" hidden />
@@ -9,11 +9,11 @@
         <p>Вы уверены, что хотите удалить команду "@Model.Name"?</p>
     </div>
     <div class="vacmodal__buttons">
-        <button class="button" data-dismiss="modal" type="button">
+        <button class="button ripple" data-dismiss="modal" type="button">
             <img src="~/images/cancel.png" alt="cancel" />
             <p>Отменить</p>
         </button>
-        <button class="button" type="submit">
+        <button class="button ripple" type="submit">
             <img src="~/images/submit.png" alt="submit" />
             <p>Подтвердить</p>
         </button>

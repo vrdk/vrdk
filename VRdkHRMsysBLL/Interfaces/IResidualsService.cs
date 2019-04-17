@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.BalanceResiduals;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysDAL.Entities;
 
 namespace VRdkHRMsysBLL.Interfaces

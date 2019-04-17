@@ -1,7 +1,4 @@
-﻿using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsystem.Models.SharedModels.Employee;
-
-namespace VRdkHRMsystem.Models.SharedModels.Team
+﻿namespace VRdkHRMsystem.Models.SharedModels
 {
     public class TeamProfileViewModel
     {

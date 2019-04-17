@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.SickLeave
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class SickLeaveRequestProccessViewModel
     {

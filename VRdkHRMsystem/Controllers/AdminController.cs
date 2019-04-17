@@ -7,29 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VRdkHRMsysBLL.DTOs.Absence;
-using VRdkHRMsysBLL.DTOs.Assignment;
-using VRdkHRMsysBLL.DTOs.BalanceResiduals;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Notification;
-using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Team;
-using VRdkHRMsysBLL.DTOs.Transaction;
-using VRdkHRMsysBLL.DTOs.Vacation;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
-using VRdkHRMsystem.Models.AdminViewModels.Assignment;
-using VRdkHRMsystem.Models.AdminViewModels.Employee;
-using VRdkHRMsystem.Models.AdminViewModels.Team;
-using VRdkHRMsystem.Models.SharedModels.Absence;
-using VRdkHRMsystem.Models.SharedModels.Assignment;
-using VRdkHRMsystem.Models.SharedModels.Calendar;
-using VRdkHRMsystem.Models.SharedModels.Employee;
-using VRdkHRMsystem.Models.SharedModels.SickLeave;
-using VRdkHRMsystem.Models.SharedModels.Team;
-using VRdkHRMsystem.Models.SharedModels.Vacation;
+using VRdkHRMsystem.Models.AdminViewModels;
+using VRdkHRMsystem.Models.SharedModels;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -90,10 +74,10 @@ namespace VRdkHRMsystem.Controllers
             _mapHelper = mapHelper;
         }
 
+        #region Calendar
         [HttpGet]
         public async Task<IActionResult> Calendar(int year, int month, string teamId)
         {
-
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
@@ -180,14 +164,70 @@ namespace VRdkHRMsystem.Controllers
             return RedirectToAction("Profile", "Profile");
         }
 
+        #endregion
+
+        #region Absences
+
+        [HttpGet]
+        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return View(pagedAbsences);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AbsencesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return PartialView(pagedAbsences);
+        }
+
+        #endregion
+
+        #region Teams
+
         [HttpGet]
         public async Task<IActionResult> EditTeam(string id)
         {
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (viewer != null)
+            var team = await _teamService.GetByIdAsync(id);
+            if (viewer != null && team != null)
             {
-                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);
-                var team = await _teamService.GetByIdAsync(id);
+                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);             
                 var teamMembers = team.Employees.Select(m => m.EmployeeId).ToArray();
                 var model = new EditTeamViewModel
                 {
@@ -250,54 +290,6 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var absences = new AbsenceListUnitDTO[] { };
-            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (viewer != null)
-            {
-                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
-                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
-            }
-
-            var pagedAbsences = new AbsenceListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
-            };
-
-            return View(pagedAbsences);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AbsencesPage(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var absences = new AbsenceListUnitDTO[] { };
-            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (viewer != null)
-            {
-                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
-                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId);
-            }
-
-            var pagedAbsences = new AbsenceListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
-            };
-
-            return PartialView(pagedAbsences);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Teams(int pageNumber = 0, string searchKey = null)
         {
             ViewData["SearchKey"] = searchKey;
@@ -345,55 +337,9 @@ namespace VRdkHRMsystem.Controllers
             return PartialView(pagedTeams);
         }
 
+        #endregion
 
-        [HttpGet]
-        public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var assignments = new AssignmentListUnitDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
-            {
-                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId, searchKey);
-                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId);
-            }
-
-            var pagedAssignments = new AssignmentListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
-            };
-
-            return View(pagedAssignments);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AssignmentsPage(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var assignments = new AssignmentListUnitDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
-            {
-                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId, searchKey);
-                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId);
-            }
-
-            var pagedAssignments = new AssignmentListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
-            };
-
-            return PartialView(pagedAssignments);
-        }
-
+        #region Employees
 
         [HttpGet]
         public async Task<IActionResult> Employees(int pageNumber = 0, string searchKey = null)
@@ -466,7 +412,7 @@ namespace VRdkHRMsystem.Controllers
                 return View(model);
             }
 
-            return View("AddEmployee");
+            return View("Error");
         }
 
         [HttpPost]
@@ -478,16 +424,47 @@ namespace VRdkHRMsystem.Controllers
                 var user = await _userManager.FindByIdAsync(model.EmployeeId);
                 var oldEmail = user.Email;
                 user.UserName = model.WorkEmail;
-                user.Email = model.WorkEmail;
-                if (User.Identity.Name.Equals(model.WorkEmail) && !model.WorkEmail.Equals(oldEmail))
-                {
-                    await _signInManager.RefreshSignInAsync(user);
-                }
-
+                user.Email = model.WorkEmail;            
                 var roles = await _userManager.GetRolesAsync(user);
-                await _userManager.RemoveFromRolesAsync(user, roles);
-                await _userManager.AddToRoleAsync(user, model.Role);
-                await _userManager.UpdateAsync(user);
+
+                if (roles.Contains("Administrator") && model.Role != "Administrator")
+                {
+                    await _userManager.RemoveFromRolesAsync(user, roles);
+                    await _userManager.AddToRoleAsync(user, model.Role);
+                    await _userManager.UpdateAsync(user);
+
+                    if (User.Identity.Name == oldEmail)
+                    {
+                        await _signInManager.RefreshSignInAsync(user);
+                    }
+                }
+                else if (!roles.Contains(model.Role))
+                {
+                    if (model.Role == "Administrator")
+                    {
+                        await _userManager.AddToRoleAsync(user, model.Role);
+                        await _userManager.UpdateAsync(user);
+                    }
+                    else
+                    {
+                        await _userManager.RemoveFromRolesAsync(user, roles);
+                        await _userManager.AddToRoleAsync(user, model.Role);
+                        await _userManager.UpdateAsync(user);
+                    }
+
+                    if (User.Identity.Name == oldEmail)
+                    {
+                        await _signInManager.RefreshSignInAsync(user);
+                    }
+                }
+                else
+                {
+                    if (User.Identity.Name == oldEmail && !(model.WorkEmail == oldEmail))
+                    {
+                        await _signInManager.RefreshSignInAsync(user);
+                    }
+                }                
+
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance = model.AbsenceBalance;
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance = model.AssignmentBalance;
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance = model.PaidVacationBalance;
@@ -497,9 +474,11 @@ namespace VRdkHRMsystem.Controllers
                 newEmployee.TeamId = employee.Team?.TeamId;
                 newEmployee.EmployeeBalanceResiduals = employee.EmployeeBalanceResiduals;
                 await _employeeService.UpdateAsync(newEmployee, true);
+
+                return Ok();
             }
 
-            return RedirectToAction("Profile", "Profile");
+            return BadRequest();
         }
 
         [HttpGet]
@@ -609,6 +588,10 @@ namespace VRdkHRMsystem.Controllers
             return View(model);
         }
 
+        #endregion
+
+        #region Vacations
+
         [HttpGet]
         public async Task<IActionResult> Vacations(int pageNumber = 0, string searchKey = null)
         {
@@ -674,60 +657,140 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Sickleaves(int pageNumber = 0, string searchKey = null)
+        public async Task<IActionResult> CheckVacationRequest(string id)
         {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var sickLeaves = new SickLeaveViewDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
+            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (vacationRequest != null)
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
-                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
-                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
+                if(vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString())
+                {
+                    var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
+                    var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
+                    model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
+                    model.VacationType = vacationRequest.VacationType;
+                    model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
+                    if (vacationRequest.Employee.Team != null)
+                    {
+                        model.TeamName = vacationRequest.Employee.Team.Name;
+                        model.TeamleadFullName = $"{vacationRequest.Employee.Team.Teamlead.FirstName} {vacationRequest.Employee.Team.Teamlead.LastName}";
+                    }
+                    else
+                    {
+                        model.TeamName = emptyValue;
+                        model.TeamleadFullName = emptyValue;
+                    }
+
+                    return PartialView("VacationProccessModal", model);
+                }
+                else 
+                {
+                    var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
+                    var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
+                    var model = _mapHelper.Map<VacationRequestDTO, VacationRequestCheckViewModel>(vacationRequest);
+                    model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
+                    model.VacationType = vacationRequest.VacationType;
+                    model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
+                    if (proccessor != null)
+                    {
+                        model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                    }
+                    else
+                    {
+                        model.ProccessedByName = "Данные отсутствуют";
+                    }
+                    model.RequestStatus = vacationRequest.RequestStatus;
+                    if (vacationRequest.Employee.Team != null)
+                    {
+                        model.TeamName = vacationRequest.Employee.Team.Name;
+                        model.TeamleadFullName = $"{vacationRequest.Employee.Team.Teamlead.FirstName} {vacationRequest.Employee.Team.Teamlead.LastName}";
+                    }
+                    else
+                    {
+                        model.TeamName = emptyValue;
+                        model.TeamleadFullName = emptyValue;
+                    }
+
+                    return PartialView("VacationViewModal", model);
+                }                
             }
 
-            var pagedSickLeaves = new SickLeaveListViewModel()
-            {
-                Count = count,
-                PageNumber = pageNumber,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
-            };
-
-            return View(pagedSickLeaves);
+            return BadRequest();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> SickleavesPage(int pageNumber = 0, string searchKey = null)
+        [HttpPost]
+        public async Task<IActionResult> ProccessVacationRequest(VacationRequestProccessViewModel model)
         {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var sickLeaves = new SickLeaveViewDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            var vacationRequest = await _vacationService.GetByIdAsync(model.VacationId);
+            if (vacationRequest != null && (vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString()))
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
-                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
-                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
+                try
+                {
+                    vacationRequest.ProccessDate = DateTime.UtcNow;
+                    vacationRequest.ProccessedbyId = user.Id;
+                    if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
+                    {
+                        vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                        await _vacationService.UpdateAsync(vacationRequest);
+                        var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
+                        residual.ResidualBalance -= vacationRequest.Duration;
+                        await _residualsService.UpdateAsync(residual);
+                        var transaction = new TransactionDTO()
+                        {
+                            TransactionId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            Change = model.Duration,
+                            Description = model.VacationType,
+                            TransactionDate = DateTime.UtcNow,
+                            TransactionType = model.VacationType
+                        };
+                        await _transactionService.CreateAsync(transaction);
+                        vacationRequest.TransactionId = transaction.TransactionId;
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваша заявка на отпуск была подтверждена.",
+                            NotificationRange = NotificationRangeEnum.User.ToString()
+                        };
+
+                        await _notificationService.CreateAsync(notification, true);
+                    }
+                    else
+                    {
+                        vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                        await _vacationService.UpdateAsync(vacationRequest);
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = vacationRequest.EmployeeId,
+                            OrganisationId = user.OrganisationId,
+                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            Description = $"Ваша заявка на отпуск была отклонена."
+                        };
+
+                        await _notificationService.CreateAsync(notification, true);
+                    }
+                }
+                catch (DbUpdateConcurrencyException e)
+                {
+                    return BadRequest(e.Message);
+                }
             }
 
-            var pagedSickLeaves = new SickLeaveListViewModel()
-            {
-                Count = count,
-                PageNumber = pageNumber,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
-            };
-
-            return PartialView(pagedSickLeaves);
+            return RedirectToAction("Vacations", "Admin");
         }
 
         [HttpGet]
         public async Task<IActionResult> ViewVacationRequest(string id)
         {
             var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (vacationRequest != null && vacationRequest.ProccessedbyId != null)
+            if (vacationRequest != null)
             {
                 var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
                 var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
@@ -735,13 +798,19 @@ namespace VRdkHRMsystem.Controllers
                 model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
                 model.VacationType = vacationRequest.VacationType;
                 model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
-                model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                if(proccessor!= null)
+                {
+                    model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                }
+                else
+                {
+                    model.ProccessedByName ="Данные отсутствуют";
+                }
                 model.RequestStatus = vacationRequest.RequestStatus;
                 if (vacationRequest.Employee.Team != null)
                 {
-                    var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
                     model.TeamName = vacationRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                    model.TeamleadFullName = $"{vacationRequest.Employee.Team.Teamlead.FirstName} {vacationRequest.Employee.Team.Teamlead.LastName}";
                 }
                 else
                 {
@@ -754,6 +823,10 @@ namespace VRdkHRMsystem.Controllers
 
             return View();
         }
+
+        #endregion
+
+        #region Sickleaves
 
         [HttpGet]
         public async Task<IActionResult> CheckSickleaveRequest(string id)
@@ -818,8 +891,7 @@ namespace VRdkHRMsystem.Controllers
                             NotificationType = NotificationTypeEnum.SickLeave.ToString(),
                             NotificationDate = DateTime.UtcNow,
                             Description = $"Ваш запрос на больничный был подтвердён.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
+                            NotificationRange = NotificationRangeEnum.User.ToString()
                         };
 
                         await _notificationService.CreateAsync(notification);
@@ -835,8 +907,7 @@ namespace VRdkHRMsystem.Controllers
                             NotificationType = NotificationTypeEnum.SickLeave.ToString(),
                             NotificationDate = DateTime.UtcNow,
                             Description = $"Ваш запрос на больничный был отклонён.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
+                            NotificationRange = NotificationRangeEnum.User.ToString()
                         };
 
                         await _notificationService.CreateAsync(notification);
@@ -844,9 +915,9 @@ namespace VRdkHRMsystem.Controllers
 
                     await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException e)
                 {
-                    return View("Error");
+                    return BadRequest(e.Message);
                 }
             }
 
@@ -854,103 +925,105 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ProccessVacationRequest(string id)
+        public async Task<IActionResult> Sickleaves(int pageNumber = 0, string searchKey = null)
         {
-            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (vacationRequest != null)
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var sickLeaves = new SickLeaveViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
             {
-                var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
-                var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
-                model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
-                model.VacationType = vacationRequest.VacationType;
-                model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
-                if (vacationRequest.Employee.Team != null)
-                {
-                    var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
-                    model.TeamName = vacationRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                }
-                else
-                {
-                    model.TeamName = emptyValue;
-                    model.TeamleadFullName = emptyValue;
-                }
-
-                return PartialView("VacationProccessModal", model);
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
+                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
             }
 
-            return View();
+            var pagedSickLeaves = new SickLeaveListViewModel()
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
+            };
+
+            return View(pagedSickLeaves);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ProccessVacationRequest(VacationRequestProccessViewModel model)
+        [HttpGet]
+        public async Task<IActionResult> SickleavesPage(int pageNumber = 0, string searchKey = null)
         {
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            var vacationRequest = await _vacationService.GetByIdAsync(model.VacationId);
-            if (vacationRequest != null && (vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString()))
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var sickLeaves = new SickLeaveViewDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
             {
-                try
-                {
-                    vacationRequest.ProccessDate = DateTime.UtcNow;
-                    vacationRequest.ProccessedbyId = user.Id;
-                    if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
-                    {
-                        vacationRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
-                        await _vacationService.UpdateAsync(vacationRequest);
-                        var residual = await _residualsService.GetByEmployeeIdAsync(vacationRequest.EmployeeId, model.VacationType);
-                        residual.ResidualBalance -= vacationRequest.Duration;
-                        await _residualsService.UpdateAsync(residual);
-                        var transaction = new TransactionDTO()
-                        {
-                            TransactionId = Guid.NewGuid().ToString(),
-                            EmployeeId = vacationRequest.EmployeeId,
-                            Change = model.Duration,
-                            Description = model.VacationType,
-                            TransactionDate = DateTime.UtcNow,
-                            TransactionType = model.VacationType
-                        };
-                        await _transactionService.CreateAsync(transaction);
-                        vacationRequest.TransactionId = transaction.TransactionId;
-                        var notification = new NotificationDTO
-                        {
-                            NotificationId = Guid.NewGuid().ToString(),
-                            EmployeeId = vacationRequest.EmployeeId,
-                            OrganisationId = user.OrganisationId,
-                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
-                            NotificationDate = DateTime.UtcNow,
-                            Description = $"Ваша заявка на отпуск была подтверждена.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
-                        };
-
-                        await _notificationService.CreateAsync(notification, true);
-                    }
-                    else
-                    {
-                        vacationRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                        await _vacationService.UpdateAsync(vacationRequest);
-                        var notification = new NotificationDTO
-                        {
-                            NotificationId = Guid.NewGuid().ToString(),
-                            EmployeeId = vacationRequest.EmployeeId,
-                            OrganisationId = user.OrganisationId,
-                            NotificationType = NotificationTypeEnum.Vacation.ToString(),
-                            NotificationDate = DateTime.UtcNow,
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            Description = $"Ваша заявка на отпуск была отклонена.",
-                            IsChecked = false
-                        };
-
-                        await _notificationService.CreateAsync(notification, true);
-                    }
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    return View("Error");
-                }
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                                                                  req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
+                count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
             }
 
-            return RedirectToAction("Vacations", "Admin");
+            var pagedSickLeaves = new SickLeaveListViewModel()
+            {
+                Count = count,
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                SickLeaves = _mapHelper.MapCollection<SickLeaveViewDTO, SickLeaveRequestViewModel>(sickLeaves)
+            };
+
+            return PartialView(pagedSickLeaves);
+        }
+
+        #endregion
+
+        #region Assignments
+
+        [HttpGet]
+        public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var assignments = new AssignmentListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId, searchKey);
+                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedAssignments = new AssignmentListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
+            };
+
+            return View(pagedAssignments);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AssignmentsPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var assignments = new AssignmentListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                assignments = await _assignmentService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, a => a.OrganisationId == employee.OrganisationId, searchKey);
+                count = await _assignmentService.GetAssignmentsCountAsync(searchKey, a => a.OrganisationId == employee.OrganisationId);
+            }
+
+            var pagedAssignments = new AssignmentListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Assignments = _mapHelper.MapCollection<AssignmentListUnitDTO, AssignmentViewModel>(assignments)
+            };
+
+            return PartialView(pagedAssignments);
         }
 
         [HttpGet]
@@ -1158,8 +1231,7 @@ namespace VRdkHRMsystem.Controllers
                                 NotificationType = NotificationTypeEnum.Assignment.ToString(),
                                 NotificationDate = DateTime.UtcNow,
                                 Description = "Вы были отмечены как участник командировки.",
-                                NotificationRange = NotificationRangeEnum.User.ToString(),
-                                IsChecked = false
+                                NotificationRange = NotificationRangeEnum.User.ToString()
                             });
                             if (employee.TeamId != null)
                             {
@@ -1171,8 +1243,7 @@ namespace VRdkHRMsystem.Controllers
                                     NotificationType = NotificationTypeEnum.Assignment.ToString(),
                                     NotificationDate = DateTime.UtcNow,
                                     Description = $"Ваш работник, {employee.FirstName} {employee.LastName}, был отмечен как участник командировки.",
-                                    NotificationRange = NotificationRangeEnum.Organisation.ToString(),
-                                    IsChecked = false
+                                    NotificationRange = NotificationRangeEnum.Organisation.ToString()
                                 });
                             }
                         }
@@ -1259,8 +1330,7 @@ namespace VRdkHRMsystem.Controllers
                         NotificationType = NotificationTypeEnum.Assignment.ToString(),
                         NotificationDate = DateTime.UtcNow,
                         Description = "Вы были отмечены как участник командировки.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
+                        NotificationRange = NotificationRangeEnum.User.ToString()
                     });
                     if (employee.TeamId != null)
                     {
@@ -1272,8 +1342,7 @@ namespace VRdkHRMsystem.Controllers
                             NotificationType = NotificationTypeEnum.Assignment.ToString(),
                             NotificationDate = DateTime.UtcNow,
                             Description = $"Ваш работник, {employee.FirstName} {employee.LastName}, был отмечен как участник командировки.",
-                            NotificationRange = NotificationRangeEnum.Organisation.ToString(),
-                            IsChecked = false
+                            NotificationRange = NotificationRangeEnum.Organisation.ToString()
                         });
                     }
                 }
@@ -1283,5 +1352,7 @@ namespace VRdkHRMsystem.Controllers
 
             return RedirectToAction("Assignments", "Admin");
         }
+
+        #endregion
     }
 }

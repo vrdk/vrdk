@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
-using VRdkHRMsystem.Models.SharedModels.Assignment;
 
-namespace VRdkHRMsystem.Models.SharedModels.Employee
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class CalendarEmployeeViewModel
     {

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Post;
-using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.DTOs;
 
 namespace VRdkHRMsystem.Interfaces
 {

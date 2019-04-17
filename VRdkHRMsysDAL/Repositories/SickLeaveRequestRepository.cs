@@ -20,7 +20,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<SickLeaveRequest[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
         {
-            return await _context.SickLeaveRequest.Where(req => req.EmployeeId == id).OrderByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+            return await _context.SickLeaveRequest.Where(req => req.EmployeeId == id).OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
         }
 
         public async Task<int> GetSickLeavesNumberAsync(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)

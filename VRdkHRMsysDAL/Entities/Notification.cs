@@ -11,7 +11,8 @@ namespace VRdkHRMsysDAL.Entities
         public string Description { get; set; }
         public string NotificationType { get; set; }
         public string NotificationRange { get; set; }
-        public bool IsChecked { get; set; }
+        public string RelatedTeamId { get; set; }
+        public DateTime RelatedDate{ get; set; }
         public DateTime NotificationDate { get; set; }
 
         public Employee Employee { get; set; }

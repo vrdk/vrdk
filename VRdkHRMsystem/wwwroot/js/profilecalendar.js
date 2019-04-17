@@ -21,10 +21,9 @@
 });
 
 
-function proccessDayOff(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+function proccessDayOff(cellElement) {  
     var el = $(cellElement);
+    toastr.info('Запрос формы для запроса выходного дня...', el.attr('date-anchor'));
     var url = "/request/proccesscalendarday";
     $.ajax({
         url: url,
@@ -38,39 +37,16 @@ function proccessDayOff(cellElement) {
             $('#modal_place').empty();
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 }
 
-function proccessWorkDay(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
+function timeManagmentModal(cellElement) { 
     var el = $(cellElement);
-    var url = "/request/proccesscalendarday";
-    $.ajax({
-        url: url,
-        method: 'get',
-        data: {
-            id: el.attr('employee-anchor'),
-            date: el.attr('date-anchor'),
-            teamId: el.attr('team-anchor')
-        },
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
-        }
-    });
-}
-
-function timeManagmentModal(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-    var el = $(cellElement);
+    toastr.info('Запрос формы распорядка дня...', el.attr('date-anchor'));
     var url = "/profile/timemanagment";
     $.ajax({
         url: url,
@@ -81,10 +57,9 @@ function timeManagmentModal(cellElement) {
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 
@@ -92,9 +67,8 @@ function timeManagmentModal(cellElement) {
 }
 
 function callDayProccessMenu(cellElement) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
     var el = $(cellElement);
+    toastr.info('Запрос формы работы с днём...', el.attr('date-anchor'));
     var url = '/profile/dayproccessmenu';
     $.ajax({
         url: url,
@@ -107,11 +81,10 @@ function callDayProccessMenu(cellElement) {
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
-            $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
+            $('#modal_place').html(modal_html);          
         },
         error: function () {
-            preloader.css('display', 'none');
+            toastr.error('Произошла ошибка');
         }
     });
 

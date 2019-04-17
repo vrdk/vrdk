@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VRdkHRMsysBLL.DTOs.Post
+﻿namespace VRdkHRMsysBLL.DTOs
 {
     public class PostDTO
     {

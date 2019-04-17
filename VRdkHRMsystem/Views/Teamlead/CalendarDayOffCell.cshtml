@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Calendar.CalendarDayOffCellViewModel
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.CalendarDayOffCellViewModel
 <div class="calendar__block
      @if (Model.DayOffImportance != null) { <text> calendar__block_dayoff@(Model.DayOffImportance) calendar__block_moon</text> } calendar__block_dayoff_img"
      title="@(Model.Comment!=null? Model.Comment : "Нет комментария")" 
@@ -8,5 +8,4 @@
      name-anchor="@Model.FirstName"
      surname-anchor ="@Model.LastName"
      team-anchor="@Model.TeamId"
-     role-anchor="@Model.Role"
 ></div> 

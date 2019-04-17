@@ -1,7 +1,7 @@
 ﻿using System;
-using VRdkHRMsystem.Models.Profile.TimeManagement;
+using VRdkHRMsystem.Models.Profile;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.TimeManagement
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class TimeManagementListViewModel
     {

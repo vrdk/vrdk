@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.SickLeave.SickLeaveListViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.SickLeaveListViewModel
 
 @{
     ViewData["Title"] = "SickLeaves";
@@ -45,7 +45,7 @@
                             }
                             else
                             {
-                                <p class="sicklist__dates">@item.CreateDate.ToString("dd.MM.yyyy") - @item.CloseDate.Value.ToString("dd.MM.yyyy")</p>
+                                <p class="sicklist__dates">@item.CreateDate.ToString("dd.MM.yyyy") <span>-</span> @item.CloseDate.Value.ToString("dd.MM.yyyy")</p>
                             }
 
                             @if (item.RequestStatus == "Denied")
@@ -87,7 +87,7 @@
         <div class="table__pageblock" id="paggination_list">
             @if (Model.PageNumber == 0)
             {
-                <img src="~/images/cross.png" alt="arrow" class="disabled" style="margin-bottom:3px; cursor:not-allowed;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {
@@ -96,7 +96,7 @@
             <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
             @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
             {
-                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;margin-bottom:3px;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {

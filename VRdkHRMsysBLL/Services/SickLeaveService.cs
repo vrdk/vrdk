@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Team;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsysDAL.Entities;

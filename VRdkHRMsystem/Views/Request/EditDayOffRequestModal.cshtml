@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.DayOff.EditDayOffRequestViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.EditDayOffRequestViewModel
 <form asp-action="EditDayOffRequest" method="post" class="box-modal vacmodal dayoffmodal" id="edit_day_off_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <input asp-for="TeamId" hidden />
@@ -34,20 +34,23 @@
                         <p>Очень важно</p>
                     </label>
                 </div>
-                <div class="dayoffmodal__labelwrapper">
-                    <input type="radio" name="DayOffImportance" value="delete" id="dayoffmodal__radio4" />
-                    <label for="dayoffmodal__radio4">
-                        <p>Удалить</p>
-                    </label>
-                </div>
+                @if (Model.DayOffImportance != null)
+                {
+                    <div class="dayoffmodal__labelwrapper">
+                        <input type="radio" name="DayOffImportance" value="delete" id="dayoffmodal__radio4" />
+                        <label for="dayoffmodal__radio4">
+                            <p>Удалить</p>
+                        </label>
+                    </div>
+                }
             </div>
         </div>
         <div class="vacmodal__buttons dayoffmodal__buttons">
-            <button class="button" type="button" data-dismiss="modal">
+            <button class="button ripple" type="button" data-dismiss="modal">
                 <img src="~/images/cancel.png" alt="cancel" />
                 <p>Отменить</p>
             </button>
-            <button class="button" type="submit">
+            <button class="button ripple" type="submit">
                 <img src="~/images/submit.png" alt="submit" />
                 <p>Изменить</p>
             </button>

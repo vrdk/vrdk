@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.Profile.TimeManagement.TimeManagementProccessViewModel
+﻿@model VRdkHRMsystem.Models.Profile.TimeManagementProccessViewModel
 <div class="box-modal vacmodal planningmodal" id="planningmodal" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
         <p class="modal__title">Планирование деятельности</p>
@@ -39,11 +39,11 @@
         </div>
     </div>
     <div class="vacmodal__buttons planningmodal__button">
-        <button class="button" type="button" onclick="AddTimeManagment('table_body','@Model.Date.ToString("dd.MM.yyyy")')">
+        <button class="button ripple" type="button" onclick="AddTimeManagment('table_body','@Model.Date.ToString("dd.MM.yyyy")')">
             <img src="~/images/plus.png" alt="cancel" />
             <p>Добавить деятельность</p>
         </button>
-        <button class="empprofile__button button back_button" data-dismiss="modal" style="width:80px;margin-left:auto; margin-top:0" type="button">
+        <button class="empprofile__button button back_button ripple" data-dismiss="modal" style="width:80px;margin-left:auto; margin-top:0" type="button">
             <p>Закрыть</p>
         </button>
     </div>

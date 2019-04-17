@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.SharedModels.Employee.EmployeeProfileViewModel
+﻿@model VRdkHRMsystem.Models.SharedModels.EmployeeProfileViewModel
 @{
     ViewData["Title"] = "EmployeeProfileView";
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
@@ -111,7 +111,7 @@
 
         </div>
     </div>
-        <button class="empprofile__button button back_button" type="button">
+        <button class="empprofile__button button back_button ripple" type="button">
             <img src="~/images/submit.png" alt="submit" />
             <p>Готово</p>
         </button>

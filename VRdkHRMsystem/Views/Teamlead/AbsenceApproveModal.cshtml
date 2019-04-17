@@ -1,6 +1,6 @@
-﻿@model VRdkHRMsystem.Models.TeamleadViewModels.Absence.AbsenceApproveViewModel
+﻿@model VRdkHRMsystem.Models.TeamleadViewModels.AbsenceApproveViewModel
 
-<form asp-action="SetAbsence" method="post" class="box-modal vacmodal" id="absence_set_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
+<form asp-action="SetAbsence" method="post" class="box-modal vacmodal" id="absence_set_form" style="border-radius:10px;">
     <input asp-for="EmployeeId" hidden />
     <input asp-for="Role" hidden />
     <input asp-for="Date" hidden />
@@ -12,11 +12,11 @@
         <p>Вы уверены, что хотите поставить прогул "@Model.FirstName @Model.LastName" за "@Model.Date.ToString("dd.MM.yyyy")"?</p>
     </div>
     <div class="vacmodal__buttons">
-        <button class="button" data-dismiss="modal" type="button">
+        <button class="button ripple" data-dismiss="modal" type="button">
             <img src="~/images/cancel.png" alt="cancel" />
             <p>Отменить</p>
         </button>
-        <button class="button" type="submit">
+        <button class="button ripple" type="submit">
             <img src="~/images/submit.png" alt="submit" />
             <p>Подтвердить</p>
         </button>

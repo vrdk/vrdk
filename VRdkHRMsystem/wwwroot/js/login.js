@@ -1,15 +1,10 @@
 ﻿$(document).ready(function () {
     $("#submit_form").on('submit', function () {
-        showPreloader();
+        showLoginPreloader('preloader');
     });
 });
 
-function closePreloader(preloader) {
-    setTimeout(function () {
-        $(preloader).hide();
-    }, 1000);
-}
-function showPreloader() {
-    var pl = $('#preloader');
+function showLoginPreloader(preloaderId) {
+    var pl = $('#' + preloaderId);
     pl.css('display', 'flex');
 }

@@ -3,20 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using VRdkHRMsysBLL.DTOs.DayOff;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Notification;
-using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Vacation;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models.Profile;
 using VRdkHRMsystem.Models.RequestViewModels;
-using VRdkHRMsystem.Models.RequestViewModels.DayOff;
-using VRdkHRMsystem.Models.RequestViewModels.SickLeave;
-using VRdkHRMsystem.Models.RequestViewModels.Vacation;
-using VRdkHRMsystem.Models.SharedModels.SickLeave;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -147,8 +139,9 @@ namespace VRdkHRMsystem.Controllers
                     NotificationType = NotificationTypeEnum.DayOff.ToString(),
                     NotificationDate = DateTime.UtcNow,
                     Description = $"{employee.FirstName} {employee.LastName} выбрал желаемый выходной.",
-                    NotificationRange = NotificationRangeEnum.User.ToString(),
-                    IsChecked = false
+                    RelatedDate = model.DayOffDate,
+                    RelatedTeamId = employee.TeamId,
+                    NotificationRange = NotificationRangeEnum.User.ToString()
                 };
                 await _dayOffService.CreateAsync(dayOff);
                 await _notificationService.CreateAsync(notification, true);
@@ -156,18 +149,7 @@ namespace VRdkHRMsystem.Controllers
                 return Json(dayOff);
             }
 
-            if (User.IsInRole("Administrator"))
-            {
-                return RedirectToAction("Calendar", "Admin", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
-            }
-            else if (User.IsInRole("Teamlead"))
-            {
-                return RedirectToAction("Calendar", "Teamlead", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
-            }
-            else
-            {
-                return RedirectToAction("Calendar", "Profile", new { teamId = model.TeamId, year = model.DayOffDate.Year, month = model.DayOffDate.Month });
-            }
+            return Json(false);
         }
 
         [HttpGet]
@@ -228,7 +210,6 @@ namespace VRdkHRMsystem.Controllers
                     NotificationDate = DateTime.UtcNow,
                     EmployeeId = employee.Team?.TeamleadId,
                     NotificationType = NotificationTypeEnum.Vacation.ToString(),
-                    IsChecked = false,
                     NotificationRange = NotificationRangeEnum.Organisation.ToString(),
                     Description = $"{employee.FirstName} {employee.LastName} запросил отпуск."
                 };
@@ -308,7 +289,6 @@ namespace VRdkHRMsystem.Controllers
                     EmployeeId = employee.Team?.TeamleadId,
                     NotificationDate = DateTime.UtcNow,
                     NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                    IsChecked = false,
                     NotificationRange = NotificationRangeEnum.Organisation.ToString(),
                     Description = $"{employee.FirstName} {employee.LastName} запросил больничный"
                 };

@@ -1,4 +1,4 @@
-﻿@model VRdkHRMsystem.Models.RequestViewModels.DayOff.RequestDayOffViewModel
+﻿@model VRdkHRMsystem.Models.RequestViewModels.RequestDayOffViewModel
 
 <form asp-action="RequestDayOff" method="post" class="box-modal vacmodal dayoffmodal" id="proc_day_off_form" style="border-radius:10px;  margin-left:auto;margin-right:auto;margin-top:auto">
     <div class="modal__header" style="border-top-left-radius:10px;border-top-right-radius:10px;">
@@ -37,11 +37,11 @@
             </div>
         </div>
         <div class="vacmodal__buttons dayoffmodal__buttons">
-            <button class="button" type="button" data-dismiss="modal">
+            <button class="button ripple" type="button" data-dismiss="modal">
                 <img src="~/images/cancel.png" alt="cancel" />
                 <p>Отменить</p>
             </button>
-            <button class="button" type="submit">
+            <button class="button ripple" type="submit">
                 <img src="~/images/submit.png" alt="submit" />
                 <p>Создать</p>
             </button>

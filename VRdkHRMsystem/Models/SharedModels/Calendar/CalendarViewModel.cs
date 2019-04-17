@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Globalization;
-using VRdkHRMsystem.Models.SharedModels.Employee;
 
-namespace VRdkHRMsystem.Models.SharedModels.Calendar
+namespace VRdkHRMsystem.Models.SharedModels
 {
     public class CalendarViewModel
     {

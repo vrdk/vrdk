@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
+using VRdkHRMsystem.Models.SharedModels;
 
-namespace VRdkHRMsystem.Models.TeamleadViewModels.Assignment
+namespace VRdkHRMsystem.Models.TeamleadViewModels
 {
     public class AssignmentCheckViewModel
     {   

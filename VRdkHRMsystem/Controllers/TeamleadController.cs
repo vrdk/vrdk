@@ -5,35 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using VRdkHRMsysBLL.DTOs.Absence;
-using VRdkHRMsysBLL.DTOs.Assignment;
-using VRdkHRMsysBLL.DTOs.DayOff;
-using VRdkHRMsysBLL.DTOs.Employee;
-using VRdkHRMsysBLL.DTOs.Notification;
-using VRdkHRMsysBLL.DTOs.SickLeave;
-using VRdkHRMsysBLL.DTOs.Team;
-using VRdkHRMsysBLL.DTOs.TimeManagement;
-using VRdkHRMsysBLL.DTOs.Transaction;
-using VRdkHRMsysBLL.DTOs.Vacation;
-using VRdkHRMsysBLL.DTOs.WorkDay;
+using VRdkHRMsysBLL.DTOs;
 using VRdkHRMsysBLL.Enums;
 using VRdkHRMsysBLL.Interfaces;
 using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Models;
-using VRdkHRMsystem.Models.Profile.TimeManagement;
+using VRdkHRMsystem.Models.Profile;
 using VRdkHRMsystem.Models.SharedModels;
-using VRdkHRMsystem.Models.SharedModels.Absence;
-using VRdkHRMsystem.Models.SharedModels.Assignment;
-using VRdkHRMsystem.Models.SharedModels.Calendar;
-using VRdkHRMsystem.Models.SharedModels.Employee;
-using VRdkHRMsystem.Models.SharedModels.SickLeave;
-using VRdkHRMsystem.Models.SharedModels.Team;
-using VRdkHRMsystem.Models.SharedModels.Vacation;
-using VRdkHRMsystem.Models.SharedViewModels.Employee;
-using VRdkHRMsystem.Models.TeamleadViewModels.Absence;
-using VRdkHRMsystem.Models.TeamleadViewModels.Assignment;
-using VRdkHRMsystem.Models.TeamleadViewModels.Calendar;
-using VRdkHRMsystem.Models.TeamleadViewModels.TimeManagement;
+using VRdkHRMsystem.Models.TeamleadViewModels;
 
 namespace VRdkHRMsystem.Controllers
 {
@@ -101,6 +80,9 @@ namespace VRdkHRMsystem.Controllers
             _mapHelper = mapHelper;
             _fileManagmentService = fileManagmentService;
         }
+
+        #region Calendar
+
         [HttpGet]
         public async Task<IActionResult> Calendar(int year, int month, string teamId)
         {
@@ -110,7 +92,7 @@ namespace VRdkHRMsystem.Controllers
                 TeamDTO team = new TeamDTO();
                 CalendarViewModel model = new CalendarViewModel();
                 EmployeeDTO[] employees = new EmployeeDTO[] { };
-                var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId && t.TeamleadId == viewer.EmployeeId || t.TeamId == viewer.TeamId);
+                var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId && (t.TeamleadId == viewer.EmployeeId || t.TeamId == viewer.TeamId));
                 if (year == 0 || month == 0)
                 {
                     year = DateTime.UtcNow.Year;
@@ -131,8 +113,18 @@ namespace VRdkHRMsystem.Controllers
                 else
                 {
                     team = teams.FirstOrDefault(t => t.TeamId == teamId);
+                    if (team == null)
+                    {
+                        if (viewer.TeamId != null)
+                        {
+                            team = teams.FirstOrDefault(t => t.TeamId == viewer.TeamId);
+                        }
+                        else
+                        {
+                            team = teams.FirstOrDefault(t => t.Employees.Count() != 0);
+                        }
+                    }
                 }
-
 
                 if (team != null)
                 {
@@ -177,13 +169,539 @@ namespace VRdkHRMsystem.Controllers
                     return View(new CalendarViewModel()
                     {
                         Year = year,
-                        Month = month
+                        Month = month,
+                        Teams = _listMapper.CreateTeamList(teams, team.TeamId)
                     });
                 }
             }
 
             return RedirectToAction("Profile", "Profile");
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EditDayOff(EditCalendarDayViewModel model)
+        {
+            var dayOff = await _dayOffService.GetByIdAsync(model.CalendarDayId);
+            if (dayOff != null)
+            {
+                if (model.Result == CalendarDayTypeEnum.WorkDay.ToString())
+                {
+                    var workDay = new WorkDayDTO
+                    {
+                        WorkDayId = Guid.NewGuid().ToString(),
+                        EmployeeId = dayOff.Employee.EmployeeId,
+                        WorkDayDate = model.Date,
+                        TimeFrom = model.TimeFrom.TimeOfDay,
+                        TimeTo = model.TimeTo.TimeOfDay,
+                        ProcessDate = DateTime.UtcNow
+                    };
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = dayOff.Employee.EmployeeId,
+                        OrganisationId = dayOff.Employee.OrganisationId,
+                        NotificationType = NotificationTypeEnum.WorkDay.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        RelatedDate = model.Date,
+                        RelatedTeamId = model.TeamId
+                    };
+                    if (dayOff.DayOffImportance != null)
+                    {
+                        notification.Description = $"Подтверждение рабочего дня на {workDay.WorkDayDate.ToLocalTime().ToString("dd.MM.yyyy")}";
+                        dayOff.DayOffState = DayOffStateEnum.Requested.ToString();
+                        dayOff.ProcessDate = DateTime.UtcNow;
+                        await _dayOffService.UpdateAsync(dayOff);
+                    }
+                    else
+                    {
+                        notification.Description = $"Ваш выходной день на {dayOff.DayOffDate.ToLocalTime().ToString("dd.MM.yyyy")} был заменён рабочим днём";
+                        await _dayOffService.DeleteAsync(dayOff.DayOffId);
+                    }
+
+                    await _workDayService.CreateAsync(workDay);
+                    await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarWorkDayCellViewModel
+                    {
+                        EmployeeId = workDay.EmployeeId,
+                        Date = workDay.WorkDayDate,
+                        FirstName = dayOff.Employee.FirstName,
+                        LastName = dayOff.Employee.LastName,
+                        TeamId = dayOff.Employee.TeamId,
+                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                        DayOffImportance = dayOff.DayOffImportance
+                    };
+
+                    return PartialView("CalendarWorkDayCell", cellModel);
+                }
+                else if (dayOff.DayOffState == DayOffStateEnum.Requested.ToString())
+                {
+                    dayOff.DayOffState = DayOffStateEnum.Approved.ToString();
+                    dayOff.ProcessDate = DateTime.UtcNow;
+                    await _dayOffService.UpdateAsync(dayOff, true);
+
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = dayOff.Employee.EmployeeId,
+                        OrganisationId = dayOff.Employee.OrganisationId,
+                        NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Подтверждение выходного дня на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")}",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        RelatedDate = model.Date,
+                        RelatedTeamId = model.TeamId
+                    };
+
+                    await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarDayOffCellViewModel
+                    {
+                        EmployeeId = dayOff.EmployeeId,
+                        Date = dayOff.DayOffDate,
+                        FirstName = dayOff.Employee.FirstName,
+                        LastName = dayOff.Employee.LastName,
+                        TeamId = dayOff.Employee.TeamId,
+                        Comment = dayOff.Comment,
+                        DayOffImportance = dayOff.DayOffImportance,
+                        DayOffState = dayOff.DayOffState
+                    };
+
+                    return PartialView("CalendarDayOffCell", cellModel);
+                }
+            }
+
+            return Json(false);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditWorkDay(EditCalendarDayViewModel model)
+        {
+            var workDay = await _workDayService.GetByIdAsync(model.CalendarDayId);
+            if (workDay != null)
+            {
+                if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
+                {
+                    var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
+                    if (dayOffEx != null && dayOffEx.DayOffImportance != null)
+                    {
+                        dayOffEx.DayOffState = DayOffStateEnum.Approved.ToString();
+                        dayOffEx.ProcessDate = DateTime.UtcNow;
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            OrganisationId = workDay.Employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш рабочий день на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")} был заменён выходным",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            RelatedDate = model.Date,
+                            RelatedTeamId = model.TeamId
+                        };
+                        await _dayOffService.UpdateAsync(dayOffEx);
+                        await _notificationService.CreateAsync(notification);
+                        await _workDayService.DeleteAsync(workDay.WorkDayId, true);
+
+                        var cellModel = new CalendarDayOffCellViewModel
+                        {
+                            EmployeeId = dayOffEx.EmployeeId,
+                            Date = dayOffEx.DayOffDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            TeamId = workDay.Employee.TeamId,
+                            Comment = dayOffEx.Comment,
+                            DayOffImportance = dayOffEx.DayOffImportance,
+                            DayOffState = dayOffEx.DayOffState
+                        };
+
+                        return PartialView("CalendarDayOffCell", cellModel);
+                    }
+                    else
+                    {
+                        var dayOff = new DayOffDTO
+                        {
+                            DayOffId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            DayOffDate = model.Date,
+                            DayOffState = DayOffStateEnum.Approved.ToString(),
+                            ProcessDate = DateTime.UtcNow
+                        };
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            OrganisationId = workDay.Employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Ваш рабочий день на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")} был заменён выходным",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            RelatedDate = model.Date,
+                            RelatedTeamId = model.TeamId
+                        };
+
+                        await _workDayService.DeleteAsync(workDay.WorkDayId);
+                        await _dayOffService.CreateAsync(dayOff);
+                        await _notificationService.CreateAsync(notification, true);
+
+                        var cellModel = new CalendarDayOffCellViewModel
+                        {
+                            EmployeeId = dayOff.EmployeeId,
+                            Date = dayOff.DayOffDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            TeamId = workDay.Employee.TeamId,
+                            Comment = dayOff.Comment,
+                            DayOffImportance = dayOff.DayOffImportance,
+                            DayOffState = dayOff.DayOffState
+                        };
+
+                        return PartialView("CalendarDayOffCell", cellModel);
+                    }
+                }
+                else
+                {
+                    if (workDay.TimeFrom != model.TimeFrom.TimeOfDay || workDay.TimeTo != model.TimeTo.TimeOfDay)
+                    {
+                        var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
+                        workDay.TimeFrom = model.TimeFrom.TimeOfDay;
+                        workDay.TimeTo = model.TimeTo.TimeOfDay;
+                        workDay.ProcessDate = DateTime.UtcNow;
+                        var notification = new NotificationDTO
+                        {
+                            NotificationId = Guid.NewGuid().ToString(),
+                            EmployeeId = workDay.Employee.EmployeeId,
+                            OrganisationId = workDay.Employee.OrganisationId,
+                            NotificationType = NotificationTypeEnum.WorkDay.ToString(),
+                            NotificationDate = DateTime.UtcNow,
+                            Description = $"Были внесены изменения в Ваш рабочий день на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")}",
+                            NotificationRange = NotificationRangeEnum.User.ToString(),
+                            RelatedDate = model.Date,
+                            RelatedTeamId = model.TeamId
+                        };
+                        await _workDayService.UpdateAsync(workDay);
+                        await _notificationService.CreateAsync(notification, true);
+
+                        var cellModel = new CalendarWorkDayCellViewModel
+                        {
+                            EmployeeId = workDay.EmployeeId,
+                            Date = workDay.WorkDayDate,
+                            FirstName = workDay.Employee.FirstName,
+                            LastName = workDay.Employee.LastName,
+                            TeamId = workDay.Employee.TeamId,
+                            TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                            TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                            DayOffImportance = dayOffEx?.DayOffImportance
+                        };
+
+                        return PartialView("CalendarWorkDayCell", cellModel);
+                    }
+                    else
+                    {
+                        return Json(false);
+                    }
+                }
+            }
+
+            return Json(false);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ProccessCalendarDay(string id, string date, string name, string surname, string teamId)
+        {
+            var day = Convert.ToDateTime(date);
+            var dayOff = await _dayOffService.GetByDateAsync(day, id);
+            var workDay = await _workDayService.GetByDateAsync(day, id);
+            if (workDay != null)
+            {
+                var model = new EditCalendarDayViewModel
+                {
+                    CalendarDayId = workDay.WorkDayId,
+                    Date = day,
+                    TimeFrom = new DateTime(day.Year, day.Month, day.Day, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                    TimeTo = new DateTime(day.Year, day.Month, day.Day, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
+                    FirstName = name,
+                    LastName = surname,
+                    TeamId = teamId,
+                    EmployeeId = id
+                };
+
+                return PartialView("EditWorkDayModal", model);
+            }
+            else if (dayOff != null)
+            {
+                var model = new EditCalendarDayViewModel
+                {
+                    CalendarDayId = dayOff.DayOffId,
+                    Date = day,
+                    FirstName = name,
+                    LastName = surname,
+                    TeamId = teamId,
+                    EmployeeId = id,
+                };
+
+                return PartialView("EditDayOffModal", model);
+
+            }
+            else
+            {
+                var model = new CalendarDayViewModel
+                {
+                    EmployeeId = id,
+                    Date = day,
+                    FirstName = name,
+                    LastName = surname,
+                    TeamId = teamId,
+                };
+
+                return PartialView("ProccessCalendarDayModal", model);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProccessCalendarDay(CalendarDayViewModel model)
+        {
+            var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
+            if (employee != null)
+            {
+                if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
+                {
+                    var dayOff = new DayOffDTO
+                    {
+                        DayOffId = Guid.NewGuid().ToString(),
+                        EmployeeId = employee.EmployeeId,
+                        DayOffDate = model.Date,
+                        DayOffState = DayOffStateEnum.Approved.ToString(),
+                        ProcessDate = DateTime.UtcNow
+                    };
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = employee.EmployeeId,
+                        OrganisationId = employee.OrganisationId,
+                        NotificationType = NotificationTypeEnum.DayOff.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Подтверждение выходного дня на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")}",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        RelatedDate = model.Date,
+                        RelatedTeamId = model.TeamId
+                    };
+                    await _dayOffService.CreateAsync(dayOff);
+                    await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarDayOffCellViewModel
+                    {
+                        EmployeeId = dayOff.EmployeeId,
+                        Date = dayOff.DayOffDate,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        TeamId = employee.TeamId,
+                        DayOffState = dayOff.DayOffState,
+                        DayOffImportance = dayOff.DayOffImportance,
+
+                    };
+
+                    return PartialView("CalendarDayOffCell", cellModel);
+                }
+                else
+                {
+                    var workDay = new WorkDayDTO
+                    {
+                        WorkDayId = Guid.NewGuid().ToString(),
+                        EmployeeId = employee.EmployeeId,
+                        WorkDayDate = model.Date,
+                        TimeFrom = model.TimeFrom.TimeOfDay,
+                        TimeTo = model.TimeTo.TimeOfDay,
+                        ProcessDate = DateTime.UtcNow
+                    };
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = employee.EmployeeId,
+                        OrganisationId = employee.OrganisationId,
+                        NotificationType = NotificationTypeEnum.WorkDay.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Подтверждение рабочего дня на {model.Date.ToLocalTime().ToString("dd.MM.yyyy")}",
+                        NotificationRange = NotificationRangeEnum.User.ToString(),
+                        RelatedDate = model.Date,
+                        RelatedTeamId = model.TeamId
+                    };
+                    await _workDayService.CreateAsync(workDay);
+                    await _notificationService.CreateAsync(notification, true);
+
+                    var cellModel = new CalendarWorkDayCellViewModel
+                    {
+                        EmployeeId = workDay.EmployeeId,
+                        Date = workDay.WorkDayDate,
+                        FirstName = employee.FirstName,
+                        LastName = employee.LastName,
+                        TeamId = employee.TeamId,
+                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
+                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0)
+                    };
+
+                    return PartialView("CalendarWorkDayCell", cellModel);
+                }
+            }
+
+            return Json(false);
+        }
+
+        [HttpGet]
+        public IActionResult DayProccessMenu(string id, string date, string name, string surname, string teamId)
+        {
+            var model = new DayProccessMenuViewModel
+            {
+                EmployeeId = id,
+                Date = date,
+                TeamId = teamId,
+                Name = name,
+                Surname = surname,
+            };
+
+            return PartialView("DayProccessMenuModal", model);
+        }
+
+        [HttpGet]
+        public IActionResult SelfDayProccessMenu(string id, string date, string name, string surname, string teamId)
+        {
+            var model = new DayProccessMenuViewModel
+            {
+                EmployeeId = id,
+                Date = date,
+                TeamId = teamId,
+                Name = name,
+                Surname = surname,
+            };
+
+            return PartialView("SelfDayProccessMenuModal", model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> TimeManagementRecords(string id, string date)
+        {
+            var recordsDate = Convert.ToDateTime(date);
+            var employee = await _employeeService.GetByIdAsync(id);
+            var records = await _timeManagementService.GetAsync(r => r.EmployeeId == id && r.RecordDate.Date == recordsDate.Date);
+            if (employee != null)
+            {
+                var model = new TimeManagementListViewModel
+                {
+                    EmployeeFullName = $"{employee.FirstName} {employee.LastName}",
+                    Date = recordsDate,
+                    Records = _mapHelper.MapCollection<TimeManagementRecordDTO, TimeManagementListUnitViewModel>(records.OrderBy(r => r.RecordDate).ToArray())
+                };
+
+                return PartialView("TimeManagementModal", model);
+            }
+
+            return Json(false);
+        }
+
+        #endregion
+
+        #region Absences
+        [HttpGet]
+        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return View(pagedAbsences);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AbsencesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var absences = new AbsenceListUnitDTO[] { };
+            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (viewer != null)
+            {
+                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
+            }
+
+            var pagedAbsences = new AbsenceListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
+            };
+
+            return PartialView(pagedAbsences);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SetAbsence(string id, string teamId, string firstName, string lastName, string role)
+        {
+            var abs = await _absenceService.GetTodayByEmployeeIdAsync(id);
+            if (abs == null)
+            {
+
+                var model = new AbsenceApproveViewModel
+                {
+                    TeamId = teamId,
+                    EmployeeId = id,
+                    Date = DateTime.UtcNow,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Role = role
+                };
+
+                return PartialView("AbsenceApproveModal", model);
+            }
+
+            return RedirectToAction("Calendar", role, new { teamId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SetAbsence(AbsenceApproveViewModel model)
+        {
+            var abs = await _absenceService.GetTodayByEmployeeIdAsync(model.EmployeeId);
+            if (abs == null)
+            {
+                var absence = new AbsenceDTO
+                {
+                    AbsenceId = Guid.NewGuid().ToString(),
+                    EmployeeId = model.EmployeeId,
+                    AbsenceDate = model.Date
+                };
+                var residual = await _residualsService.GetByEmployeeIdAsync(model.EmployeeId, ResidualTypeEnum.Absence.ToString());
+                residual.ResidualBalance += 1;
+                await _residualsService.UpdateAsync(residual);
+                await _absenceService.CreateAsync(absence, true);
+                return Json(true);
+            }
+
+            return Json(false);
+        }
+
+        #endregion
+
+        #region Teams
 
         [HttpGet]
         public async Task<IActionResult> TeamProfile(string id)
@@ -243,6 +761,10 @@ namespace VRdkHRMsystem.Controllers
             return PartialView(pagedTeams);
         }
 
+        #endregion
+
+        #region Employees
+
         [HttpGet]
         public async Task<IActionResult> EmployeeProfile(string id)
         {
@@ -267,58 +789,58 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public IActionResult DayProccessMenu(string id, string date, string name, string surname, string teamId, string role)
+        public async Task<IActionResult> Employees(int pageNumber = 0, string searchKey = null)
         {
-            var model = new DayProccessMenuViewModel
-            {
-                EmployeeId = id,
-                Date = date,
-                TeamId = teamId,
-                Name = name,
-                Surname = surname,
-                Role = role
-            };
-
-            return PartialView("DayProccessMenuModal", model);
-        }
-
-        [HttpGet]
-        public IActionResult SelfDayProccessMenu(string id, string date, string name, string surname, string teamId, string role)
-        {
-            var model = new DayProccessMenuViewModel
-            {
-                EmployeeId = id,
-                Date = date,
-                TeamId = teamId,
-                Name = name,
-                Surname = surname,
-                Role = role
-            };
-
-            return PartialView("SelfDayProccessMenuModal", model);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> TimeManagementRecords(string id, string date)
-        {
-            var recordsDate = Convert.ToDateTime(date);
-            var employee = await _employeeService.GetByIdAsync(id);
-            var records = await _timeManagementService.GetAsync(r => r.EmployeeId == id && r.RecordDate.Date == recordsDate.Date);
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var employees = new EmployeeListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                var model = new TimeManagementListViewModel
-                {
-                    EmployeeFullName = $"{employee.FirstName} {employee.LastName}",
-                    Date = recordsDate,
-                    Records = _mapHelper.MapCollection<TimeManagementRecordDTO, TimeManagementListUnitViewModel>(records.OrderBy(r => r.RecordDate).ToArray())
-                };
-
-                return PartialView("TimeManagementModal", model);
+                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
             }
 
-            return Json(false);
+            var pagedEmployees = new EmployeeListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
+            };
+
+            return View(pagedEmployees);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> EmployeesPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            int count = 0;
+            var employees = new EmployeeListUnitDTO[] { };
+            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (employee != null)
+            {
+                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+            }
+
+            var pagedEmployees = new EmployeeListViewModel()
+            {
+                PageNumber = pageNumber,
+                Count = count,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
+            };
+
+            return PartialView(pagedEmployees);
+        }
+
+        #endregion
+
+        #region Vacations
 
         [HttpGet]
         public async Task<IActionResult> Vacations(int pageNumber = 0, string searchKey = null)
@@ -386,103 +908,59 @@ namespace VRdkHRMsystem.Controllers
             return PartialView(pagedVacations);
         }
 
+       
         [HttpGet]
-        public async Task<IActionResult> Absences(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var absences = new AbsenceListUnitDTO[] { };
-            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (viewer != null)
-            {
-                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
-                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
-            }
-
-            var pagedAbsences = new AbsenceListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
-            };
-
-            return View(pagedAbsences);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AbsencesPage(int pageNumber = 0, string searchKey = null)
-        {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var absences = new AbsenceListUnitDTO[] { };
-            var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (viewer != null)
-            {
-                absences = await _absenceService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
-                count = await _absenceService.GetAbsencesCountAsync(searchKey, a => a.Employee.OrganisationId == viewer.OrganisationId && a.Employee.Team.TeamleadId == viewer.EmployeeId);
-            }
-
-            var pagedAbsences = new AbsenceListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Absences = _mapHelper.MapCollection<AbsenceListUnitDTO, AbsenceViewModel>(absences)
-            };
-
-            return PartialView(pagedAbsences);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ViewVacationRequest(string id)
+        public async Task<IActionResult> CheckVacationRequest(string id)
         {
             var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (vacationRequest != null && vacationRequest.ProccessedbyId != null)
+            if (vacationRequest != null)
             {
-                var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
-                var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
-                var model = _mapHelper.Map<VacationRequestDTO, VacationRequestCheckViewModel>(vacationRequest);
-                model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
-                model.VacationType = vacationRequest.VacationType;
-                model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
-                model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
-                model.RequestStatus = vacationRequest.RequestStatus;
-                if (vacationRequest.Employee.Team != null)
+                if(vacationRequest.RequestStatus == RequestStatusEnum.Pending.ToString())
                 {
-                    var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
-                    model.TeamName = vacationRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                    var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
+                    model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
+                    model.VacationType = vacationRequest.VacationType;
+                    if (vacationRequest.Employee.Team != null)
+                    {
+                        var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
+                        model.TeamName = vacationRequest.Employee.Team.Name;
+                        model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                    }
+                    else
+                    {
+                        model.TeamName = emptyValue;
+                        model.TeamleadFullName = emptyValue;
+                    }
+
+                    return PartialView("VacationProccessModal", model);
                 }
                 else
                 {
-                    model.TeamName = emptyValue;
-                    model.TeamleadFullName = emptyValue;
+                    var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
+                    var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
+                    var model = _mapHelper.Map<VacationRequestDTO, VacationRequestCheckViewModel>(vacationRequest);
+                    model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
+                    model.VacationType = vacationRequest.VacationType;
+                    model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
+                    model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
+                    model.RequestStatus = vacationRequest.RequestStatus;
+                    if (vacationRequest.Employee.Team != null)
+                    {
+                        var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
+                        model.TeamName = vacationRequest.Employee.Team.Name;
+                        model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                    }
+                    else
+                    {
+                        model.TeamName = emptyValue;
+                        model.TeamleadFullName = emptyValue;
+                    }
+
+                    return PartialView("VacationViewModal", model);
                 }
-
-                return PartialView("VacationViewModal", model);
             }
-
-            return View();
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ProccessVacationRequest(string id)
-        {
-            var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (vacationRequest != null && vacationRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-            {
-                var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
-                model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
-                model.VacationType = vacationRequest.VacationType;
-                var teamlead = await _employeeService.GetByIdAsync(vacationRequest.Employee.Team.TeamleadId);
-                model.TeamName = vacationRequest.Employee.Team.Name;
-                model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-
-                return PartialView("VacationProccessModal", model);
-            }
-
-            return View();
+            
+            return BadRequest();
         }
 
         [HttpPost]
@@ -516,9 +994,8 @@ namespace VRdkHRMsystem.Controllers
                         OrganisationId = user.OrganisationId,
                         NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на отпуск был подтверждён руководителем.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
+                        Description = $"Ваш запрос на отпуск был подтверждён руководителем",
+                        NotificationRange = NotificationRangeEnum.User.ToString()
                         },
                    new NotificationDTO
                         {
@@ -526,9 +1003,8 @@ namespace VRdkHRMsystem.Controllers
                         OrganisationId = user.OrganisationId,
                         NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Запрос на отпуск работника был подтверждён его руководителем.",
-                        NotificationRange = NotificationRangeEnum.Organisation.ToString(),
-                        IsChecked = false
+                        Description = $"Запрос на отпуск работника был подтверждён его руководителем",
+                        NotificationRange = NotificationRangeEnum.Organisation.ToString()
                         }
                     };
 
@@ -544,9 +1020,8 @@ namespace VRdkHRMsystem.Controllers
                         OrganisationId = user.OrganisationId,
                         NotificationType = NotificationTypeEnum.Vacation.ToString(),
                         NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на отпуск был отклонён руководителем.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
+                        Description = $"Ваш запрос на отпуск был отклонён руководителем",
+                        NotificationRange = NotificationRangeEnum.User.ToString()
                     };
 
                     await _notificationService.CreateAsync(notification);
@@ -557,6 +1032,10 @@ namespace VRdkHRMsystem.Controllers
 
             return RedirectToAction("Vacations", "Teamlead");
         }
+
+        #endregion
+
+        #region Sickleaves
 
         [HttpGet]
         public async Task<IActionResult> Sickleaves(int pageNumber = 0, string searchKey = null)
@@ -649,54 +1128,82 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Employees(int pageNumber = 0, string searchKey = null)
+        public async Task<IActionResult> ProccessSickLeaveRequest(string id)
         {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var employees = new EmployeeListUnitDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
+            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
+            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
-                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
-                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
-                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLeaveRequest);
+                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(model.SickLeaveId);
+                model.EmployeeFullName = $"{sickLeaveRequest.Employee.FirstName} {sickLeaveRequest.Employee.LastName}";
+                if (sickLeaveRequest.Employee.Team != null)
+                {
+                    var teamlead = await _employeeService.GetByIdAsync(sickLeaveRequest.Employee.Team.TeamleadId);
+                    model.TeamName = sickLeaveRequest.Employee.Team.Name;
+                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
+                }
+                else
+                {
+                    model.TeamName = emptyValue;
+                    model.TeamleadFullName = emptyValue;
+                }
+
+                return PartialView("SickleaveProccessModal", model);
             }
 
-            var pagedEmployees = new EmployeeListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
-            };
-
-            return View(pagedEmployees);
+            return PartialView("SickleaveProccessModal");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> EmployeesPage(int pageNumber = 0, string searchKey = null)
+        [HttpPost]
+        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveCheckViewModel model)
         {
-            ViewData["SearchKey"] = searchKey;
-            int count = 0;
-            var employees = new EmployeeListUnitDTO[] { };
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            if (employee != null)
+            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            var sickLeaveRequest = await _sickLeaveService.GetByIdAsync(model.SickLeaveId);
+            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
             {
-                employees = await _employeeService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
-                                                                emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
-                count = await _employeeService.GetEmployeesCountAsync(searchKey, emp => emp.State && emp.OrganisationId == employee.OrganisationId && emp.Team.TeamleadId == employee.EmployeeId);
+                sickLeaveRequest.ProccessedbyId = user.Id;
+                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
+                {
+                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был подтверждён",
+                        NotificationRange = NotificationRangeEnum.User.ToString()
+                    };
+
+                    await _notificationService.CreateAsync(notification);
+                }
+                else
+                {
+                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
+                    var notification = new NotificationDTO
+                    {
+                        NotificationId = Guid.NewGuid().ToString(),
+                        EmployeeId = sickLeaveRequest.EmployeeId,
+                        OrganisationId = user.OrganisationId,
+                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
+                        NotificationDate = DateTime.UtcNow,
+                        Description = $"Ваш запрос на больничный был отклонён",
+                        NotificationRange = NotificationRangeEnum.User.ToString()
+                    };
+
+                    await _notificationService.CreateAsync(notification);
+                }
+
+                await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
             }
 
-            var pagedEmployees = new EmployeeListViewModel()
-            {
-                PageNumber = pageNumber,
-                Count = count,
-                PageSize = (int)PageSizeEnum.PageSize15,
-                Employees = _mapHelper.MapCollection<EmployeeListUnitDTO, EmployeeViewModel>(employees)
-            };
-
-            return PartialView(pagedEmployees);
+            return RedirectToAction("Sickleaves", "Teamlead");
         }
+
+        #endregion
+
+        #region Assignments
 
         [HttpGet]
         public async Task<IActionResult> Assignments(int pageNumber = 0, string searchKey = null)
@@ -778,499 +1285,6 @@ namespace VRdkHRMsystem.Controllers
             return RedirectToAction("Assignments", "Teamlead");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ProccessSickLeaveRequest(string id)
-        {
-            var sickLeaveRequest = await _sickLeaveService.GetByIdWithEmployeeWithTeamAsync(id);
-            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-            {
-                var model = _mapHelper.Map<SickLeaveRequestDTO, SickLeaveCheckViewModel>(sickLeaveRequest);
-                model.Files = await _fileManagmentService.GetSickLeaveFilesAsync(model.SickLeaveId);
-                model.EmployeeFullName = $"{sickLeaveRequest.Employee.FirstName} {sickLeaveRequest.Employee.LastName}";
-                if (sickLeaveRequest.Employee.Team != null)
-                {
-                    var teamlead = await _employeeService.GetByIdAsync(sickLeaveRequest.Employee.Team.TeamleadId);
-                    model.TeamName = sickLeaveRequest.Employee.Team.Name;
-                    model.TeamleadFullName = $"{teamlead.FirstName} {teamlead.LastName}";
-                }
-                else
-                {
-                    model.TeamName = emptyValue;
-                    model.TeamleadFullName = emptyValue;
-                }
-
-                return PartialView("SickleaveProccessModal", model);
-            }
-
-            return PartialView("SickleaveProccessModal");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ProccessSickLeaveRequest(SickLeaveCheckViewModel model)
-        {
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            var sickLeaveRequest = await _sickLeaveService.GetByIdAsync(model.SickLeaveId);
-            if (sickLeaveRequest != null && sickLeaveRequest.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
-            {
-                sickLeaveRequest.ProccessedbyId = user.Id;
-                if (model.Result.Equals(RequestStatusEnum.Approved.ToString()))
-                {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Approved.ToString();
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = sickLeaveRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на больничный был подтвердён.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-
-                    await _notificationService.CreateAsync(notification);
-                }
-                else
-                {
-                    sickLeaveRequest.RequestStatus = RequestStatusEnum.Denied.ToString();
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = sickLeaveRequest.EmployeeId,
-                        OrganisationId = user.OrganisationId,
-                        NotificationType = NotificationTypeEnum.SickLeave.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш запрос на больничный был отклонён.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-
-                    await _notificationService.CreateAsync(notification);
-                }
-
-                await _sickLeaveService.UpdateAsync(sickLeaveRequest, true);
-            }
-
-            return RedirectToAction("Sickleaves", "Teamlead");
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ViewVacationRequests(int pageNumber = 0, string searchKey = null)
-        {
-            var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
-            var requests = await _vacationService.GetPageAsync(pageNumber,
-                                                                         (int)PageSizeEnum.PageSize15,
-                                                                          RequestStatusEnum.Pending.ToString(),
-                                                                          searchKey,
-                                                                          req => req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                          && req.Employee.OrganisationId == employee.OrganisationId);
-            var model = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(requests);
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditDayOff(EditCalendarDayViewModel model)
-        {
-            var dayOff = await _dayOffService.GetByIdAsync(model.CalendarDayId);
-            if (dayOff != null)
-            {
-                if (model.Result == CalendarDayTypeEnum.WorkDay.ToString())
-                {
-                    var workDay = new WorkDayDTO
-                    {
-                        WorkDayId = Guid.NewGuid().ToString(),
-                        EmployeeId = dayOff.Employee.EmployeeId,
-                        WorkDayDate = model.Date,
-                        TimeFrom = model.TimeFrom.TimeOfDay,
-                        TimeTo = model.TimeTo.TimeOfDay,
-                        ProcessDate = DateTime.UtcNow
-                    };
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = dayOff.Employee.EmployeeId,
-                        OrganisationId = dayOff.Employee.OrganisationId,
-                        NotificationType = NotificationTypeEnum.WorkDay.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Ваш выходной день на {model.Date.ToString("dd.MM.yyyy")} был заменён рабочим.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-                    if (dayOff.DayOffImportance != null)
-                    {
-                        dayOff.DayOffState = DayOffStateEnum.Requested.ToString();
-                        dayOff.ProcessDate = DateTime.UtcNow;
-                        await _dayOffService.UpdateAsync(dayOff);
-                    }
-                    else
-                    {
-                        await _dayOffService.DeleteAsync(dayOff.DayOffId);
-                    }
-
-                    await _workDayService.CreateAsync(workDay);
-                    await _notificationService.CreateAsync(notification, true);
-
-                    var cellModel = new CalendarWorkDayCellViewModel
-                    {
-                        EmployeeId = workDay.EmployeeId,
-                        Date = workDay.WorkDayDate,
-                        FirstName = dayOff.Employee.FirstName,
-                        LastName = dayOff.Employee.LastName,
-                        Role = model.Role,
-                        TeamId = dayOff.Employee.TeamId,
-                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
-                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
-                        DayOffImportance = dayOff?.DayOffImportance
-                    };
-
-                    return PartialView("CalendarWorkDayCell", cellModel);
-                }
-                else if (dayOff.DayOffState == DayOffStateEnum.Requested.ToString())
-                {
-                    dayOff.DayOffState = DayOffStateEnum.Approved.ToString();
-                    dayOff.ProcessDate = DateTime.UtcNow;
-                    await _dayOffService.UpdateAsync(dayOff, true);
-
-                    var cellModel = new CalendarDayOffCellViewModel
-                    {
-                        EmployeeId = dayOff.EmployeeId,
-                        Date = dayOff.DayOffDate,
-                        FirstName = dayOff.Employee.FirstName,
-                        LastName = dayOff.Employee.LastName,
-                        Role = model.Role,
-                        TeamId = dayOff.Employee.TeamId,
-                        Comment = dayOff.Comment,
-                        DayOffImportance = dayOff.DayOffImportance,
-                        DayOffState = dayOff.DayOffState
-                    };
-
-                    return PartialView("CalendarDayOffCell", cellModel);
-                }
-            }
-
-            return Json(false);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> EditWorkDay(EditCalendarDayViewModel model)
-        {
-            var workDay = await _workDayService.GetByIdAsync(model.CalendarDayId);
-            if (workDay != null)
-            {
-                if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
-                {
-                    var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
-                    if (dayOffEx != null && dayOffEx.DayOffImportance != null)
-                    {
-                        dayOffEx.DayOffState = DayOffStateEnum.Approved.ToString();
-                        dayOffEx.ProcessDate = DateTime.UtcNow;
-                        var notification = new NotificationDTO
-                        {
-                            NotificationId = Guid.NewGuid().ToString(),
-                            EmployeeId = workDay.Employee.EmployeeId,
-                            OrganisationId = workDay.Employee.OrganisationId,
-                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
-                            NotificationDate = DateTime.UtcNow,
-                            Description = $"Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")} был заменён выходным.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
-                        };
-                        await _dayOffService.UpdateAsync(dayOffEx);
-                        await _notificationService.CreateAsync(notification);
-                        await _workDayService.DeleteAsync(workDay.WorkDayId, true);
-
-                        var cellModel = new CalendarDayOffCellViewModel
-                        {
-                            EmployeeId = dayOffEx.EmployeeId,
-                            Date = dayOffEx.DayOffDate,
-                            FirstName = workDay.Employee.FirstName,
-                            LastName = workDay.Employee.LastName,
-                            Role = model.Role,
-                            TeamId = workDay.Employee.TeamId,
-                            Comment = dayOffEx.Comment,
-                            DayOffImportance = dayOffEx.DayOffImportance,
-                            DayOffState = dayOffEx.DayOffState
-                        };
-
-                        return PartialView("CalendarDayOffCell", cellModel);
-                    }
-                    else
-                    {
-                        var dayOff = new DayOffDTO
-                        {
-                            DayOffId = Guid.NewGuid().ToString(),
-                            EmployeeId = workDay.Employee.EmployeeId,
-                            DayOffDate = model.Date,
-                            DayOffState = DayOffStateEnum.Approved.ToString(),
-                            ProcessDate = DateTime.UtcNow
-                        };
-                        var notification = new NotificationDTO
-                        {
-                            NotificationId = Guid.NewGuid().ToString(),
-                            EmployeeId = workDay.Employee.EmployeeId,
-                            OrganisationId = workDay.Employee.OrganisationId,
-                            NotificationType = NotificationTypeEnum.DayOff.ToString(),
-                            NotificationDate = DateTime.UtcNow,
-                            Description = $"Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")} был заменён выходным.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
-                        };
-
-                        await _workDayService.DeleteAsync(workDay.WorkDayId);
-                        await _dayOffService.CreateAsync(dayOff);
-                        await _notificationService.CreateAsync(notification, true);
-
-                        var cellModel = new CalendarDayOffCellViewModel
-                        {
-                            EmployeeId = dayOff.EmployeeId,
-                            Date = dayOff.DayOffDate,
-                            FirstName = workDay.Employee.FirstName,
-                            LastName = workDay.Employee.LastName,
-                            Role = model.Role,
-                            TeamId = workDay.Employee.TeamId,
-                            Comment = dayOff.Comment,
-                            DayOffImportance = dayOff.DayOffImportance,
-                            DayOffState = dayOff.DayOffState
-                        };
-
-                        return PartialView("CalendarDayOffCell", cellModel);
-                    }
-                }
-                else
-                {
-                    if (workDay.TimeFrom != model.TimeFrom.TimeOfDay || workDay.TimeTo != model.TimeTo.TimeOfDay)
-                    {
-                        var dayOffEx = await _dayOffService.GetByDateAsync(workDay.WorkDayDate, workDay.EmployeeId);
-                        workDay.TimeFrom = model.TimeFrom.TimeOfDay;
-                        workDay.TimeTo = model.TimeTo.TimeOfDay;
-                        workDay.ProcessDate = DateTime.UtcNow;
-                        var notification = new NotificationDTO
-                        {
-                            NotificationId = Guid.NewGuid().ToString(),
-                            EmployeeId = workDay.Employee.EmployeeId,
-                            OrganisationId = workDay.Employee.OrganisationId,
-                            NotificationType = NotificationTypeEnum.WorkDay.ToString(),
-                            NotificationDate = DateTime.UtcNow,
-                            Description = $"Были внесены изменения в Ваш рабочий день на {model.Date.ToString("dd.MM.yyyy")}.",
-                            NotificationRange = NotificationRangeEnum.User.ToString(),
-                            IsChecked = false
-                        };
-                        await _workDayService.UpdateAsync(workDay);
-                        await _notificationService.CreateAsync(notification, true);
-
-                        var cellModel = new CalendarWorkDayCellViewModel
-                        {
-                            EmployeeId = workDay.EmployeeId,
-                            Date = workDay.WorkDayDate,
-                            FirstName = workDay.Employee.FirstName,
-                            LastName = workDay.Employee.LastName,
-                            Role = model.Role,
-                            TeamId = workDay.Employee.TeamId,
-                            TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
-                            TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
-                            DayOffImportance = dayOffEx?.DayOffImportance
-                        };
-
-                        return PartialView("CalendarWorkDayCell", cellModel);
-                    }
-                    else
-                    {
-                        return Json(false);
-                    }
-                }
-            }
-
-            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> ProccessCalendarDay(string id, string date, string name, string surname, string teamId, string role)
-        {
-            var day = Convert.ToDateTime(date);
-            var dayOff = await _dayOffService.GetByDateAsync(day, id);
-            var workDay = await _workDayService.GetByDateAsync(day, id);
-            if (workDay != null)
-            {
-                var model = new EditCalendarDayViewModel
-                {
-                    CalendarDayId = workDay.WorkDayId,
-                    Date = day,
-                    TimeFrom = new DateTime(day.Year, day.Month, day.Day, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
-                    TimeTo = new DateTime(day.Year, day.Month, day.Day, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0),
-                    FirstName = name,
-                    LastName = surname,
-                    TeamId = teamId,
-                    Role = role,
-                    EmployeeId = id
-                };
-
-                return PartialView("EditWorkDayModal", model);
-            }
-            else if (dayOff != null)
-            {
-                var model = new EditCalendarDayViewModel
-                {
-                    CalendarDayId = dayOff.DayOffId,
-                    Date = day,
-                    FirstName = name,
-                    LastName = surname,
-                    TeamId = teamId,
-                    EmployeeId = id,
-                    Role = role
-                };
-
-                return PartialView("EditDayOffModal", model);
-
-            }
-            else
-            {
-                var model = new CalendarDayViewModel
-                {
-                    EmployeeId = id,
-                    Date = day,
-                    FirstName = name,
-                    LastName = surname,
-                    TeamId = teamId,
-                    Role = role
-                };
-
-                return PartialView("ProccessCalendarDayModal", model);
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> ProccessCalendarDay(CalendarDayViewModel model)
-        {
-            var employee = await _employeeService.GetByIdAsync(model.EmployeeId);
-            if (employee != null)
-            {
-                if (model.Result == CalendarDayTypeEnum.DayOff.ToString())
-                {
-                    var dayOff = new DayOffDTO
-                    {
-                        DayOffId = Guid.NewGuid().ToString(),
-                        EmployeeId = employee.EmployeeId,
-                        DayOffDate = model.Date,
-                        DayOffState = DayOffStateEnum.Approved.ToString(),
-                        ProcessDate = DateTime.UtcNow
-                    };
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = employee.EmployeeId,
-                        OrganisationId = employee.OrganisationId,
-                        NotificationType = NotificationTypeEnum.DayOff.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Подтверждение выходного дня.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-                    await _dayOffService.CreateAsync(dayOff);
-                    await _notificationService.CreateAsync(notification, true);
-
-                    var cellModel = new CalendarDayOffCellViewModel
-                    {
-                        EmployeeId = dayOff.EmployeeId,
-                        Date = dayOff.DayOffDate,
-                        FirstName = employee.FirstName,
-                        LastName = employee.LastName,
-                        Role = model.Role,
-                        TeamId = employee.TeamId,
-                        DayOffState = dayOff.DayOffState,
-                        DayOffImportance = dayOff.DayOffImportance,
-
-                    };
-
-                    return PartialView("CalendarDayOffCell", cellModel);
-                }
-                else
-                {
-                    var workDay = new WorkDayDTO
-                    {
-                        WorkDayId = Guid.NewGuid().ToString(),
-                        EmployeeId = employee.EmployeeId,
-                        WorkDayDate = model.Date,
-                        TimeFrom = model.TimeFrom.TimeOfDay,
-                        TimeTo = model.TimeTo.TimeOfDay,
-                        ProcessDate = DateTime.UtcNow
-                    };
-                    var notification = new NotificationDTO
-                    {
-                        NotificationId = Guid.NewGuid().ToString(),
-                        EmployeeId = employee.EmployeeId,
-                        OrganisationId = employee.OrganisationId,
-                        NotificationType = NotificationTypeEnum.WorkDay.ToString(),
-                        NotificationDate = DateTime.UtcNow,
-                        Description = $"Подтверждение рабочего дня.",
-                        NotificationRange = NotificationRangeEnum.User.ToString(),
-                        IsChecked = false
-                    };
-                    await _workDayService.CreateAsync(workDay);
-                    await _notificationService.CreateAsync(notification, true);
-
-                    var cellModel = new CalendarWorkDayCellViewModel
-                    {
-                        EmployeeId = workDay.EmployeeId,
-                        Date = workDay.WorkDayDate,
-                        FirstName = employee.FirstName,
-                        LastName = employee.LastName,
-                        Role = model.Role,
-                        TeamId = employee.TeamId,
-                        TimeFrom = new DateTime(1, 1, 1, workDay.TimeFrom.Hours, workDay.TimeFrom.Minutes, 0),
-                        TimeTo = new DateTime(1, 1, 1, workDay.TimeTo.Hours, workDay.TimeTo.Minutes, 0)
-                    };
-
-                    return PartialView("CalendarWorkDayCell", cellModel);
-                }
-            }
-
-            return RedirectToAction("Calendar", model.Role, new { teamId = model.TeamId, year = model.Date.Year, month = model.Date.Month });
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> SetAbsence(string id, string teamId, string firstName, string lastName, string role)
-        {
-            var abs = await _absenceService.GetTodayByEmployeeIdAsync(id);
-            if (abs == null)
-            {
-
-                var model = new AbsenceApproveViewModel
-                {
-                    TeamId = teamId,
-                    EmployeeId = id,
-                    Date = DateTime.UtcNow,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Role = role
-                };
-
-                return PartialView("AbsenceApproveModal", model);
-            }
-
-            return RedirectToAction("Calendar", role, new { teamId });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SetAbsence(AbsenceApproveViewModel model)
-        {
-            var abs = await _absenceService.GetTodayByEmployeeIdAsync(model.EmployeeId);
-            if (abs == null)
-            {
-                var absence = new AbsenceDTO
-                {
-                    AbsenceId = Guid.NewGuid().ToString(),
-                    EmployeeId = model.EmployeeId,
-                    AbsenceDate = model.Date
-                };
-                var residual = await _residualsService.GetByEmployeeIdAsync(model.EmployeeId, ResidualTypeEnum.Absence.ToString());
-                residual.ResidualBalance += 1;
-                await _residualsService.UpdateAsync(residual);
-                await _absenceService.CreateAsync(absence, true);
-                return Json(true);
-            }
-
-            return Json(false);
-        }
+        #endregion
     }
 }
