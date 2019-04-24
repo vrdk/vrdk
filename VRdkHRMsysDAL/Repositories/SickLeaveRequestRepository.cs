@@ -20,7 +20,8 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<SickLeaveRequest[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
         {
-            return await _context.SickLeaveRequest.Where(req => req.EmployeeId == id).OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+            return await _context.SickLeaveRequest.Where(req => req.EmployeeId == id).OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                                                      Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<int> GetSickLeavesNumberAsync(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
@@ -34,10 +35,10 @@ namespace VRdkHRMsysDAL.Repositories
 
             return condition != null ? await _context.SickLeaveRequest.Where(condition).
                                                                        Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                                               || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).CountAsync() :
-                                      await _context.SickLeaveRequest.Where(condition).
-                                                                      Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                                               || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).CountAsync();
+                                                                               || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).CountAsync() :
+                                      await _context.SickLeaveRequest.Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
+                                                                               || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).CountAsync();
+
         }
 
         public async Task<SickLeaveRequest[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
@@ -48,10 +49,12 @@ namespace VRdkHRMsysDAL.Repositories
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(condition).
-                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
-                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
 
 
             }
@@ -61,13 +64,15 @@ namespace VRdkHRMsysDAL.Repositories
                                                 ThenInclude(emp => emp.Team).
                                                 Where(condition).
                                                 Where(req=> $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                         || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                         OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req=>req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                         || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
+                                                         OrderBy(req => req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req=>req.CreateDate).
+                                                         Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
                 await _context.SickLeaveRequest.Include(r => r.Employee).
                                                 ThenInclude(emp => emp.Team).
                                                 Where(req => $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                         || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                         OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                         || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
+                                                         OrderBy(req=>req.RequestStatus == "Pending" ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                         Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
 
 
         }

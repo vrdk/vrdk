@@ -1963,6 +1963,7 @@ input {
 }
 
 .input {
+    -moz-appearance:textfield;
     color: #9da5b0;
     font-size: 14px;
     font-family: "OpenSans-Light";
@@ -2155,7 +2156,7 @@ input {
         padding: 0 3%
     }
 
-    .auth a {
+    .auth a.reset__pass {
         color: #86919d;
         text-decoration: none;
         border-bottom: 1px dotted #86919d
@@ -2834,6 +2835,28 @@ header {
 .notiflist__content {
     width: 83%;
     text-align: left
+}
+
+.notiflist__info {
+    width: 25%;
+    height: 45px;
+    min-width: 40px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    border-left: 1px solid #eef0f8;
+    padding: 0px 12px
+}
+
+.teamlist__info img {
+    margin: 0 3px;
+    cursor: pointer
 }
 
 .passlist__info {
@@ -4639,7 +4662,6 @@ label.sickmessage__ulpoad_label img {
     position: absolute;
     bottom: 0;
     right: 0;
-    z-index: 1
 }
 
 .calendar__block_dayoffgreen:before {
@@ -4664,7 +4686,6 @@ label.sickmessage__ulpoad_label img {
     position: absolute;
     bottom: 0;
     right: 0;
-    z-index: 1
 }
 
 .calendar__block_dayoffyellow:before {
@@ -4689,7 +4710,6 @@ label.sickmessage__ulpoad_label img {
     position: absolute;
     bottom: 0;
     right: 0;
-    z-index: 1
 }
 
 .calendar__block_dayoffred:before {
@@ -4768,7 +4788,10 @@ label.sickmessage__ulpoad_label img {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
-    flex-direction: column
+    flex-direction: column;
+    -webkit-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
 
 .vacmodal__empinfo {
@@ -5577,6 +5600,11 @@ label.sickmessage__ulpoad_label img {
         width: -moz-min-content;
         width: min-content
     }
+
+    .vacmodal__buttons {
+        padding: 10px 10px;
+    }
+    
 }
 
 @media screen and (max-width: 374px) {
@@ -6569,6 +6597,7 @@ label.sickmessage__ulpoad_label img {
     width: 100%;
     justify-content: center;
     align-items: center;
+    margin-bottom:10px;
 }
 
     .table__pageblock img {
@@ -6581,7 +6610,7 @@ label.sickmessage__ulpoad_label img {
 
 .error p {
     color: #86919d;
-    font-size: 150px;
+    font-size: 80px;
 }
 
 .error span {
@@ -6647,3 +6676,54 @@ height:100%;
         background-size: 100%;
         transition: background -5s;
     }
+
+
+.error__block {
+    max-width: 270px;
+    width: 100%;
+    height: 350px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    color: #86919d
+}
+
+    .error__block * {
+        width: 100%
+    }
+
+    .error__block .button {
+        
+        margin-top: 15px;
+        font-size: 14px
+    }
+
+    .error__code{
+        font-size:40px;
+        text-align:center;
+    }
+
+.error__text {
+    font-size: 19px;
+    text-align: center;
+}
+
+.center_content{
+    justify-content:center;
+    -webkit-justify-content:center;
+}

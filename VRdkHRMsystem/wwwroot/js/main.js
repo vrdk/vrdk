@@ -69,7 +69,7 @@ $(document).ready(function () {
                 $('.listsection').replaceWith(page_html);
             },
             error: function () {
-                toastr.warning('pagination error');
+                toastr.error('Не удалось загрузить страницу');
             }
         });
     });
@@ -80,7 +80,7 @@ $(document).ready(function () {
         checkSickleaveRequest(this);
     });
     $('#list_form').on('submit', function (event) {
-        showPreloader();
+        var toast = toastr.info('Поиск...');
         event.preventDefault();
         var form = $(this);
         var data = form.serializeArray();
@@ -88,13 +88,15 @@ $(document).ready(function () {
             url: form.attr('action'),
             method: 'get',
             data: data,
-            success: function (search_result_html) {
-                $('.listsection').replaceWith(search_result_html);
-                closePreloader();
+            success: function (searchResultHtml) {
+                $('.listsection').replaceWith(searchResultHtml);
+
+                toastr.close(toast);
             },
             error: function () {
-                alert('search error');
-                closePreloader();
+
+                toastr.error('Не удалось выполнить поиск');
+                toastr.close(toast);
             }
         });
     });
@@ -251,7 +253,6 @@ function CalcDiff(fromId, toId) {
 }
 
 function changeUserPhoto(input) {
-
     if (input.files && input.files[0]) {
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -306,27 +307,6 @@ function checkSickleaveRequest(requestAnchorHolder) {
         }
     });
 }
-function ShowRequestPopup(url, id) {
-    var preloader = $("#preloader");
-    preloader.css('display', 'flex');
-
-    url = url + id;
-    $.ajax({
-        type: "Get",
-        url: url,
-        success: function (modal_html) {
-            $('#modal_place').empty();
-            $('#request_modal').modal();
-            $('#modal_place').html(modal_html);
-            preloader.css('display', 'none');
-        },
-        error: function () {
-            preloader.css('display', 'none');
-        }
-    });
-
-}
-
 
 function proccessSickleave(method, id) {
     var preloader = $("#preloader");
@@ -346,8 +326,6 @@ function proccessSickleave(method, id) {
             preloader.css('display', 'none');
         }
     });
-
-
 }
 
 function showPreloader() {

@@ -64,15 +64,15 @@ namespace VRdkHRMsysDAL.Repositories
         {
             if(searchKey == null)
             {
-                return condition != null ? await _context.Assignment.Include(a => a.AssignmentEmployee).Where(condition).OrderByDescending(a=>a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
-                                           await _context.Assignment.Include(a => a.AssignmentEmployee).OrderByDescending(a => a.CreateDate).Skip(pageNumber*pageSize).Take(pageSize).ToArrayAsync();
+                return condition != null ? await _context.Assignment.Include(a => a.AssignmentEmployee).Where(condition).OrderByDescending(a=>a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
+                                           await _context.Assignment.Include(a => a.AssignmentEmployee).OrderByDescending(a => a.CreateDate).Skip(pageNumber*pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
             }
 
             return condition != null ? await _context.Assignment.Include(a => a.AssignmentEmployee).Where(condition).
                                                                  Where(a=>a.AssignmentEmployee.Count().ToString().Contains(searchKey) || a.Name.ToLower().Contains(searchKey.ToLower())).
-                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
                                        await _context.Assignment.Include(a => a.AssignmentEmployee).Where(a => a.AssignmentEmployee.Count().ToString().Contains(searchKey) || a.Name.ToLower().Contains(searchKey.ToLower())).
-                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                                 OrderByDescending(a => a.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<AssignmentEmployee[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)

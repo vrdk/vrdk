@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-    $("#team_select").on('change', function () {
+    $('#team_select').on('change', function () {
         showPreloader();
         var teamId = $(this).val();
         var role = $("#redirectUrl").val();
@@ -23,8 +23,8 @@
 
 function proccessDayOff(cellElement) {  
     var el = $(cellElement);
-    toastr.info('Запрос формы для запроса выходного дня...', el.attr('date-anchor'));
-    var url = "/request/proccesscalendarday";
+    var toast = toastr.info('Запрос формы для запроса выходного дня...', el.attr('date-anchor'));
+    var url = '/request/proccesscalendarday';
     $.ajax({
         url: url,
         method: 'get',
@@ -33,12 +33,15 @@ function proccessDayOff(cellElement) {
             date: el.attr('date-anchor'),
             teamId: el.attr('team-anchor')
         },
-        success: function (modal_html) {
+        success: function (modalHtml) {
             $('#modal_place').empty();
             $('#request_modal').modal();
-            $('#modal_place').html(modal_html);
+            $('#modal_place').html(modalHtml);
+
+            toast.clear(toast);
         },
         error: function () {
+            toastr.clear(toast);
             toastr.error('Произошла ошибка');
         }
     });
@@ -68,7 +71,7 @@ function timeManagmentModal(cellElement) {
 
 function callDayProccessMenu(cellElement) {
     var el = $(cellElement);
-    toastr.info('Запрос формы работы с днём...', el.attr('date-anchor'));
+    var toast = toastr.info('Запрос формы работы с днём...', el.attr('date-anchor'));
     var url = '/profile/dayproccessmenu';
     $.ajax({
         url: url,
@@ -81,9 +84,12 @@ function callDayProccessMenu(cellElement) {
         success: function (modal_html) {
             $('#modal_place').empty();
             $('#request_modal').modal();
-            $('#modal_place').html(modal_html);          
+            $('#modal_place').html(modal_html);
+
+            toastr.clear(toast);
         },
         error: function () {
+            toastr.clear(toast);
             toastr.error('Произошла ошибка');
         }
     });

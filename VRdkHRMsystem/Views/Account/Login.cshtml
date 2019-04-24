@@ -20,7 +20,9 @@
         <div class="item-5"></div>
     </div>
     <div class="auth">
-        <img src="~/images/logo.png" alt="logo" />
+        <a href="@Url.Action("Profile","Profile")">
+            <img src="~/images/logo.png" alt="logo" style="margin-top:4px;"/>
+        </a>
         <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="auth__form" id="submit_form">
             <label asp-for="Email"></label><span asp-validation-for="Email" style="color: #ad545f;" class="text-danger"></span>
             <input class="input @ViewData["Denied"]" asp-for="Email" />
@@ -30,7 +32,7 @@
             {
                 <p style="color: #ad545f;">Неверний e-mail или пароль</p>
             }
-            <a href="@Url.Action("ForgotPassword","Account")">Забыли пароль?</a>
+            <a class="reset__pass" href="@Url.Action("ForgotPassword","Account")">Забыли пароль?</a>
             <button type="submit" class="button ripple">Войти</button>
         </form>
     </div>

@@ -19,7 +19,7 @@ namespace VRdkHRMsysBLL.Interfaces
         Task<EmployeeDTO> GetByEmailWithTeamWithResidualsAsync(string email);
         Task<EmployeeListUnitDTO[]> GetPageAsync(int pageNumber,int pageSize, string searchKey, Expression<Func<Employee, bool>> condition = null);
         Task<int> GetEmployeesCountAsync(string searchKey = null, Expression<Func<Employee, bool>> condition = null);
-        Task<EmployeeDTO[]> GetForCalendaAsync(string teamId, string teamleadId, int month, int year, string personalId = null);
+        Task<EmployeeDTO[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year, string personalId = null);
         Task RemoveFromTeamAsync(string[] membersIds, bool writeChanges = false);
         Task AddToTeamAsync(string[] membersIds, string teamId, bool writeChanges = false);
         Task CreateAsync(EmployeeDTO employee, bool writeChanges = false);

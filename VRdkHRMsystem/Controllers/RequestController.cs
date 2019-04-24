@@ -15,11 +15,12 @@ namespace VRdkHRMsystem.Controllers
     [Authorize]
     public class RequestController : Controller
     {
-        private const string emptyValue = "None";
+        private const string EmptyValue = "None";
         private readonly IEmployeeService _employeeService;
         private readonly IVacationService _vacationService;
         private readonly ISickLeaveService _sickLeaveService;
         private readonly IPostService _postService;
+        private readonly ITransactionService _transactionService;
         private readonly IFileManagmentService _fileManagmentService;
         private readonly INotificationService _notificationService;
         private readonly IDayOffService _dayOffService;
@@ -29,6 +30,7 @@ namespace VRdkHRMsystem.Controllers
         public RequestController(IEmployeeService employeeService,
                                  IVacationService vacationRequestService,
                                  ISickLeaveService sickLeaveService,
+                                 ITransactionService transactionService,
                                  IFileManagmentService fileManagmentService,
                                  IPostService postService,
                                  IDayOffService dayOffService,
@@ -41,6 +43,7 @@ namespace VRdkHRMsystem.Controllers
             _sickLeaveService = sickLeaveService;
             _postService = postService;
             _dayOffService = dayOffService;
+            _transactionService = transactionService;
             _notificationService = notificationService;
             _fileManagmentService = fileManagmentService;
             _mapHelper = mapHelper;
@@ -186,8 +189,8 @@ namespace VRdkHRMsystem.Controllers
                 }
                 else
                 {
-                    model.ProfileModel.Team = emptyValue;
-                    model.ProfileModel.Teamlead = emptyValue;
+                    model.ProfileModel.Team = EmptyValue;
+                    model.ProfileModel.Teamlead = EmptyValue;
                 }
             }
 
@@ -263,8 +266,8 @@ namespace VRdkHRMsystem.Controllers
                 }
                 else
                 {
-                    model.ProfileModel.Team = emptyValue;
-                    model.ProfileModel.Teamlead = emptyValue;
+                    model.ProfileModel.Team = EmptyValue;
+                    model.ProfileModel.Teamlead = EmptyValue;
                 }
             }
 
@@ -362,6 +365,16 @@ namespace VRdkHRMsystem.Controllers
                 request.Duration = (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays != 0 ? (int)(DateTime.UtcNow.Date - request.CreateDate).TotalDays : 1;
                 request.RequestStatus = RequestStatusEnum.Closed.ToString();
                 request.Employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance += request.Duration.Value;
+                var transaction = new TransactionDTO()
+                {
+                    TransactionId = Guid.NewGuid().ToString(),
+                    EmployeeId = request.EmployeeId,
+                    Change = request.Duration.Value,
+                    Description = "Sickleave close",
+                    TransactionDate = DateTime.UtcNow,
+                    TransactionType = "Sickleave close"
+                };
+                await _transactionService.CreateAsync(transaction);
                 await _sickLeaveService.UpdateAsync(request, true);
             }
 

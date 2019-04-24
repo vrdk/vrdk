@@ -18,20 +18,14 @@ namespace VRdkHRMsystem.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
-        private readonly IEmployeeService _employeeService;
-        private readonly IPostService _postService;
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IPostService postService,
-            IEmployeeService employeeService,
             IEmailSender emailSender,
             ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _postService = postService;
-            _employeeService = employeeService;
             _emailSender = emailSender;
             _logger = logger;
         }
@@ -328,27 +322,15 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> SetPasswordAndConfrimEmail(string id, string resetCode = null, string confirmCode = null)
+        public async Task<IActionResult> SetPassword(string id, string resetCode = null)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if(user != null)
+            if(user != null && resetCode != null)
             {
-                if(resetCode != null && confirmCode != null)
-                {
-                   await _userManager.ConfirmEmailAsync(user, confirmCode);
-                }
-
-                return RedirectToAction("ResetPassword", new { code = resetCode, email = user.Email });
+                    return RedirectToAction("ResetPassword", new { code = resetCode, email = user.Email });
             }
 
-            return RedirectToAction(nameof(ForgotPasswordConfirmation));
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
+            return RedirectToAction("ForgotPassword");
         }
 
         [HttpGet]
@@ -362,6 +344,23 @@ namespace VRdkHRMsystem.Controllers
 
             var model = new ResetPasswordViewModel { Code = code, Email = email };
             return View(model);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> SendPasswordSetEmail(string id, string workEmail, string organisation)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null && user.Email == workEmail && user.OrganisationId == organisation)
+            {
+                var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
+                string callbackUrl = Url.Action("SetPassword", "Account", new { id = user.Id, resetCode = passwordResetCode }, Request.Scheme);
+                await _emailSender.SendPasswordResetLink(workEmail, "", "Set password", "",
+                    $"Чтобы перейти к форме изменения пароля, нажмите на ссылку: <a href='{callbackUrl}'>изменить пароль</a>");
+
+                return Redirect("https://youtube.com");
+            }
+
+            return Redirect("https://v-rdk.com");
         }
 
         [HttpPost]
@@ -380,6 +379,7 @@ namespace VRdkHRMsystem.Controllers
                 return RedirectToAction(nameof(Login));
             }
             ViewData["Error"] = " должен содержать только буквы латинского алфавита либо цифры, а также, как минимум, 6 уникальных символов и одну заглавную букву";
+
             AddErrors(result);
             return View();
         }

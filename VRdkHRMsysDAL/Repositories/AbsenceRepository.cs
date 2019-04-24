@@ -34,22 +34,22 @@ namespace VRdkHRMsysDAL.Repositories
 
         public async Task<Absence[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0)
         {
-            return await _context.Absence.Where(req => req.EmployeeId == id).OrderByDescending(req => req.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+            return await _context.Absence.Where(req => req.EmployeeId == id).OrderByDescending(req => req.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<Absence[]> GetPageAsync(int pageNumber, int pageSize, Expression<Func<Absence, bool>> condition = null, string searchKey = null)
         {
             if (searchKey == null)
             {
-                return condition != null ? await _context.Absence.Include(a => a.Employee).ThenInclude(e=>e.Team).Where(condition).OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
-                                           await _context.Absence.Include(a => a.Employee).ThenInclude(e => e.Team).OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                return condition != null ? await _context.Absence.Include(a => a.Employee).ThenInclude(e=>e.Team).Where(condition).OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
+                                           await _context.Absence.Include(a => a.Employee).ThenInclude(e => e.Team).OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
             }
 
             return condition != null ? await _context.Absence.Include(a => a.Employee).ThenInclude(e => e.Team).Where(condition).
                                                                  Where(a => $"{a.Employee.FirstName} {a.Employee.LastName}".ToLower().Contains(searchKey.ToLower()) || a.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
-                                                                 OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
+                                                                 OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
                                        await _context.Absence.Include(a => a.Employee).ThenInclude(e => e.Team).Where(a => $"{a.Employee.FirstName} {a.Employee.LastName}".ToLower().Contains(searchKey.ToLower()) || a.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
-                                                                 OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                                 OrderByDescending(a => a.AbsenceDate).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task CreateAsync(Absence entity, bool writeChanges)

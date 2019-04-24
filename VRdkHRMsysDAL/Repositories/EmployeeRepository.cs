@@ -35,7 +35,7 @@ namespace VRdkHRMsysDAL.Repositories
                 Absences = e.Absences.Where(a=>a.AbsenceDate.Month == month && a.AbsenceDate.Year == year).ToList(),
                 WorkDays = e.WorkDays.Where(w=>w.WorkDayDate.Month == month && w.WorkDayDate.Year == year).ToList(),
                 DayOffs = e.DayOffs.Where(d=>d.DayOffDate.Month == month && d.DayOffDate.Year == year).ToList()              
-            }).ToArrayAsync();
+            }).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<Employee[]> GetAsync(Expression<Func<Employee, bool>> condition = null)
@@ -48,7 +48,7 @@ namespace VRdkHRMsysDAL.Repositories
             return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).ToArrayAsync() : await _context.Employee.Include(emp => emp.Team).ToArrayAsync();
         }
 
-        public async Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition = null, string searchKey = null)
+        public async Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition, string searchKey = null)
         {
             return searchKey == null ? await _context.Employee.Where(condition).CountAsync() :
                                        await _context.Employee.Where(condition).Where(emp => emp.Team.Name.ToLower().Contains(searchKey.ToLower())
@@ -60,20 +60,23 @@ namespace VRdkHRMsysDAL.Repositories
         {
             if(searchKey == null)
             {
-                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp=>emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync() :
-                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
+                                                                   OrderBy(emp=>emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
+                                           await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
+                                                                   OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
             }
                 return condition != null ? await _context.Employee.Where(condition).Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
                                                                    Where(emp=>emp.Team.Name.ToLower().Contains(searchKey.ToLower())
                                                                    || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
                                                                    || emp.EmployeeBalanceResiduals.Any(res=>res.ResidualBalance.ToString().Contains(searchKey))
-                                                                   || emp.TeamNavigation.Any(t => t.Name.ToLower().Contains(searchKey.ToLower()))).OrderBy(emp => emp.Team.Name).Skip(pageNumber*pageSize).Take(pageSize).ToArrayAsync() :
+                                                                   || emp.TeamNavigation.Any(t => t.Name.ToLower().Contains(searchKey.ToLower()))).
+                                                                   OrderBy(emp => emp.Team.Name).Skip(pageNumber*pageSize).Take(pageSize).AsNoTracking().ToArrayAsync() :
                                            await _context.Employee.Include(emp => emp.Team).Include(emp => emp.EmployeeBalanceResiduals).
                                                                    Where(emp => emp.Team.Name.ToLower().Contains(searchKey.ToLower())
                                                                    || $"{emp.FirstName} {emp.LastName}".ToLower().Contains(searchKey.ToLower())
                                                                    || emp.EmployeeBalanceResiduals.Any(res => res.ResidualBalance.ToString().Contains(searchKey))
                                                                    || emp.TeamNavigation.Any(t => t.Name.ToLower().Contains(searchKey.ToLower()))).
-                                                                   OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                                   OrderBy(emp => emp.Team.Name).Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<Employee> GetByIdAsync(string id)

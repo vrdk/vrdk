@@ -26,7 +26,7 @@ namespace VRdkHRMsysDAL.Contexts
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=tcp:vrdkserver.database.windows.net,1433;Initial catalog=VRdkdb;Persist Security Info=False;User ID=vrdk;Password=Northtsev314159265;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+                optionsBuilder.UseSqlServer(@"Server=tcp:vrdksqlserver.database.windows.net,1433;Initial catalog=vrdkdatabase;Persist Security Info=False;User ID=vrdk;Password=V20r21dk9899;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
             }
         }
 
@@ -51,7 +51,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Absences)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__absence__employe__5812160E");
+                    .HasConstraintName("FK__absence__employe__1EA48E88");
             });
 
             modelBuilder.Entity<Assignment>(entity =>
@@ -89,7 +89,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Organisation)
                     .WithMany(p => p.Assignment)
                     .HasForeignKey(d => d.OrganisationId)
-                    .HasConstraintName("FK__assignmen__organ__607251E5");
+                    .HasConstraintName("FK__assignmen__organ__18EBB532");
             });
 
             modelBuilder.Entity<AssignmentEmployee>(entity =>
@@ -114,12 +114,12 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Assignment)
                     .WithMany(p => p.AssignmentEmployee)
                     .HasForeignKey(d => d.AssignmentId)
-                    .HasConstraintName("FK__assignmen__assig__5BE2A6F2");
+                    .HasConstraintName("FK__assignmen__assig__17036CC0");
 
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Assignments)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__assignmen__emplo__5AEE82B9");
+                    .HasConstraintName("FK__assignmen__emplo__17F790F9");
             });
 
             modelBuilder.Entity<DayOff>(entity =>
@@ -158,7 +158,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.DayOffs)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__day_off__employe__68487DD7");
+                    .HasConstraintName("FK__day_off__employe__160F4887");
             });
 
             modelBuilder.Entity<Employee>(entity =>
@@ -231,13 +231,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Employee)
                     .HasForeignKey(d => d.OrganisationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__employee__organi__403A8C7D");
+                    .HasConstraintName("FK__employee__organi__1332DBDCD");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.Employee)
                     .HasForeignKey(d => d.PostId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__employee__post_i__412EB0B6");
+                    .HasConstraintName("FK__employee__post_i__14270015");
 
                 entity.HasOne(d => d.Team)
                     .WithMany(p => p.Employees)
@@ -270,7 +270,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.EmployeeBalanceResiduals)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__employee___emplo__60A75C0F");
+                    .HasConstraintName("FK__employee___emplo__123EB7A3");
             });
 
             modelBuilder.Entity<Notification>(entity =>
@@ -321,13 +321,13 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__notificat__emplo__681373AD");
+                    .HasConstraintName("FK__notificat__emplo__10566F31");
 
                 entity.HasOne(d => d.Organisation)
                     .WithMany(p => p.Notification)
                     .HasForeignKey(d => d.OrganisationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__notificat__organ__690797E6");
+                    .HasConstraintName("FK__notificat__organ__114A936A");
             });
 
             modelBuilder.Entity<Organisation>(entity =>
@@ -370,13 +370,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Post)
                     .HasForeignKey(d => d.OrganisationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__post__organisati__398D8EEE");
+                    .HasConstraintName("FK__post__organisati__0F624AF8");
             });
 
             modelBuilder.Entity<SickLeaveRequest>(entity =>
             {
                 entity.HasKey(e => e.SickLeaveId)
-                    .HasName("PK__sick_lea__BC1B4FECC4FCD277");
+                    .HasName("PK__sick_lea__BC1B4FEC2A135DE6");
 
                 entity.ToTable("sick_leave_request");
 
@@ -422,7 +422,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.SickLeaves)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__sick_leav__emplo__52593CB8");
+                    .HasConstraintName("FK__sick_leav__emplo__0D7A0286");
             });
 
             modelBuilder.Entity<Team>(entity =>
@@ -453,13 +453,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Team)
                     .HasForeignKey(d => d.OrganisationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__team__organisati__3C69FB99");
+                    .HasConstraintName("FK__team__organisati__0B91BA14");
 
                 entity.HasOne(d => d.Teamlead)
                     .WithMany(p => p.TeamNavigation)
                     .HasForeignKey(d => d.TeamleadId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__team__teamlead_i__214BF109");
+                    .HasConstraintName("FK__team__teamlead_i__0C85DE4D");
             });
 
             modelBuilder.Entity<TimeManagementRecord>(entity =>
@@ -467,7 +467,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasKey(e => e.TimeManagementRecordId)
                     .HasName("PK__time_man__F5CD42EA8952EF95");
 
-                entity.ToTable("time_managment_record");
+                entity.ToTable("time_management_record");
 
                 entity.Property(e => e.TimeManagementRecordId)
                     .HasColumnName("time_management_record_id")
@@ -497,7 +497,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.TimeManagmentRecords)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__time_mana__emplo__160F4887");
+                    .HasConstraintName("FK__time_mana__emplo__0A9D95DB");
             });
 
             modelBuilder.Entity<Transaction>(entity =>
@@ -533,13 +533,13 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Transaction)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__transacti__emplo__47DBAE45");
+                    .HasConstraintName("FK__transacti__emplo__09A971A2");
             });
 
             modelBuilder.Entity<VacationRequest>(entity =>
             {
                 entity.HasKey(e => e.VacationId)
-                    .HasName("PK__vacation__F558A74CDAEC33E6");
+                    .HasName("PK__vacation__F558A74C5E6724D6");
 
                 entity.ToTable("vacation_request");
 
@@ -598,7 +598,7 @@ namespace VRdkHRMsysDAL.Contexts
                     .WithMany(p => p.Vacations)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__vacation___emplo__4D94879B");
+                    .HasConstraintName("FK__vacation___emplo__07C12930");
             });
 
             modelBuilder.Entity<WorkDay>(entity =>
@@ -628,7 +628,7 @@ namespace VRdkHRMsysDAL.Contexts
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.WorkDays)
                     .HasForeignKey(d => d.EmployeeId)
-                    .HasConstraintName("FK__work_day__employ__6D0D32F4");
+                    .HasConstraintName("FK__work_day__employ__04E4BC85");
             });
         }
     }

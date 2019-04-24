@@ -15,7 +15,7 @@ namespace VRdkHRMsysDAL.Interfaces
         Task<Employee> GetByEmailWithTeamWithResidualsAsync(string email);
         Task<Employee[]> GetWithTeamAsync(Expression<Func<Employee, bool>> condition = null);
         Task<Employee[]> GetPageAsync(int pageSize, int pageNumber, string searchKey, Expression<Func<Employee, bool>> condition = null);
-        Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition = null, string searchKey = null);
+        Task<int> GetEmployeesCount(Expression<Func<Employee, bool>> condition, string searchKey = null);
         Task<Employee[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year, string personalId = null);
         Task UpdateAsync(Employee entity, bool writeChange);
     }

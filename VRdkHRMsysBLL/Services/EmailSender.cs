@@ -17,7 +17,7 @@ namespace VRdkHRMsysBLL.Services
 
         public async Task SendPasswordResetLink(string address, string name, string title, string plainTextContent, string message)
         {
-            var from = new EmailAddress("vrdksystems@gmail.com", "VRdkSystems");
+            var from = new EmailAddress("vrdk2019@gmail.com", "vrdk");
             var subject = title;
             var to = new EmailAddress(address, name);
             var htmlContent = "<strong>" + message + "</strong>";

@@ -31,7 +31,7 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
         }
 
-        public async Task<EmployeeDTO[]> GetForCalendaAsync(string teamId, string teamleadId, int month, int year, string personalId = null)
+        public async Task<EmployeeDTO[]> GetForCalendarAsync(string teamId, string teamleadId, int month, int year, string personalId = null)
         {
             var employees = await _employeeRepository.GetForCalendarAsync(teamId, teamleadId, month, year, personalId);
             return _mapHelper.MapCollection<Employee, EmployeeDTO>(employees);
@@ -146,8 +146,8 @@ namespace VRdkHRMsysBLL.Services
             var currentEmployees = await _employeeRepository.GetAsync(emp => newEmployees.Any(e=>emp.EmployeeId==e.EmployeeId));
             if (currentEmployees != null)
             {
-                newEmployees.OrderBy(emp => emp.EmployeeId);
-                currentEmployees.OrderBy(emp => emp.EmployeeId);
+                newEmployees = newEmployees.OrderBy(emp => emp.EmployeeId).ToArray();
+                currentEmployees = currentEmployees.OrderBy(emp => emp.EmployeeId).ToArray();
                 for (int i = 0; i < currentEmployees.Length; i++)
                 {
                     _mapHelper.MapChanges(newEmployees[i],currentEmployees[i]);

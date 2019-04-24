@@ -15,7 +15,7 @@
 });
 
 function AddTimeManagment(objAppendToId, date) {
-    toastr.info('Добавление...');
+    var toast = toastr.info('Добавление...', '', { timeOut: 0, extendedTimeOut: 0 });
     var url = "/profile/addtimemanagementrecord";
     var table = $("#" + objAppendToId);
     $.ajax({
@@ -32,8 +32,11 @@ function AddTimeManagment(objAppendToId, date) {
                 interval: 60
             });
             $(".timemanagement_timepicker").mask('00:00');
+
+            toastr.clear(toast);
         },
         error: function () {
+            toastr.clear(toast);
             toastr.info('Произошла ошибка');
         }
     });
@@ -42,7 +45,7 @@ function AddTimeManagment(objAppendToId, date) {
 }
 
 function deleteTimeManagementRecord(element, id) {
-    toastr.info('Удаление деятельности');
+    var toast = toastr.info('Удаление деятельности', '', { timeOut: 0, extendedTimeOut: 0 });
     var url = "/profile/deletetimemanagementrecord";
     if (id !== '') {
         $.ajax({
@@ -54,9 +57,12 @@ function deleteTimeManagementRecord(element, id) {
             success: function () {
                 var elemToDelete = $(element).parent().parent();
                 elemToDelete.empty();
+
+                toastr.clear(toast);
                 toastr.success('Деятельность удалена');
             },
             error: function () {
+                toastr.clear(toast);
                 toastr.error('Произошла ошибка');
             }
         });
@@ -64,18 +70,17 @@ function deleteTimeManagementRecord(element, id) {
     else {
         var elemToDelete = $(element).parent().parent();
         elemToDelete.empty();
-        toastr.success('Деятельность удалена');
+        toastr.clear(toast);
     }
 
 
 }
 
-function submitForm(form_elem) {
-    
+function submitForm(form_elem) { 
     var form = $(form_elem);
     var data = form.serializeArray();
     if (data[2].value !== '' && data[3].value !== '' && data[4].value !== '') {
-        toastr.info('Добавление деятельности в распорядок дня');
+        var toast = toastr.info('Добавление деятельности в распорядок дня', '', { timeOut: 0, extendedTimeOut: 0 });
         var url = form.attr('action');
         $.ajax({
             url: url,
@@ -88,9 +93,12 @@ function submitForm(form_elem) {
                     interval: 60
                 });
                 $(".timemanagement_timepicker").mask('00:00');
+
+                toastr.clear(toast);
                 toastr.success('Деятельность добавлена');
             },
             error: function () {
+                toastr.clear(toast);
                 toastr.error('Произошла ошибка');
             }
         });

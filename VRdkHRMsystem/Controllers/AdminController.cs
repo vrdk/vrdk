@@ -81,12 +81,10 @@ namespace VRdkHRMsystem.Controllers
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
-                TeamDTO team = new TeamDTO();
-                CalendarViewModel model = new CalendarViewModel();
-                EmployeeDTO[] employees = new EmployeeDTO[] { };
+                TeamDTO team;
                 var teams = await _teamService.GetAsync(t => t.OrganisationId == viewer.OrganisationId);
 
-                if (year == 0 || month == 0)
+                if (year == 0 || month == 0 || month > 12 || year > 9999)
                 {
                     year = DateTime.UtcNow.Year;
                     month = DateTime.UtcNow.Month;
@@ -110,9 +108,11 @@ namespace VRdkHRMsystem.Controllers
 
                 if (team != null)
                 {
+                    CalendarViewModel model;
+                    EmployeeDTO[] employees;
                     if (team.TeamId == viewer.TeamId)
                     {
-                        employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+                        employees = await _employeeService.GetForCalendarAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
                         model = new CalendarViewModel
                         {
                             Year = year,
@@ -129,7 +129,7 @@ namespace VRdkHRMsystem.Controllers
                         return View("~/Views/Profile/Calendar.cshtml", model);
                     }
 
-                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+                    employees = await _employeeService.GetForCalendarAsync(team.TeamId, team.TeamleadId, month, year);
 
                     model = new CalendarViewModel
                     {
@@ -151,14 +151,15 @@ namespace VRdkHRMsystem.Controllers
 
                     return View(model);
                 }
-                else
+
+                var emptyModel = new CalendarViewModel()
                 {
-                    return View(new CalendarViewModel()
-                    {
-                        Year = year,
-                        Month = month
-                    });
-                }
+                    Year = year,
+                    Month = month,
+                    Teams = _listMapper.CreateTeamList(teams, null)
+                };
+
+                return View(emptyModel);
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -252,12 +253,12 @@ namespace VRdkHRMsystem.Controllers
                 var teamMembers = team.Employees.Select(e => e.EmployeeId).ToArray();
                 var removedFromTeam = teamMembers.Except(model.TeamMembers).ToArray();
                 var addedToTeam = model.TeamMembers.Except(teamMembers).ToArray();
-                if (removedFromTeam != null && removedFromTeam.Count() != 0)
+                if (removedFromTeam.Count() != 0)
                 {
                     await _employeeService.RemoveFromTeamAsync(removedFromTeam);
                 }
 
-                if (addedToTeam != null && addedToTeam.Count() != 0)
+                if (addedToTeam.Count() != 0)
                 {
                     await _employeeService.AddToTeamAsync(addedToTeam, team.TeamId);
                 }
@@ -502,8 +503,8 @@ namespace VRdkHRMsystem.Controllers
             if (ModelState.IsValid)
             {
                 var organisationId = _userManager.FindByNameAsync(User.Identity.Name).Result.OrganisationId;
-                var user = new ApplicationUser { UserName = model.WorkEmail, Email = model.WorkEmail, PhoneNumber = model.PhoneNumber, Id = Guid.NewGuid().ToString(), OrganisationId = organisationId };
-                var result = await _userManager.CreateAsync(user, "123asdQ!");
+                var user = new ApplicationUser { UserName = model.WorkEmail, Email = model.WorkEmail, PhoneNumber = model.PhoneNumber, Id = Guid.NewGuid().ToString(), OrganisationId = organisationId, EmailConfirmed = true};
+                var result = await _userManager.CreateAsync(user, Guid.NewGuid().ToString().ToUpper());
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.Role);
@@ -551,10 +552,9 @@ namespace VRdkHRMsystem.Controllers
                     await _employeeService.CreateAsync(employee);
                     await _residualsService.CreateRangeAsync(residuals, true);
                     var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    var emailConfirmationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    string callbackUrl = Url.Action("SetPasswordAndConfrimEmail", "Account", new { id = user.Id, resetCode = passwordResetCode, confirmCode = emailConfirmationCode }, Request.Scheme);
+                    string callbackUrl = Url.Action("SetPassword", "Account", new { id = user.Id, resetCode = passwordResetCode}, Request.Scheme);
                     await _emailSender.SendPasswordResetLink(model.WorkEmail, "", "Set password", "",
-                      $"Please set your password by clicking here: <a href='{callbackUrl}'>link</a>");
+                        $"Чтобы перейти к форме изменения пароля, нажмите на ссылку: <a href='{callbackUrl}'>изменить пароль</a>");
 
                     await _fileManagmentService.UploadDefaultUserPhoto(employee.EmployeeId);
                 }
@@ -739,7 +739,7 @@ namespace VRdkHRMsystem.Controllers
                         {
                             TransactionId = Guid.NewGuid().ToString(),
                             EmployeeId = vacationRequest.EmployeeId,
-                            Change = model.Duration,
+                            Change = vacationRequest.Duration,
                             Description = model.VacationType,
                             TransactionDate = DateTime.UtcNow,
                             TransactionType = model.VacationType
@@ -753,7 +753,7 @@ namespace VRdkHRMsystem.Controllers
                             OrganisationId = user.OrganisationId,
                             NotificationType = NotificationTypeEnum.Vacation.ToString(),
                             NotificationDate = DateTime.UtcNow,
-                            Description = $"Ваша заявка на отпуск была подтверждена.",
+                            Description = "Ваша заявка на отпуск была подтверждена.",
                             NotificationRange = NotificationRangeEnum.User.ToString()
                         };
 
@@ -771,7 +771,7 @@ namespace VRdkHRMsystem.Controllers
                             NotificationType = NotificationTypeEnum.Vacation.ToString(),
                             NotificationDate = DateTime.UtcNow,
                             NotificationRange = NotificationRangeEnum.User.ToString(),
-                            Description = $"Ваша заявка на отпуск была отклонена."
+                            Description = "Ваша заявка на отпуск была отклонена."
                         };
 
                         await _notificationService.CreateAsync(notification, true);
@@ -821,7 +821,7 @@ namespace VRdkHRMsystem.Controllers
                 return PartialView("VacationViewModal", model);
             }
 
-            return View();
+            return BadRequest();
         }
 
         #endregion
@@ -1197,7 +1197,7 @@ namespace VRdkHRMsystem.Controllers
                     if (assignment.Duration != model.Duration)
                     {
                         var residuals = assignment.AssignmentEmployee.Select(ae => ae.Employee.EmployeeBalanceResiduals.
-                                                                                       FirstOrDefault(r => !removedFromAssignment.Any(m => m == r.EmployeeId)
+                                                                                       FirstOrDefault(r => removedFromAssignment.All(m => m != r.EmployeeId)
                                                                                                            && r.Name == ResidualTypeEnum.Assignment.ToString())).Where(r => r != null).ToArray();
                         foreach (var res in residuals)
                         {

@@ -72,12 +72,12 @@ namespace VRdkHRMsystem.Services
                 {
                     Text = "Уволен",
                     Value = false.ToString(),
-                    Selected = false.ToString() == userState?.ToString()
+                    Selected = false.ToString() == userState
                 },new SelectListItem
                 {
                     Text = "Работает",
                     Value = true.ToString(),
-                    Selected = userState == null ? true : true.ToString() == userState.ToString()
+                    Selected = userState == null ? true : true.ToString() == userState
                 }
             };
         }

@@ -1,5 +1,4 @@
-﻿
- $.validator.setDefaults({
+﻿$.validator.setDefaults({
         ignore: []
     });
 

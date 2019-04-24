@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -32,11 +33,11 @@ namespace VRdkHRMsysDAL.Repositories
 
             return condition != null ? await _context.VacationRequest.Where(req => req.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
                                                                                 || req.Employee.LastName.ToLower().Contains(searchKey.ToLower())
-                                                                                || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).CountAsync():
-                                       await _context.VacationRequest.Where(condition).
-                                                                      Where(req => req.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
+                                                                                || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).CountAsync():
+                                       await _context.VacationRequest.Where(req => req.Employee.FirstName.ToLower().Contains(searchKey.ToLower())
                                                                                 || req.Employee.LastName.ToLower().Contains(searchKey.ToLower())
-                                                                                || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).CountAsync();                                                                              
+                                                                                || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).CountAsync();
+
         }
 
         public async Task<VacationRequest[]> GetAsync(Expression<Func<VacationRequest, bool>> condition = null)
@@ -52,11 +53,15 @@ namespace VRdkHRMsysDAL.Repositories
                 await _context.VacationRequest.Include(r => r.Employee).
                                                ThenInclude(emp => emp.Team).
                                                Include(req => req.Employee).
-                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).Where(condition).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync()
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).Where(condition).
+                                               OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                               Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync()
               : await _context.VacationRequest.Include(r => r.Employee).
                                                ThenInclude(emp => emp.Team).
                                                Include(req => req.Employee).
-                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                               ThenInclude(emp => emp.EmployeeBalanceResiduals).
+                                               OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                               Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
             }
 
             return condition != null ?
@@ -65,18 +70,22 @@ namespace VRdkHRMsysDAL.Repositories
                                                Include(req => req.Employee).
                                                ThenInclude(emp => emp.EmployeeBalanceResiduals).
                                                Where(condition).
-                                               Where(req => req.BeginDate.ToString().Contains(searchKey)
-                                                        || req.EndDate.ToString().Contains(searchKey)
+                                               Where(req => req.BeginDate.ToString(CultureInfo.InvariantCulture).Contains(searchKey)
+                                                        || req.EndDate.ToString(CultureInfo.InvariantCulture).Contains(searchKey)
                                                         || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                        || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync()
+                                                        || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
+                                                        OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                        Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync()
               : await _context.VacationRequest.Include(r => r.Employee).
                                                ThenInclude(emp => emp.Team).
                                                Include(req => req.Employee).
                                                ThenInclude(emp => emp.EmployeeBalanceResiduals).
-                                               Where(req => req.BeginDate.ToString().Contains(searchKey)
-                                                        || req.EndDate.ToString().Contains(searchKey)
+                                               Where(req => req.BeginDate.ToString(CultureInfo.InvariantCulture).Contains(searchKey)
+                                                        || req.EndDate.ToString(CultureInfo.InvariantCulture).Contains(searchKey)
                                                         || $"{req.Employee.FirstName} {req.Employee.LastName}".ToLower().Contains(searchKey.ToLower())
-                                                        || (req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower()))).OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).Skip(pageNumber * pageSize).Take(pageSize).ToArrayAsync();
+                                                        || req.Employee.Team != null && req.Employee.Team.Name.ToLower().Contains(searchKey.ToLower())).
+                                                           OrderBy(req => req.RequestStatus == priorityStatus ? 0 : 1).ThenByDescending(req => req.CreateDate).
+                                                           Skip(pageNumber * pageSize).Take(pageSize).AsNoTracking().ToArrayAsync();
         }
 
         public async Task<VacationRequest> GetByIdAsync(string id)

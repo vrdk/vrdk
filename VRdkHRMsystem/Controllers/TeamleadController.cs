@@ -130,7 +130,7 @@ namespace VRdkHRMsystem.Controllers
                 {
                     if (team.TeamId == viewer.TeamId)
                     {
-                        employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+                        employees = await _employeeService.GetForCalendarAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
                         model = new CalendarViewModel
                         {
                             Year = year,
@@ -147,7 +147,7 @@ namespace VRdkHRMsystem.Controllers
                         return View("~/Views/Profile/Calendar.cshtml", model);
                     }
 
-                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year);
+                    employees = await _employeeService.GetForCalendarAsync(team.TeamId, team.TeamleadId, month, year);
 
                     model = new CalendarViewModel
                     {
@@ -164,15 +164,13 @@ namespace VRdkHRMsystem.Controllers
 
                     return View(model);
                 }
-                else
+
+                return View(new CalendarViewModel()
                 {
-                    return View(new CalendarViewModel()
-                    {
-                        Year = year,
-                        Month = month,
-                        Teams = _listMapper.CreateTeamList(teams, team.TeamId)
-                    });
-                }
+                    Year = year,
+                    Month = month,
+                    Teams = _listMapper.CreateTeamList(teams, null)
+                });
             }
 
             return RedirectToAction("Profile", "Profile");
@@ -674,7 +672,7 @@ namespace VRdkHRMsystem.Controllers
                 return PartialView("AbsenceApproveModal", model);
             }
 
-            return RedirectToAction("Calendar", role, new { teamId });
+            return BadRequest();
         }
 
         [HttpPost]

@@ -21,12 +21,12 @@ namespace VRdkHRMsystem
 {
     public class Startup
     {
-        private Container container;
+        private readonly Container _container;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            container = new DIContainerConfiguration().RegistrateDependencies();
+            _container = new DIContainerConfiguration().RegistrateDependencies();
         }
 
         public IConfiguration Configuration { get; }
@@ -37,15 +37,15 @@ namespace VRdkHRMsystem
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddSingleton<IControllerActivator>(
-                new SimpleInjectorControllerActivator(container));
+                new SimpleInjectorControllerActivator(_container));
             services.AddSingleton<IViewComponentActivator>(
-                new SimpleInjectorViewComponentActivator(container));
+                new SimpleInjectorViewComponentActivator(_container));
 
-            services.EnableSimpleInjectorCrossWiring(container);
-            services.UseSimpleInjectorAspNetRequestScoping(container);
+            services.EnableSimpleInjectorCrossWiring(_container);
+            services.UseSimpleInjectorAspNetRequestScoping(_container);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("VRdkHRMsystemDBconnection")));
+                options.UseSqlServer(Configuration.GetConnectionString("vrdkdatabaseConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(opts =>
             {
@@ -66,7 +66,7 @@ namespace VRdkHRMsystem
                 options.Password.RequiredUniqueChars = 6;
 
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
                 options.User.RequireUniqueEmail = true;
@@ -101,10 +101,10 @@ namespace VRdkHRMsystem
                     template: "{controller=Profile}/{action=Profile}/{id?}");
             });
 
-            container.AutoCrossWireAspNetComponents(app);
-            container.RegisterMvcControllers(app);
-            container.RegisterMvcViewComponents(app);
-            container.Verify();
+            _container.AutoCrossWireAspNetComponents(app);
+            _container.RegisterMvcControllers(app);
+            _container.RegisterMvcViewComponents(app);
+            _container.Verify();
 
             var cultureInfo = new CultureInfo("ru-RU");
             CultureInfo.DefaultThreadCurrentCulture = cultureInfo;

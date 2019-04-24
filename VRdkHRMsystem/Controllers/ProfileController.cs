@@ -67,13 +67,9 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<IActionResult> Calendar(int year, int month, string teamId)
         {
-
             var viewer = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (viewer != null)
             {
-                TeamDTO team = new TeamDTO();
-                CalendarViewModel model = new CalendarViewModel();
-                EmployeeDTO[] employees = new EmployeeDTO[] { };
                 var teams = await _teamService.GetAsync(t => t.TeamId == viewer.TeamId);
 
                 if (year == 0 || month == 0)
@@ -82,13 +78,13 @@ namespace VRdkHRMsystem.Controllers
                     month = DateTime.UtcNow.Month;
                 }
 
-                team = teams.FirstOrDefault();
+                var team = teams.FirstOrDefault();
 
                 if (team != null)
                 {
-                    employees = await _employeeService.GetForCalendaAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
+                    var employees = await _employeeService.GetForCalendarAsync(team.TeamId, team.TeamleadId, month, year, viewer.EmployeeId);
 
-                    model = new CalendarViewModel
+                    var model = new CalendarViewModel
                     {
                         Year = year,
                         Month = month,
@@ -109,7 +105,8 @@ namespace VRdkHRMsystem.Controllers
                     return View(new CalendarViewModel()
                     {
                         Year = year,
-                        Month = month
+                        Month = month,
+                        Teams = _listMapper.CreateTeamList(teams, null)
                     });
                 }
             }
@@ -456,6 +453,42 @@ namespace VRdkHRMsystem.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> NotificationsPage(int pageNumber = 0, string searchKey = null)
+        {
+            ViewData["SearchKey"] = searchKey;
+            NotificationDTO[] notifications = new NotificationDTO[] { };
+            int count = 0;
+            var user = await _employeeService.GetByEmailAsync(User.Identity.Name);
+            if (user != null)
+            {
+                if (User.IsInRole("Administrator"))
+                {
+                    notifications = await _notificationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
+                                                                            note => (note.EmployeeId == user.EmployeeId
+                                                                                 || note.EmployeeId == null)
+                                                                                 && note.OrganisationId == user.OrganisationId, searchKey);
+                    count = await _notificationService.GetNotificationsNumber(note => (note.EmployeeId == user.EmployeeId || note.EmployeeId == null) && note.OrganisationId == user.OrganisationId, searchKey);
+                }
+                else
+                {
+                    notifications = await _notificationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15,
+                                                  note => note.EmployeeId == user.EmployeeId && note.OrganisationId == user.OrganisationId, searchKey);
+                    count = await _notificationService.GetNotificationsNumber(note => note.EmployeeId == user.EmployeeId && note.OrganisationId == user.OrganisationId, searchKey);
+                }
+            }
+            var pagedNotifications = new NotificationListViewModel
+            {
+                PageNumber = pageNumber,
+                PageSize = (int)PageSizeEnum.PageSize15,
+                Count = count,
+                Notifications = _mapHelper.MapCollection<NotificationDTO, NotificationViewModel>(notifications)
+            };
+
+            return PartialView(pagedNotifications);
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> RedirectWithNotification(string notificationId, string notificationRange, string notificationType, string role = null)
         {
             var notification = await _notificationService.GetByIdAsync(notificationId);
@@ -507,23 +540,23 @@ namespace VRdkHRMsystem.Controllers
         [HttpGet]
         public async Task<bool> CheckNotificationsNuvelty(string userEmail)
         {
-            var notifications = new NotificationDTO[] { };
-            if (User.IsInRole("Administrator"))
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user != null)
             {
-                notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail || n.EmployeeId == null);
+                var notifications = new NotificationDTO[] { };
+                if (User.IsInRole("Administrator"))
+                {
+                    notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail || n.EmployeeId == null && n.OrganisationId == user.OrganisationId);
+                }
+                else
+                {
+                    notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail);
+                }
+
+                return notifications.Length != 0;
             }
-            else
-            {
-                notifications = await _notificationService.GetAsync(n => n.Employee.WorkEmail == userEmail || n.EmployeeId == null);
-            }
-            if(notifications.Count() == 0)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+
+            return false;
         }
 
         #endregion

@@ -47,28 +47,28 @@
         </div>
     </div>
     @if (Model.Count > Model.PageSize)
+    {
+        <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
+            <img src="~/images/load.gif" />
+        </div>
+        <div class="table__pageblock" id="paggination_list">
+            @if (Model.PageNumber == 0)
             {
-    <div class="table__pageblock" style=" margin-top:10px;display:none;" id="paggination_list_gif" type-anchor="vacation">
-        <img src="~/images/load.gif" />
-    </div>
-    <div class="table__pageblock" id="paggination_list">
-        @if (Model.PageNumber == 0)
-            {
-        <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {
-        <img class="list_paggination" action-anchor="AbsencesPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
+                <img class="list_paggination" action-anchor="AbsencesPage" pageNumber-anchor="@(Model.PageNumber-1)" searchKey-anchor="@searchKey" src="~/images/arrow-left.png" alt="arrow" />
             }
-        <p style="padding-bottom:5px;">@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
-        @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
+            <p>@(Model.PageNumber + 1) страница из @(Model.Count % Model.PageSize != 0 ? Model.Count / @Model.PageSize + 1 : Model.Count / @Model.PageSize)</p>
+            @if (Model.Count % Model.PageSize != 0 ? Model.PageNumber == Model.Count / Model.PageSize : Model.PageNumber == Model.Count / Model.PageSize - 1)
             {
-        <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
+                <img src="~/images/cross.png" alt="arrow" class="disabled" style="cursor:not-allowed;" />
             }
             else
             {
-        <img class="list_paggination" action-anchor="AbsencesPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
+                <img class="list_paggination" action-anchor="AbsencesPage" pageNumber-anchor="@(Model.PageNumber+1)" searchKey-anchor="@searchKey" src="~/images/arrow-right.png" alt="arrow" />
             }
-    </div>
-            }
+        </div>
+    }
 </section>

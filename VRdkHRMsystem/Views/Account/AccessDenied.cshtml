@@ -1,8 +1,24 @@
 ﻿@{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "Vrdk";
+    Layout = null;
 }
-
-<header>
-    <h2 class="text-danger">@ViewData["Title"]</h2>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    <title>Vrdk</title>
+    <link rel="stylesheet" href="~/css/main.min.css"/>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/login.js"></script>
+</head>
+<body>
+    <div class="error__block">
+        <a href="@Url.Action("Profile","Profile")">
+            <img class="header__logo" src="~/images/logo.png" alt="logo" style="margin-top:4px;" />
+        </a>
+        <p class="error__code">401</p><span class="error__text" >У вас нет прав доступа к этому ресурсу</span>
+        <a href="@Url.Action("Profile","Profile")"><button class="button back_button ripple">Вернуться</button></a>
+    </div>      
+ </body>
+</html>
