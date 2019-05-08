@@ -8,6 +8,8 @@
 
         public int PageSize { get; set; }
 
+        public string SyncHubAnchor { get; set; }
+
         public VacationRequestViewModel[] Vacations { get; set; }
     }
 }

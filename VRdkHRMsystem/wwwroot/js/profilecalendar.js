@@ -38,7 +38,7 @@ function proccessDayOff(cellElement) {
             $('#request_modal').modal();
             $('#modal_place').html(modalHtml);
 
-            toast.clear(toast);
+            toastr.clear(toast);
         },
         error: function () {
             toastr.clear(toast);
@@ -49,7 +49,7 @@ function proccessDayOff(cellElement) {
 
 function timeManagmentModal(cellElement) { 
     var el = $(cellElement);
-    toastr.info('Запрос формы распорядка дня...', el.attr('date-anchor'));
+    var toast = toastr.info('Запрос формы распорядка дня...', el.attr('date-anchor'));
     var url = "/profile/timemanagment";
     $.ajax({
         url: url,
@@ -58,10 +58,12 @@ function timeManagmentModal(cellElement) {
             date: el.attr('date-anchor')
         },
         success: function (modal_html) {
+            toastr.clear(toast);
             $('#modal_place').empty();
             $('#modal_place').html(modal_html);
         },
         error: function () {
+            toastr.clear(toast);
             toastr.error('Произошла ошибка');
         }
     });

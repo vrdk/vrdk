@@ -8,7 +8,7 @@ namespace VRdkHRMsysDAL.Interfaces
     public interface ISickLeaveRequestRepository : IRepository<SickLeaveRequest>
     {
         Task<SickLeaveRequest> GetByIdWithEmployeeWithTeamAsync(string id);
-        Task<SickLeaveRequest[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
+        Task<SickLeaveRequest[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<int> GetSickLeavesNumberAsync(string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null);
         Task<SickLeaveRequest[]> GetProfilePageAsync(int pageSize, string id, int pageNumber = 0);
         Task<SickLeaveRequest> GetByIdWithEmployeeWithResidualsAsync(string id);

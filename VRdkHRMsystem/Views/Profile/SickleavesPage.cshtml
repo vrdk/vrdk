@@ -14,7 +14,7 @@
             <div class="profile__tabs_sickleavecontent profile__tabs_content">
                 <p class="profile__tabs_sickleavedate">@item.CreateDate.ToString("dd.MM.yyyy") - @(item.CloseDate == null ? "..." : item.CloseDate.Value.Date.ToString("dd.MM.yyyy"))</p>
                 <div class="profile__tabs_sickleavestatus profile__tabs_sickleavestatus-item">
-                    <div class="profile__status_circle_sickleave_@item.RequestStatus">
+                    <div class="sickleave_status_@item.RequestStatus">
                         <div></div>
                     </div>
                 </div>

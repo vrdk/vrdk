@@ -849,9 +849,8 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                vacations = await _vacationService.GetPageAsync(pageNumber,
+                vacations = await _vacationService.GetPageWithPendingPriorityAsync(pageNumber,
                                                                           (int)PageSizeEnum.PageSize15,
-                                                                          RequestStatusEnum.Pending.ToString(),
                                                                           searchKey,
                                                                           req => (req.Employee.Team.TeamleadId == employee.EmployeeId)
                                                                           && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
@@ -882,9 +881,8 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                vacations = await _vacationService.GetPageAsync(pageNumber,
+                vacations = await _vacationService.GetPageWithPendingPriorityAsync(pageNumber,
                                                                           (int)PageSizeEnum.PageSize15,
-                                                                          RequestStatusEnum.Pending.ToString(),
                                                                           searchKey,
                                                                           req => (req.Employee.Team.TeamleadId == employee.EmployeeId)
                                                                           && req.RequestStatus != RequestStatusEnum.Proccessing.ToString()
@@ -1044,7 +1042,7 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
                                                                   req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
                 count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
             }
@@ -1069,7 +1067,7 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
                                                                   req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
                 count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.Team.TeamleadId == employee.EmployeeId && req.Employee.State);
             }

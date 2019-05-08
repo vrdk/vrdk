@@ -27,7 +27,7 @@ namespace VRdkHRMsysDAL.Repositories
                 LastName = e.LastName,
                 TeamId = e.TeamId,
                 Vacations = e.Vacations.Where(v=>((v.BeginDate.Month == month && v.BeginDate.Year == year) || (v.EndDate.Month == month && v.EndDate.Year == year))  && v.RequestStatus == "Approved").ToList(),
-                SickLeaves = e.SickLeaves.Where(s=>((s.CreateDate.Month == month && s.CreateDate.Year == year && s.CloseDate == null) || (s.CloseDate != null && s.CloseDate.Value.Month == month && s.CloseDate.Value.Year == year) || (s.CloseDate == null && s.CloseDate.Value.Month != month && s.CloseDate.Value.Year != year)) && (s.RequestStatus == "Approved" || s.RequestStatus == "Closed")).ToList(),
+                SickLeaves = e.SickLeaves.Where(s=>(s.CloseDate == null || (s.CloseDate != null && s.CloseDate.Value.Month == month && s.CloseDate.Value.Year == year) || (s.CreateDate.Month == month && s.CreateDate.Year == year)) && (s.RequestStatus == "Approved" || s.RequestStatus == "Closed")).ToList(),
                 Assignments = e.Assignments.Where(a=>(a.Assignment.BeginDate.Month == month && a.Assignment.BeginDate.Year == year) || (a.Assignment.EndDate.Month == month && a.Assignment.EndDate.Year == year) ).Select(a=>new AssignmentEmployee
                 {
                     Assignment = a.Assignment

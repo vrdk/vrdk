@@ -51,9 +51,30 @@ namespace VRdkHRMsysBLL.Services
             return _mapHelper.MapCollection<VacationRequest, VacationRequestDTO>(reqs);
         }
 
-        public async Task<VacationRequestViewDTO[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<VacationRequest, bool>> condition = null)
+        public async Task<VacationRequestViewDTO[]> GetPageWithProccessingPriorityAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<VacationRequest, bool>> condition = null)
         {
-            var reqs = await _vacationRepository.GetPageAsync(pageNumber, pageSize, priorityStatus, condition, searchKey);
+            var reqs = await _vacationRepository.GetPageWithProccessingPriorityAsync(pageNumber, pageSize,  condition, searchKey);
+            var requests = reqs != null ? reqs.Select(r => new VacationRequestViewDTO()
+            {
+                EmployeeId = r.EmployeeId,
+                VacationId = r.VacationId,
+                EmployeeFullName = $"{r.Employee.FirstName} {r.Employee.LastName}",
+                BeginDate = r.BeginDate,
+                EndDate = r.EndDate,
+                Duration = r.Duration,
+                RequestStatus = r.RequestStatus,
+                TeamName = r.Employee.Team != null ? r.Employee.Team.Name : emptyValue,
+                VacationType = r.VacationType,
+                Balance = r.Employee.EmployeeBalanceResiduals.FirstOrDefault(res => res.Name == r.VacationType).ResidualBalance
+            }
+            ).ToArray() : new VacationRequestViewDTO[] { };
+
+            return requests;
+        }
+
+        public async Task<VacationRequestViewDTO[]> GetPageWithPendingPriorityAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<VacationRequest, bool>> condition = null)
+        {
+            var reqs = await _vacationRepository.GetPageWithPendingPriorityAsync(pageNumber, pageSize, condition, searchKey);
             var requests = reqs != null ? reqs.Select(r => new VacationRequestViewDTO()
             {
                 EmployeeId = r.EmployeeId,

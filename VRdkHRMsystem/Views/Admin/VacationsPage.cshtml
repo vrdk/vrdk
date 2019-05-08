@@ -3,8 +3,6 @@
 @{
     ViewData["Title"] = "Vacations";
     var searchKey = ViewData["SearchKey"] as string;
-    var urlForProccess = "/Admin/ProccessVacationRequest?id=";
-    var urlForCheck = "/Admin/ViewVacationRequest?id=";
 }
 <section class="listsection">
     <div class="table">
@@ -27,41 +25,43 @@
                     <p class="vaclist__balance">Баланс</p>
                     <p class="vaclist__info">Инфо</p>
                 </div>
-                foreach (var item in Model.Vacations)
-                {
-                    <div class="table__body_content vaclist__body_content">
-                        <div class="table__body_block">
-                            <p class="vaclist__name">@item.EmployeeFullName</p>
-                            <p class="vaclist__team">@item.TeamName</p>
-                            @if (item.VacationType == "Paid_vacation")
-                            {
-                                <p class="vaclist__type">Оплачиваемый</p>
-                            }
-                            else
-                            {
-                                <p class="vaclist__type">Неоплачиваемый</p>
-                            }
-                            <p class="vaclist__dates">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
-                            <p class="vaclist__duration">@item.Duration</p>
-                            <p class="vaclist__balance">@item.Balance</p>
-                            <div class="vaclist__info">
-                                <div class="profile__status_circle_@item.RequestStatus" style="margin-right:5px;">
-                                    <div></div>
-                                </div>
-                                <a href="@Url.Action("EmployeeProfile","Admin", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" style="margin-top:5px;" /></a>
-                                <img src="~/images/penciltable.png" class="vacation__check_popup" alt="pencil" style="cursor:pointer;" request-anchor="@item.VacationId" />
+                <div class="table__body_content vaclist__body_content">
+                    @foreach (var item in Model.Vacations)
+                    {
+
+                    <div class="table__body_block" request-anchor="@item.VacationId">
+                        <p class="vaclist__name">@item.EmployeeFullName</p>
+                        <p class="vaclist__team">@item.TeamName</p>
+                        @if (item.VacationType == "Paid_vacation")
+                        {
+                            <p class="vaclist__type">Оплачиваемый</p>
+                        }
+                        else
+                        {
+                            <p class="vaclist__type">Неоплачиваемый</p>
+                        }
+                        <p class="vaclist__dates">@item.BeginDate.ToString("dd.MM.yyyy") - @item.EndDate.ToString("dd.MM.yyyy")</p>
+                        <p class="vaclist__duration">@item.Duration</p>
+                        <p class="vaclist__balance" employee-anchor="@item.EmployeeId" type-anchor="@item.VacationType" data-balance="@item.Balance">@item.Balance</p>
+                        <div class="vaclist__info">
+                            <div class="vacation_status_@item.RequestStatus" style="margin-right:5px;">
+                                <div></div>
                             </div>
+                            <a href="@Url.Action("EmployeeProfile","Admin", new { id = item.EmployeeId })"><img src="~/images/usertable.png" alt="users" style="margin-top:5px;" /></a>
+                            <img src="~/images/penciltable.png" class="vacation__check_popup" alt="pencil" style="cursor:pointer;" request-anchor="@item.VacationId" />
                         </div>
                     </div>
-                }
+
+                    }
+                </div>
             }
             else
             {
-                <div class="table__body_content vaclist__body_content">
-                    <div class="table__body_block">
-                        <p class="vaclist__name">Нет записей</p>
-                    </div>
+            <div class="table__body_content vaclist__body_content">
+                <div class="table__body_block">
+                    <p class="vaclist__name">Нет записей</p>
                 </div>
+            </div>
             }
         </div>
     </div>

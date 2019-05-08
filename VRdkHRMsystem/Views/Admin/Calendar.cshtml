@@ -58,15 +58,15 @@
                                         {
                                             <div class="calendar__block calendar__block_pass"></div>
                                         }
-                                        else if (employee.SickLeaves.Any(s => s.CreateDate.Day <= date.Day && (s.CloseDate == null || s.CloseDate.Day > date.Day) || (s.CreateDate.Month != date.Month && s.CreateDate.Day >= date.Day && (s.CloseDate == null || s.CloseDate.Day > date.Day))))
+                                        else if (employee.SickLeaves.Any(s => s.CreateDate <= date && (s.CloseDate == null || s.CloseDate > date)))
                                         {
                                             <div class="calendar__block calendar__block_health"></div>
                                         }
-                                        else if (employee.Vacations.Any(v => (v.BeginDate.Day <= date.Day && v.EndDate.Day > date.Day) || (v.BeginDate.Month != date.Month && v.BeginDate.Day >= date.Day && v.EndDate.Day > date.Day)))
+                                        else if (employee.Vacations.Any(v => v.BeginDate <= date && v.EndDate > date ))
                                         {
                                             <div class="calendar__block calendar__block_vacation"></div>
                                         }
-                                        else if (employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= date.Day && a.Assignment.EndDate.Day > date.Day) || (a.Assignment.BeginDate.Month != date.Month && a.Assignment.BeginDate.Day >= date.Day && a.Assignment.EndDate.Day > date.Day)))
+                                        else if(employee.Assignments.Any(a => a.Assignment.BeginDate <= date && a.Assignment.EndDate > date ))
                                         {
                                             <div class="calendar__block calendar__block_assignment"></div>
                                         }
@@ -114,16 +114,16 @@
                         </div>
                         @foreach (var employee in Model.Employees)
                         {
-                            var completeWorkDays = employee.WorkDays.Where(w => !employee.Vacations.Any(v => (v.BeginDate.Day <= w.WorkDayDate.Day && v.EndDate.Day > w.WorkDayDate.Day) || (v.BeginDate.Month != w.WorkDayDate.Month && v.BeginDate.Day >= w.WorkDayDate.Day && v.EndDate.Day > w.WorkDayDate.Day))
-                                                                                && !employee.SickLeaves.Any(s => s.CreateDate.Day <= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day > w.WorkDayDate.Day) || (s.CreateDate.Month != w.WorkDayDate.Month && s.CreateDate.Day >= w.WorkDayDate.Day && (s.CloseDate == null || s.CloseDate.Day > w.WorkDayDate.Day)))
-                                                                                && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= w.WorkDayDate.Day && a.Assignment.EndDate.Day > w.WorkDayDate.Day) || (a.Assignment.BeginDate.Month != w.WorkDayDate.Month && a.Assignment.BeginDate.Day >= w.WorkDayDate.Day && a.Assignment.EndDate.Day > w.WorkDayDate.Day))
-                                                                                && !employee.Absences.Any(a => a.AbsenceDate.Day == w.WorkDayDate.Day));
+                            var completeWorkDays = employee.WorkDays.Where(w => !employee.Vacations.Any(v => v.BeginDate <= w.WorkDayDate && v.EndDate > w.WorkDayDate)
+                                                                                && !employee.SickLeaves.Any(s => s.CreateDate <= w.WorkDayDate && (s.CloseDate == null || s.CloseDate > w.WorkDayDate))
+                                                                                && !employee.Assignments.Any(a => a.Assignment.BeginDate <= w.WorkDayDate && a.Assignment.EndDate > w.WorkDayDate)
+                                                                                && !employee.Absences.Any(a => a.AbsenceDate.Date == w.WorkDayDate.Date));
                             <div class="calendar__workdays_wrapper">
                                 <div class="calendar__workdays_daysblocks">
-                                    <div class="calendar__workdays_daysblock">@(completeWorkDays.Count())</div>
+                                    <div class="calendar__workdays_daysblock" employee-anchor="@employee.EmployeeId">@(completeWorkDays.Count())</div>
                                 </div>
                                 <div class="calendar__workdays_hoursblocks">
-                                    <div class="calendar__workdays_hoursblock">@(Math.Round(completeWorkDays.Sum(i => i.TimeTo.TotalHours - i.TimeFrom.TotalHours > 0 ? i.TimeTo.TotalHours - i.TimeFrom.TotalHours : i.TimeTo.TotalHours - i.TimeFrom.TotalHours + 24), 1).ToString(System.Globalization.CultureInfo.InvariantCulture))</div>
+                                    <div class="calendar__workdays_hoursblock" employee-anchor="@employee.EmployeeId">@(Math.Round(completeWorkDays.Sum(i => i.TimeTo.TotalHours - i.TimeFrom.TotalHours > 0 ? i.TimeTo.TotalHours - i.TimeFrom.TotalHours : i.TimeTo.TotalHours - i.TimeFrom.TotalHours + 24), 1).ToString(System.Globalization.CultureInfo.InvariantCulture))</div>
                                 </div>
                             </div>
                         }
@@ -133,11 +133,11 @@
                         <div class="calendar__chilldays_blocks">
                             @foreach (var employee in Model.Employees)
                             {
-                                var completeDayOffs = employee.DayOffs.Where(d => d.DayOffState == "Approved" && !employee.Vacations.Any(v => (v.BeginDate.Day <= d.DayOffDate.Day && v.EndDate.Day > d.DayOffDate.Day) || (v.BeginDate.Month != d.DayOffDate.Month && v.BeginDate.Day >= d.DayOffDate.Day && v.EndDate.Day > d.DayOffDate.Day))
-                                                                                  && !employee.SickLeaves.Any(s => s.CreateDate.Day <= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day > d.DayOffDate.Day) || (s.CreateDate.Month != d.DayOffDate.Month && s.CreateDate.Day >= d.DayOffDate.Day && (s.CloseDate == null || s.CloseDate.Day > d.DayOffDate.Day)))
-                                                                                  && !employee.Assignments.Any(a => (a.Assignment.BeginDate.Day <= d.DayOffDate.Day && a.Assignment.EndDate.Day > d.DayOffDate.Day) || (a.Assignment.BeginDate.Month != d.DayOffDate.Month && a.Assignment.BeginDate.Day >= d.DayOffDate.Day && a.Assignment.EndDate.Day > d.DayOffDate.Day))
-                                                                                  && !employee.Absences.Any(a => a.AbsenceDate.Day == d.DayOffDate.Day));
-                                <div class="calendar__chilldays_block">@(completeDayOffs.Count())</div>
+                                var completeDayOffs = employee.DayOffs.Where(d => d.DayOffState == "Approved" && !employee.Vacations.Any(v => v.BeginDate <= d.DayOffDate && v.EndDate > d.DayOffDate)
+                                                                                 && !employee.SickLeaves.Any(s => s.CreateDate <= d.DayOffDate && (s.CloseDate == null || s.CloseDate > d.DayOffDate))
+                                                                                 && !employee.Assignments.Any(a => a.Assignment.BeginDate <= d.DayOffDate && a.Assignment.EndDate > d.DayOffDate)
+                                                                                 && !employee.Absences.Any(a => a.AbsenceDate == d.DayOffDate));
+                                <div class="calendar__chilldays_block" employee-anchor="@employee.EmployeeId">@(completeDayOffs.Count())</div>
                             }
                         </div>
                     </div>

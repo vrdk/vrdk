@@ -241,9 +241,11 @@
                             });
                         }
                         var workDaysCount = $(".calendar__workdays_daysblock[employee-anchor='" + employeeAnchor + "']");
-                        var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");
-                        var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
-                        dayOffsCount.text(parseFloat(dayOffsCount.text()) - 1);
+                        var workDaysHours = $(".calendar__workdays_hoursblock[employee-anchor='" + employeeAnchor + "']");                      
+                        if (!currentCell.attr('requested')) {
+                            var dayOffsCount = $(".calendar__chilldays_block[employee-anchor='" + employeeAnchor + "']");
+                            dayOffsCount.text(parseFloat(dayOffsCount.text()) - 1);
+                        }                    
                         workDaysCount.text(parseFloat(workDaysCount.text()) + 1);
                         var newWorkHours = (parseFloat(workDaysHours.text()) + selectedWorkDayDuration).toFixed(1);
                         if (isInt(newWorkHours)) {
@@ -506,7 +508,7 @@ function getEmployeesTimeManagementRecords(event_element) {
             toastr.clear(toast);
         },
         error: function () {
-            toastr.clear(toast);yfhjlybq 
+            toastr.clear(toast);
             toastr.error('Произошла ошибка');
         }
     });

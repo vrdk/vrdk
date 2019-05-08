@@ -52,9 +52,9 @@ namespace VRdkHRMsysBLL.Services
             return await _sickLeaveRepository.GetSickLeavesNumberAsync(searchKey, condition);
         }
 
-        public async Task<SickLeaveViewDTO[]> GetPageAsync(int pageNumber, int pageSize,string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
+        public async Task<SickLeaveViewDTO[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
         {
-            var reqs = await _sickLeaveRepository.GetPageAsync(pageNumber, pageSize, priorityStatus, searchKey, condition);
+            var reqs = await _sickLeaveRepository.GetPageAsync(pageNumber, pageSize, searchKey, condition);
             var requests = reqs != null ? reqs.Select(req => new SickLeaveViewDTO
             {
                EmployeeId = req.EmployeeId,

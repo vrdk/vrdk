@@ -1,72 +1,76 @@
 ﻿@model VRdkHRMsystem.Models.RequestViewModels.RequestVacationViewModel
-
-    <div class="profile__right">
-        <div class="profile__days vacrequest__days">
-            <div class="profile__block">
-                <p class="profile__daystitle profile__daystitle_border-none">Отпуск</p>
-                <div class="profile__vacdays_wrapper">
-                    <div>
-                        <p class="profile__vacdays_title">Оплачиваемый</p>
-                        <div class="profile__daysblock">
-                            <p class="profile__dayscount">@Model.PaidVacationResiduals</p>
-                            <p class="profile__days_word">Дн.</p>
-                            <p class="profile__days_leftword">Осталось</p>
-                        </div>
+@{
+    var groupName = Model.TeamId != null ? Model.TeamId : Model.OrganisationId;
+}
+<input id="group_name" value="@(groupName+"vacationsGroup")" hidden />
+<div class="profile__right">
+    <div class="profile__days vacrequest__days">
+        <div class="profile__block">
+            <p class="profile__daystitle profile__daystitle_border-none">Отпуск</p>
+            <div class="profile__vacdays_wrapper">
+                <div>
+                    <p class="profile__vacdays_title">Оплачиваемый</p>
+                    <div class="profile__daysblock">
+                        <p class="profile__dayscount">@Model.PaidVacationResiduals</p>
+                        <p class="profile__days_word">Дн.</p>
+                        <p class="profile__days_leftword">Осталось</p>
                     </div>
-                    <div>
-                        <p class="profile__vacdays_title">Неоплачиваемый</p>
-                        <div class="profile__daysblock">
-                            <p class="profile__dayscount">@Model.UnpaidVaccationResiduals</p>
-                            <p class="profile__days_word">Дн.</p>
-                            <p class="profile__days_leftword">Осталось</p>
-                        </div>
+                </div>
+                <div>
+                    <p class="profile__vacdays_title">Неоплачиваемый</p>
+                    <div class="profile__daysblock">
+                        <p class="profile__dayscount">@Model.UnpaidVaccationResiduals</p>
+                        <p class="profile__days_word">Дн.</p>
+                        <p class="profile__days_leftword">Осталось</p>
                     </div>
                 </div>
             </div>
         </div>
-        <form asp-action="RequestVacation" method="post" id="profile__request_form" class="vacrequest__request">
-            <p>Запрос на отпуск</p>
-            <div class="vacrequest__body">
-                <div class="vacrequest__body_left">
-                    <input asp-for="EmployeeId" hidden />
-                    <div class="vacrequest__block">
-                        <p>Тип отпуска</p>
-                        <div class="select">
-                            <select asp-for="VacationType" asp-items="Model.VacationTypes" class="input vacrequest__select"></select>
-                        </div>
-                    </div>
-                    <div class="vacrequest__block">
-                        <p>Комментарий</p>
-                        <textarea class="input" type="text"></textarea>
+    </div>
+    <form asp-action="RequestVacation" method="post" id="profile__request_form" class="vacrequest__request">
+        <p>Запрос на отпуск</p>
+        <div class="vacrequest__body">
+            <div class="vacrequest__body_left">
+                <input asp-for="EmployeeId" hidden />
+                <div class="vacrequest__block">
+                    <p>Тип отпуска</p>
+                    <div class="select">
+                        <select asp-for="VacationType" asp-items="Model.VacationTypes" class="input vacrequest__select"></select>
                     </div>
                 </div>
-                <div class="vacrequest__body_right">
-                    <div class="vacrequest__block">
-                        <p>От<span asp-validation-for="BeginDate" style="color: #ad545f; padding:0"></span></p>
-                        <input asp-for="BeginDate" class="input  date_picker_diff" type="text" id="from_datepicker" value="@null" autocomplete="off" />
-                    </div>
-                    <div class="vacrequest__block">
-                        <p>До<span asp-validation-for="EndDate" style="color: #ad545f; padding:0"></span></p>
-                        <input asp-for="EndDate" class="input date_picker_diff" type="text" id="to_datepicker" value="@null" autocomplete="off" />
-                    </div>
-                    <div class="vacrequest__block">
-                        <p>Длительность</p>
-                        <span asp-validation-for="Duration" style="color: #ad545f; padding:0"></span>
-                        <input asp-for="Duration" readonly id="Duration" class="input" />
-
-                    </div>
-                    <div class="vacrequest__button_wrapper">
-                        <button class="empprofile__button button back_button ripple" type="button">
-                            <img src="~/images/cancel.png" alt="cancel" />
-                            <p>Отменить</p>
-                        </button>
-                        <button class="empprofile__button button ripple" type="submit">
-                            <img src="~/images/plus.png" alt="submit" />
-                            <p>Готово</p>
-                        </button>
-                    </div>
+                <div class="vacrequest__block">
+                    <p>Комментарий</p>
+                    <textarea class="input" type="text"></textarea>
                 </div>
             </div>
-        </form>
-    </div>
-<script src="~/js/submit.js"></script>
+            <div class="vacrequest__body_right">
+                <div class="vacrequest__block">
+                    <p>От<span asp-validation-for="BeginDate" style="color: #ad545f; padding:0"></span></p>
+                    <input asp-for="BeginDate" class="input  date_picker_diff" type="text" id="from_datepicker" value="@null" autocomplete="off" />
+                </div>
+                <div class="vacrequest__block">
+                    <p>До<span asp-validation-for="EndDate" style="color: #ad545f; padding:0"></span></p>
+                    <input asp-for="EndDate" class="input date_picker_diff" type="text" id="to_datepicker" value="@null" autocomplete="off" />
+                </div>
+                <div class="vacrequest__block">
+                    <p>Длительность</p>
+                    <span asp-validation-for="Duration" style="color: #ad545f; padding:0"></span>
+                    <input asp-for="Duration" readonly id="Duration" class="input" />
+
+                </div>
+                <div class="vacrequest__button_wrapper">
+                    <button class="empprofile__button button back_button ripple" type="button">
+                        <img src="~/images/cancel.png" alt="cancel" />
+                        <p>Отменить</p>
+                    </button>
+                    <button class="empprofile__button button ripple" type="submit">
+                        <img src="~/images/plus.png" alt="submit" />
+                        <p>Готово</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/js/vacationRequest.js"></script>

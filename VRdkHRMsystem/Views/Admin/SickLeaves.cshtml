@@ -25,9 +25,10 @@
                         <p class="sicklist__duration">Длительность</p>
                         <p class="sicklist__info">Инфо</p>
                     </div>
-                    foreach (var item in Model.SickLeaves)
-                    {
-                        <div class="table__body_content sicklist__body_content">
+                    <div class="table__body_content sicklist__body_content">
+                        @foreach (var item in Model.SickLeaves)
+                        {
+
                             <div class="table__body_block">
                                 <p class="sicklist__name">@item.EmployeeFullName</p>
                                 <p class="sicklist__team">@item.TeamName</p>
@@ -57,23 +58,24 @@
                                     <p class="sicklist__duration">@(item.CloseDate == null ? (int)(DateTime.UtcNow.Date - item.CreateDate).TotalDays : item.Duration)</p>
                                 }
                                 <div class="sicklist__info">
-                                    <div class="profile__status_circle_sickleave_@item.RequestStatus">
+                                    <div class="sickleave_status_@item.RequestStatus">
                                         <div></div>
                                     </div>
                                     <a href="@Url.Action("EmployeeProfile", new { id = item.EmployeeId})"><img src="~/images/usertable.png" alt="users" style="margin:5px 2px 0px 5px;" /></a>
                                     <img src="~/images/pencil.png" class="sickleave__check_popup" alt="pencil" request-anchor="@item.SickLeaveId" />
                                 </div>
                             </div>
-                        </div>
-                    }
+
+                        }
+                    </div>
                 }
                 else
                 {
-                    <div class="table__body_content vaclist__body_content">
-                        <div class="table__body_block">
-                            <p class="vaclist__name">Нет записей</p>
-                        </div>
+                <div class="table__body_content vaclist__body_content">
+                    <div class="table__body_block">
+                        <p class="vaclist__name">Нет записей</p>
                     </div>
+                </div>
                 }
 
 

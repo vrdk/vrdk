@@ -16,6 +16,7 @@ using VRdkHRMsystem.Interfaces;
 using VRdkHRMsystem.Services;
 using System;
 using System.Globalization;
+using VRdkHRMsystem.Hubs;
 
 namespace VRdkHRMsystem
 {
@@ -43,7 +44,7 @@ namespace VRdkHRMsystem
 
             services.EnableSimpleInjectorCrossWiring(_container);
             services.UseSimpleInjectorAspNetRequestScoping(_container);
-
+            
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("vrdkdatabaseConnection")));
 
@@ -72,7 +73,7 @@ namespace VRdkHRMsystem
                 options.User.RequireUniqueEmail = true;
 
             });
- 
+            services.AddSignalR();
             services.AddScoped<IViewListMapper, ViewListMapper>();
             services.AddMvc();
         }
@@ -90,9 +91,14 @@ namespace VRdkHRMsystem
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
-
             app.UseAuthentication();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<VacationsListSyncHub>("/vacationListSyncHub");
+            });
+
+            app.UseStaticFiles();
 
             app.UseMvc(routes =>
             {
@@ -100,7 +106,7 @@ namespace VRdkHRMsystem
                     name: "default",
                     template: "{controller=Profile}/{action=Profile}/{id?}");
             });
-
+            
             _container.AutoCrossWireAspNetComponents(app);
             _container.RegisterMvcControllers(app);
             _container.RegisterMvcViewComponents(app);

@@ -3,7 +3,7 @@
     var photoBlobUrl = $"https://vrdkstorage.blob.core.windows.net/photos/";
     var timeStamp = DateTime.UtcNow;
 }
-<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal"  id="submit_form"  style="border-radius:10px;">
+<form asp-action="ProccessVacationRequest" method="post" class="box-modal vacmodal"  id="vac__submit_form"  style="border-radius:10px;">
     <div id="vacrequest">
         <input asp-for="VacationId" hidden />
         <input asp-for="VacationType" hidden />
@@ -80,4 +80,3 @@
         </div>
     </div>
 </form>
-<script src="~/js/submit.js"></script>

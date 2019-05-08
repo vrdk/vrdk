@@ -228,7 +228,7 @@ namespace VRdkHRMsystem.Controllers
             var team = await _teamService.GetByIdAsync(id);
             if (viewer != null && team != null)
             {
-                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);             
+                var employees = await _employeeService.GetAsync(emp => emp.OrganisationId == viewer.OrganisationId);
                 var teamMembers = team.Employees.Select(m => m.EmployeeId).ToArray();
                 var model = new EditTeamViewModel
                 {
@@ -425,7 +425,7 @@ namespace VRdkHRMsystem.Controllers
                 var user = await _userManager.FindByIdAsync(model.EmployeeId);
                 var oldEmail = user.Email;
                 user.UserName = model.WorkEmail;
-                user.Email = model.WorkEmail;            
+                user.Email = model.WorkEmail;
                 var roles = await _userManager.GetRolesAsync(user);
 
                 if (roles.Contains("Administrator") && model.Role != "Administrator")
@@ -433,11 +433,7 @@ namespace VRdkHRMsystem.Controllers
                     await _userManager.RemoveFromRolesAsync(user, roles);
                     await _userManager.AddToRoleAsync(user, model.Role);
                     await _userManager.UpdateAsync(user);
-
-                    if (User.Identity.Name == oldEmail)
-                    {
-                        await _signInManager.RefreshSignInAsync(user);
-                    }
+                    await _signInManager.RefreshSignInAsync(user);
                 }
                 else if (!roles.Contains(model.Role))
                 {
@@ -464,7 +460,7 @@ namespace VRdkHRMsystem.Controllers
                     {
                         await _signInManager.RefreshSignInAsync(user);
                     }
-                }                
+                }
 
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Absence.ToString()).ResidualBalance = model.AbsenceBalance;
                 employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Assignment.ToString()).ResidualBalance = model.AssignmentBalance;
@@ -503,7 +499,7 @@ namespace VRdkHRMsystem.Controllers
             if (ModelState.IsValid)
             {
                 var organisationId = _userManager.FindByNameAsync(User.Identity.Name).Result.OrganisationId;
-                var user = new ApplicationUser { UserName = model.WorkEmail, Email = model.WorkEmail, PhoneNumber = model.PhoneNumber, Id = Guid.NewGuid().ToString(), OrganisationId = organisationId, EmailConfirmed = true};
+                var user = new ApplicationUser { UserName = model.WorkEmail, Email = model.WorkEmail, PhoneNumber = model.PhoneNumber, Id = Guid.NewGuid().ToString(), OrganisationId = organisationId, EmailConfirmed = true };
                 var result = await _userManager.CreateAsync(user, Guid.NewGuid().ToString().ToUpper());
                 if (result.Succeeded)
                 {
@@ -552,7 +548,7 @@ namespace VRdkHRMsystem.Controllers
                     await _employeeService.CreateAsync(employee);
                     await _residualsService.CreateRangeAsync(residuals, true);
                     var passwordResetCode = await _userManager.GeneratePasswordResetTokenAsync(user);
-                    string callbackUrl = Url.Action("SetPassword", "Account", new { id = user.Id, resetCode = passwordResetCode}, Request.Scheme);
+                    string callbackUrl = Url.Action("SetPassword", "Account", new { id = user.Id, resetCode = passwordResetCode }, Request.Scheme);
                     await _emailSender.SendPasswordResetLink(model.WorkEmail, "", "Set password", "",
                         $"Чтобы перейти к форме изменения пароля, нажмите на ссылку: <a href='{callbackUrl}'>изменить пароль</a>");
 
@@ -581,7 +577,7 @@ namespace VRdkHRMsystem.Controllers
                 model.PaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Paid_vacation.ToString()).ResidualBalance;
                 model.UnpaidVacationBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Unpaid_vacation.ToString()).ResidualBalance;
                 model.SickLeaveBalance = employee.EmployeeBalanceResiduals.FirstOrDefault(r => r.Name == ResidualTypeEnum.Sick_leave.ToString()).ResidualBalance;
-                model.Role = role.Last();
+                model.Role = _listMapper.TranslateRole(role.Last());
                 model.Post = posts.FirstOrDefault(p => p.PostId == employee.PostId).Name;
             }
 
@@ -601,14 +597,14 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                vacations = await _vacationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, RequestStatusEnum.Proccessing.ToString(), searchKey,
-                                                                             req => (req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                             || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                vacations = await _vacationService.GetPageWithProccessingPriorityAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                             req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                             || req.RequestStatus != RequestStatusEnum.Pending.ToString()
                                                                              && req.Employee.OrganisationId == employee.OrganisationId
                                                                              && req.Employee.State);
                 count = await _vacationService.GetVacationsNumberAsync(searchKey,
-                                                                  req => (req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                  || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                                                                  req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                  || req.RequestStatus != RequestStatusEnum.Pending.ToString()
                                                                   && req.Employee.OrganisationId == employee.OrganisationId
                                                                   && req.Employee.State);
             }
@@ -618,6 +614,7 @@ namespace VRdkHRMsystem.Controllers
                 Count = count,
                 PageNumber = pageNumber,
                 PageSize = (int)PageSizeEnum.PageSize15,
+                SyncHubAnchor = employee.OrganisationId,
                 Vacations = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(vacations)
             };
 
@@ -633,14 +630,14 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                vacations = await _vacationService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, RequestStatusEnum.Proccessing.ToString(), searchKey,
-                                                                             req => (req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                             || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                vacations = await _vacationService.GetPageWithProccessingPriorityAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
+                                                                             req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                             || req.RequestStatus != RequestStatusEnum.Pending.ToString()
                                                                              && req.Employee.OrganisationId == employee.OrganisationId
                                                                              && req.Employee.State);
                 count = await _vacationService.GetVacationsNumberAsync(searchKey,
-                                                                  req => (req.Employee.Team.TeamleadId == employee.EmployeeId
-                                                                  || !req.RequestStatus.Equals(RequestStatusEnum.Pending.ToString()))
+                                                                  req => req.Employee.Team.TeamleadId == employee.EmployeeId
+                                                                  || req.RequestStatus != RequestStatusEnum.Pending.ToString()
                                                                   && req.Employee.OrganisationId == employee.OrganisationId
                                                                   && req.Employee.State);
             }
@@ -650,6 +647,7 @@ namespace VRdkHRMsystem.Controllers
                 Count = count,
                 PageNumber = pageNumber,
                 PageSize = (int)PageSizeEnum.PageSize15,
+                SyncHubAnchor = employee.OrganisationId,
                 Vacations = _mapHelper.MapCollection<VacationRequestViewDTO, VacationRequestViewModel>(vacations)
             };
 
@@ -662,7 +660,7 @@ namespace VRdkHRMsystem.Controllers
             var vacationRequest = await _vacationService.GetByIdWithEmployeeWithTeamAsync(id);
             if (vacationRequest != null)
             {
-                if(vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString())
+                if (vacationRequest.RequestStatus != RequestStatusEnum.Denied.ToString() && vacationRequest.RequestStatus != RequestStatusEnum.Approved.ToString())
                 {
                     var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
                     var model = _mapHelper.Map<VacationRequestDTO, VacationRequestProccessViewModel>(vacationRequest);
@@ -682,7 +680,7 @@ namespace VRdkHRMsystem.Controllers
 
                     return PartialView("VacationProccessModal", model);
                 }
-                else 
+                else
                 {
                     var proccessor = await _employeeService.GetByIdAsync(vacationRequest.ProccessedbyId);
                     var posts = await _postService.GetPostsByOrganisationIdAsync(vacationRequest.Employee.OrganisationId);
@@ -711,7 +709,7 @@ namespace VRdkHRMsystem.Controllers
                     }
 
                     return PartialView("VacationViewModal", model);
-                }                
+                }
             }
 
             return BadRequest();
@@ -776,6 +774,8 @@ namespace VRdkHRMsystem.Controllers
 
                         await _notificationService.CreateAsync(notification, true);
                     }
+
+                    return Ok(vacationRequest);
                 }
                 catch (DbUpdateConcurrencyException e)
                 {
@@ -783,7 +783,7 @@ namespace VRdkHRMsystem.Controllers
                 }
             }
 
-            return RedirectToAction("Vacations", "Admin");
+            return BadRequest();
         }
 
         [HttpGet]
@@ -798,13 +798,13 @@ namespace VRdkHRMsystem.Controllers
                 model.EmployeeFullName = $"{vacationRequest.Employee.FirstName} {vacationRequest.Employee.LastName}";
                 model.VacationType = vacationRequest.VacationType;
                 model.Post = posts.FirstOrDefault(p => p.PostId == vacationRequest.Employee.PostId).Name;
-                if(proccessor!= null)
+                if (proccessor != null)
                 {
                     model.ProccessedByName = $"{proccessor.FirstName} {proccessor.LastName}";
                 }
                 else
                 {
-                    model.ProccessedByName ="Данные отсутствуют";
+                    model.ProccessedByName = "Данные отсутствуют";
                 }
                 model.RequestStatus = vacationRequest.RequestStatus;
                 if (vacationRequest.Employee.Team != null)
@@ -933,7 +933,7 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
                                                                   req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
                 count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
             }
@@ -958,7 +958,7 @@ namespace VRdkHRMsystem.Controllers
             var employee = await _employeeService.GetByEmailAsync(User.Identity.Name);
             if (employee != null)
             {
-                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, null, searchKey,
+                sickLeaves = await _sickLeaveService.GetPageAsync(pageNumber, (int)PageSizeEnum.PageSize15, searchKey,
                                                                   req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
                 count = await _sickLeaveService.GetSickLeavesNumber(searchKey, req => req.Employee.OrganisationId == employee.OrganisationId && req.Employee.State);
             }

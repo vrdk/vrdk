@@ -1,5 +1,6 @@
 $(document).ready(function () { $(function () { $("#vacrequestmodal__from_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#vacrequestmodal__to_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#tripaddmodal__from_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#tripaddmodal__to_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#tripeditmodal__from_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#tripeditmodal__to_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#empprofileedit__datepicker__birthDate").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#from_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#to_datepicker").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#empprofileedit__datepicker__hireDate").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }), $("#empprofileedit__datepicker__dismissalDate").datepicker({ dayNamesMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"], dateFormat: 'dd.mm.yy', monthNames: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], firstDay: 1 }); }), window.onload = function () { !function () { let e = document.getElementsByClassName("profile__tab"), a = document.getElementsByClassName("profile__tab_post"); for (let t = 0; t < e.length; t++)e[t].addEventListener("click", function (i) { i.preventDefault(); for (let t = 0; t < e.length; t++)e[t].classList.remove("profile__tab_active"), a[t].classList.remove("profile__tab_postactive"); e[t].classList.add("profile__tab_active"), a[t].classList.add("profile__tab_postactive"); }); }(); }; });
 $(document).ready(function () {
+    closePreloader();
     $("#empprofileedit__datepicker__birthDate").mask('00.00.0000');
     $("#empprofileedit__datepicker__hireDate").mask('00.00.0000');
     $("#empprofileedit__datepicker__dismissalDate").mask('00.00.0000');
@@ -90,13 +91,11 @@ $(document).ready(function () {
             data: data,
             success: function (searchResultHtml) {
                 $('.listsection').replaceWith(searchResultHtml);
-
-                toastr.close(toast);
+                toastr.clear(toast);
             },
             error: function () {
-
                 toastr.error('Не удалось выполнить поиск');
-                toastr.close(toast);
+                toastr.clear(toast);
             }
         });
     });
@@ -120,25 +119,7 @@ $(document).ready(function () {
     $("#check_photo").on('click', function () {
         viewPhoto(this);
     });    
-    $('.content').on('submit', '#profile__request_form', function (event) {
-        event.preventDefault();
-        var toast = toastr.info('Создание заявки...');
-        var form = $(this);
-        var data = form.serializeArray();
-        $.ajax({
-            method: "POST",
-            url: form.attr('action'),
-            data: data,
-            success: function () {
-                toastr.clear(toast);
-                toastr.success('Заявка создана');
-            },
-            error: function () {
-                toastr.clear(toast);
-                toastr.error('Не удалось создать заявку');
-            }
-        });
-    });
+    
     $('body').on('submit', '#profile__edit_form', function (event) {
         event.preventDefault();
         var form = $(this);
@@ -158,6 +139,31 @@ $(document).ready(function () {
             }
         });
     });
+    $('.content').on('submit', '#profile__request_form', function (event) {
+        event.preventDefault();
+        var submitButton = $('button[type="submit"]');
+        submitButton.prop('disabled', true);
+        var toast = toastr.info('Создание заявки...');
+        var form = $(this);
+        var data = form.serializeArray();
+        $.ajax({
+            method: "POST",
+            url: form.attr('action'),
+            data: data,
+            success: function (vacationRequest) {
+                form[0].reset();
+                toastr.clear(toast);
+                submitButton.prop('disabled', false);
+                toastr.success('Заявка создана');
+            },
+            error: function () {
+                toastr.clear(toast);
+                submitButton.prop('disabled', false);
+                toastr.error('Не удалось создать заявку');
+            }
+        });
+    });
+
 
     ligthMenuItem();
 });
@@ -273,7 +279,7 @@ function checkVacationRequest(requestAnchorHolder) {
             id: target.attr('request-anchor')
         },
         success: function (modal_html) {
-            $('#modal_place').empty();
+            $('#modal_place').empty();  
             $('#request_modal').modal();
             $('#modal_place').html(modal_html);
             toastr.clear(toast);

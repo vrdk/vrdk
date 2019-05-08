@@ -26,9 +26,10 @@
                         <p class="emplist__passes">Прогулы</p>
                         <p class="emplist__info">Инфо</p>
                     </div>
-                    foreach (var employee in Model.Employees)
-                    {
-                        <div class="table__body_content emplist__body_content">
+                    <div class="table__body_content emplist__body_content">
+                        @foreach (var employee in Model.Employees)
+                        {
+
                             <div class="table__body_block" style="min-width:800px">
                                 <p class="emplist__name">@employee.FirstName @employee.LastName</p>
                                 <p class="emplist__payvac">@employee.TeamName</p>
@@ -42,8 +43,9 @@
                                     <a href="@Url.Action("TeamProfile", "Teamlead", new { id = employee.TeamId })"><img src="~/images/users.png" alt="users" /></a>
                                 </p>
                             </div>
-                        </div>
-                    }
+
+                        }
+                    </div>
                 }
                 else
                 {

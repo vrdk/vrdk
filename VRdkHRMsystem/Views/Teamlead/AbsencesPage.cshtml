@@ -22,9 +22,10 @@
                     <p class="passlist__date">Дата</p>
                     <p class="passlist__info">Инфо</p>
                 </div>
-                @foreach (var absence in Model.Absences)
-                {
-                    <div class="table__body_content">
+                <div class="table__body_content">
+                    @foreach (var absence in Model.Absences)
+                    {
+
                         <div class="table__body_block passlist__body_title">
                             <p class="passlist__name">@absence.FullEmployeeName</p>
                             <p class="passlist__team">@(absence.TeamName != null ? absence.TeamName : "Нет")</p>
@@ -33,8 +34,9 @@
                                 <a href="@Url.Action("EmployeeProfile", new { id = absence.EmployeeId })"><img src="~/images/usertable.png" alt="pencil" /></a>
                             </p>
                         </div>
-                    </div>
-                }
+
+                    }
+                </div>
             }
             else
             {

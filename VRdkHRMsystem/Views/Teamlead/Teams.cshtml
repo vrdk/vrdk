@@ -22,9 +22,10 @@
                         <p class="teamlist__count">Кол-во сотрудников</p>
                         <p class="teamlist__info">Инфо</p>
                     </div>
-                    foreach (var team in Model.Teams)
-                    {
-                        <div class="table__body_content teamlist__body_content">
+                    <div class="table__body_content teamlist__body_content">
+                        @foreach (var team in Model.Teams)
+                        {
+
                             <div class="table__body_block">
                                 <p class="teamlist__name">@team.Name</p>
                                 <p class="teamlist__leader">@team.TeamleadName</p>
@@ -34,8 +35,9 @@
                                 </p>
                             </div>
 
-                        </div>
-                    }
+
+                        }
+                    </div>
                 }
                 else
                 {

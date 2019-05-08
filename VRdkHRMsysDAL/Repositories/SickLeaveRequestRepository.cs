@@ -41,7 +41,7 @@ namespace VRdkHRMsysDAL.Repositories
 
         }
 
-        public async Task<SickLeaveRequest[]> GetPageAsync(int pageNumber, int pageSize, string priorityStatus, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
+        public async Task<SickLeaveRequest[]> GetPageAsync(int pageNumber, int pageSize, string searchKey = null, Expression<Func<SickLeaveRequest, bool>> condition = null)
         {
             if (searchKey == null)
             {

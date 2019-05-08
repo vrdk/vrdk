@@ -28,9 +28,10 @@
                     <p class="assignmentlist__duration">Длительность</p>
                     <p class="assignmentlist__info">Инфо</p>
                 </div>
-                foreach (var item in Model.Assignments)
-                {
-                    <div class="table__body_content assignmentlist__body_content">
+                <div class="table__body_content assignmentlist__body_content">
+                    @foreach (var item in Model.Assignments)
+                    {
+
                         <div class="table__body_block">
                             <p class="assignmentlist__name">@item.Name</p>
                             <p class="assignmentlist__countmembers">@item.EmployeesCount</p>
@@ -41,8 +42,8 @@
                                 <img src="~/images/penciltable.png" alt="pencil" onclick="editAssignment('@item.AssignmentId')" style="cursor:pointer" />
                             </p>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             }
             else
             {

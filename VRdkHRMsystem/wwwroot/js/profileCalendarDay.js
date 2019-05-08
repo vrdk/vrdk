@@ -12,7 +12,7 @@
             var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
             var date = data.find(x => x.name === 'DayOffDate').value.split('T')[0].split('-');
             var parsedDate = date[2] + "." + date[1] + "." + date[0];
-            toastr.info('Подтверждение желаемого выходного', parsedDate);   
+            var toast = toastr.info('Подтверждение желаемого выходного', parsedDate);   
             modal = $("#request_modal");
             modal.modal('hide');
             $.ajax({
@@ -27,10 +27,11 @@
                         position: 'right',
                         theme: 'tooltipster-light'
                     });         
-
+                    toastr.clear(toast);
                     toastr.success('Желаемый выходной подтверждён', parsedDate);   
                 },
                 error: function () {
+                    toastr.clear(toast);
                     toastr.error('Произошла ошибка', parsedDate);
                 }
             });
@@ -47,7 +48,7 @@
             var employee_anchor = data.find(x => x.name === 'EmployeeId').value;
             var date = data.find(x => x.name === 'DayOffDate').value.split('T')[0].split('-');
             var parsedDate = date[2] + "." + date[1] + "." + date[0];
-            toastr.info('Внесение изменений', parsedDate);  
+            var toast = toastr.info('Внесение изменений', parsedDate);  
             modal = $("#request_modal");
             modal.modal('hide');
             $.ajax({
@@ -59,6 +60,7 @@
                         var current_cell = $(".calendar__block[employee-anchor='" + employee_anchor + "'][date-anchor='" + parsedDate + "']");
                         current_cell.removeClass('calendar__block_dayoffgreen calendar__block_dayoffyellow calendar__block_dayoffred calendar__block_moon');
                         current_cell.tooltipster('destroy');
+                        toastr.clear(toast);
                         toastr.success('Изменения внесены', parsedDate);
                     }
                     else {
@@ -78,11 +80,12 @@
                                 theme: 'tooltipster-light'
                             });
                         }
-
+                        toastr.clear(toast);
                         toastr.success('Изменения внесены', parsedDate);
                     }
                 },
                 error: function () {
+                    toastr.clear(toast);
                     toastr.error('Произошла ошибка', parsedDate);
                 }
             });

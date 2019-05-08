@@ -8,6 +8,8 @@ namespace VRdkHRMsystem.Models.RequestViewModels
     public class RequestVacationViewModel
     {        
         public string EmployeeId { get; set; }
+        public string OrganisationId { get; set; }
+        public string TeamId { get; set; }
         [Required]
         public string VacationType { get; set; }
         public IEnumerable<SelectListItem> VacationTypes { get; set; }

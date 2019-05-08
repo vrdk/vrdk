@@ -3236,7 +3236,7 @@ header {
     border-bottom: 1px solid #eef0f8
 }
 
-.profile__status_circle_Approved {
+.vacation_status_Approved {
     width: 12px;
     height: 12px;
     background: #d1f5e1;
@@ -3253,7 +3253,7 @@ header {
     position: relative
 }
 
-    .profile__status_circle_Approved div {
+    .vacation_status_Approved div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6135,7 +6135,7 @@ label.sickmessage__ulpoad_label img {
     height: 40px
 }
 
-.profile__status_circle_Denied {
+.vacation_status_Denied {
     width: 12px;
     height: 12px;
     background: #CBA1A1;
@@ -6151,7 +6151,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_Denied div {
+    .vacation_status_Denied div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6163,7 +6163,7 @@ label.sickmessage__ulpoad_label img {
         transform: translate(-50%, -50%)
     }
 
-.profile__status_circle_sickleave_Denied {
+.sickleave_status_Denied {
     width: 12px;
     height: 12px;
     background: #CBA1A1;
@@ -6179,7 +6179,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_sickleave_Denied div {
+    .sickleave_status_Denied div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6191,7 +6191,7 @@ label.sickmessage__ulpoad_label img {
         transform: translate(-50%, -50%)
     }
 
-.profile__status_circle_Proccessing {
+.vacation_status_Proccessing {
     width: 12px;
     height: 12px;
     background: #98E3F2;
@@ -6208,7 +6208,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_Proccessing div {
+    .vacation_status_Proccessing div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6220,7 +6220,7 @@ label.sickmessage__ulpoad_label img {
         transform: translate(-50%, -50%)
     }
 
-.profile__status_circle_sickleave_Approved {
+.sickleave_status_Approved {
     width: 12px;
     height: 12px;
     background: #98E3F2;
@@ -6237,7 +6237,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_sickleave_Approved div {
+    .sickleave_status_Approved div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6249,7 +6249,7 @@ label.sickmessage__ulpoad_label img {
         transform: translate(-50%, -50%)
     }
 
-.profile__status_circle_Pending {
+.vacation_status_Pending {
     width: 12px;
     height: 12px;
     background: #EDEDED;
@@ -6266,7 +6266,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_Pending div {
+    .vacation_status_Pending div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6278,7 +6278,7 @@ label.sickmessage__ulpoad_label img {
         transform: translate(-50%, -50%)
     }
 
-.profile__status_circle_sickleave_Pending {
+.sickleave_status_Pending {
     width: 12px;
     height: 12px;
     background: #EDEDED;
@@ -6295,7 +6295,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_sickleave_Pending div {
+    .sickleave_status_Pending div {
         position: absolute;
         width: 50%;
         height: 50%;
@@ -6335,7 +6335,7 @@ label.sickmessage__ulpoad_label img {
         left: -10px
     }
 
-.profile__status_circle_sickleave_Closed {
+.sickleave_status_Closed {
     width: 12px;
     height: 12px;
     background: #d1f5e1;
@@ -6352,7 +6352,7 @@ label.sickmessage__ulpoad_label img {
     position: relative
 }
 
-    .profile__status_circle_sickleave_Closed div {
+    .sickleave_status_Closed div {
         position: absolute;
         width: 50%;
         height: 50%;

@@ -186,11 +186,13 @@ namespace VRdkHRMsystem.Controllers
                     var teamlead = await _employeeService.GetByIdAsync(employee.Team.TeamleadId);
                     model.ProfileModel.Team = employee.Team.Name;
                     model.ProfileModel.Teamlead = $"{teamlead.FirstName} {teamlead.LastName}";
+                    model.RequestVacationModel.TeamId = employee.TeamId;
                 }
                 else
                 {
                     model.ProfileModel.Team = EmptyValue;
                     model.ProfileModel.Teamlead = EmptyValue;
+                    model.RequestVacationModel.OrganisationId = employee.OrganisationId;
                 }
             }
 
@@ -226,11 +228,13 @@ namespace VRdkHRMsystem.Controllers
                     vacationRequest.RequestStatus = RequestStatusEnum.Proccessing.ToString();
                 }
                 vacationRequest.VacationId = Guid.NewGuid().ToString();
-                vacationRequest.CreateDate = DateTime.UtcNow.Date;
+                vacationRequest.CreateDate = DateTime.UtcNow;
                 await _vacationService.CreateAsync(vacationRequest, true);
+
+                return Ok(vacationRequest);
             }
 
-            return RedirectToAction("Profile", "Profile", new { id = model.EmployeeId });
+            return BadRequest();
         }
 
         [HttpGet]

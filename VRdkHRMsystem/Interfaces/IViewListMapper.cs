@@ -12,5 +12,6 @@ namespace VRdkHRMsystem.Interfaces
         SelectListItem[] CreateStateList(string userState = null);
         SelectListItem[] CreateSelectedEmployeesList(EmployeeDTO[] employees, string[] selectedEmployees);
         SelectListItem[] CreateTeamList(TeamDTO[] teams, string currentId);
+        string TranslateRole(string role);
     }
 }

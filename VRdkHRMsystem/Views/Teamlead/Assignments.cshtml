@@ -24,9 +24,9 @@
                         <p class="assignmentlist__duration">Длительность</p>
                         <p class="assignmentlist__info">Инфо</p>
                     </div>
-                    foreach (var item in Model.Assignments)
-                    {
-                        <div class="table__body_content assignmentlist__body_content">
+                    <div class="table__body_content assignmentlist__body_content">
+                        @foreach (var item in Model.Assignments)
+                        {
                             <div class="table__body_block">
                                 <p class="assignmentlist__name">@item.Name</p>
                                 <p class="assignmentlist__countmembers">@item.EmployeesCount</p>
@@ -34,8 +34,9 @@
                                 <p class="assignmentlist__duration">@item.Duration</p>
                                 <p class="assignmentlist__info"><img src="~/images/users.png" alt="pencil" onclick="checkAssignment('@item.AssignmentId')" /></p>
                             </div>
-                        </div>
-                    }
+
+                        }
+                    </div>
                 }
                 else
                 {

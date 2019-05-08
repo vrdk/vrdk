@@ -26,7 +26,7 @@ namespace VRdkHRMsysDAL.Contexts
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=tcp:vrdksqlserver.database.windows.net,1433;Initial catalog=vrdkdatabase;Persist Security Info=False;User ID=vrdk;Password=V20r21dk9899;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;");
+                optionsBuilder.UseSqlServer();
             }
         }
 

@@ -320,7 +320,7 @@ namespace VRdkHRMsystem.Controllers
 
             return View(model);
         }
-
+       
         [AllowAnonymous]
         public async Task<IActionResult> SetPassword(string id, string resetCode = null)
         {
@@ -357,7 +357,7 @@ namespace VRdkHRMsystem.Controllers
                 await _emailSender.SendPasswordResetLink(workEmail, "", "Set password", "",
                     $"Чтобы перейти к форме изменения пароля, нажмите на ссылку: <a href='{callbackUrl}'>изменить пароль</a>");
 
-                return Redirect("https://youtube.com");
+                return Redirect("https://vrdkmanageapp.azurewebsites.net");
             }
 
             return Redirect("https://v-rdk.com");

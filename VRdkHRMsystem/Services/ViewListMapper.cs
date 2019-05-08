@@ -31,7 +31,27 @@ namespace VRdkHRMsystem.Services
         {
             return posts.Select(post => new SelectListItem() { Text = post.Name, Value = post.PostId, Selected = post.PostId == editUserPost }).ToArray();
         }
-
+        public string TranslateRole(string role)
+        {
+            switch (role){
+                case "Administrator":
+                    {
+                        return "Администратор";
+                    }
+                case "Teamlead":
+                    {
+                        return "Руководитель";
+                    }
+                case "Employee":
+                    {
+                        return "Работник";
+                    }
+                default:
+                    {
+                        return "Неизвестно";
+                    }
+            }
+        }
         public SelectListItem[] CreateRolesList(string editUserRole = null)
         {
             var roles = new Role[] {
