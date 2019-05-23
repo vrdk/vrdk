@@ -18,13 +18,14 @@ $(window).on('focus', function () {
 connection = new signalR.HubConnectionBuilder().withUrl("/vacationListSyncHub").build();
 connection.start({ waitForPageLoad: false }).then(() => {
     signalRConnected = true;
+    connection.invoke('AddToGroup', groupAnchor);
 }).catch(function (err) {
     toastr.error('Не удалось синхронизировать страницу');
     console.error(err.toString());
 });
 connection.on('VacationRequestProccessed', function (proccessedVacationRequest) {
     changeStatus(proccessedVacationRequest);
-    if (proccessedVacationRequest.requestStatuqs === 'Approved') {
+    if (proccessedVacationRequest.requestStatus === 'Approved') {
         changeBalance(proccessedVacationRequest);
     }
 });
@@ -63,7 +64,7 @@ $('.modal-dialog').on('submit', '#vac__submit_form', function (event) {
                 connection.invoke('SyncVacationLists', groupAnchor, vacRequest).catch(function (err) {
                     return console.error(err.toString());
                 });
-            }
+            }   
             toastr.clear(toast);
             toastr.success('Заявка обработана');
         },
@@ -73,15 +74,9 @@ $('.modal-dialog').on('submit', '#vac__submit_form', function (event) {
         }
     });
 });
-function createTableRequestForm(request) {
-    var tableContent = $(document.createElement('div'));
-    tableContent.attr('request-anchor', request.vacationId);
-    tableContent.append('<div>1</div>');
-    console.log(tableContent);
-}
 function changeStatus(vacationRequest) {
     let status = $('div[request-anchor="' + vacationRequest.vacationId + '"] div.vaclist__info div[class*="vacation_status_"]');
-    if (status.length !== 0) {
+    if (status.length !== 0) {     
         status.removeClass().addClass('vacation_status_' + vacationRequest.requestStatus);
         return true;
     }
